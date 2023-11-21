@@ -92,8 +92,19 @@ namespace UltRenderer {
             tga.write(reinterpret_cast<const char *>(&pixelDepth), sizeof(pixelDepth));
             tga.write(reinterpret_cast<const char *>(&imageDescriptor), sizeof(imageDescriptor));
 
+            // RGB to BGR
+            std::vector<std::uint8_t> reorderedData = _data;
+            if (FORMAT != GRAY) {
+                // Alpha channel remains the same
+                for (std::size_t pixelIdx = 0; pixelIdx < _data.size() / FORMAT; pixelIdx++) {
+                    for (std::size_t channelIdx = 0; channelIdx < 3; channelIdx++) {
+                        reorderedData[pixelIdx * FORMAT + channelIdx] = _data[pixelIdx * FORMAT + 2 - channelIdx];
+                    }
+                }
+            }
+
             // Write data
-            tga.write(reinterpret_cast<const char *>(_data.data()), _data.size());
+            tga.write(reinterpret_cast<const char *>(reorderedData.data()), reorderedData.size());
             if (!tga.good()) {
                 std::cerr << "Error occurs when writing to: " << filename << std::endl;
                 return false;
