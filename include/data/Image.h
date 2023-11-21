@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cassert>
 
 namespace UltRenderer {
     namespace Data {
@@ -33,6 +34,9 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         std::array<std::size_t, FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
+            assert(w < _width);
+            assert(h < _height);
+
             std::array<std::size_t, FORMAT> color;
 
             for (std::size_t idx = 0; idx < FORMAT; idx++) {
@@ -42,6 +46,9 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         void Image<FORMAT>::set(std::size_t w, std::size_t h, const std::array<std::size_t, FORMAT> &color) {
+            assert(w < _width);
+            assert(h < _height);
+
             for (std::size_t idx = 0; idx < FORMAT; idx++) {
                 _data[(h * _width + w) * FORMAT + idx] = color[idx];
             }
