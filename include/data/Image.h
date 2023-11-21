@@ -10,7 +10,6 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include "utils/Color.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -31,6 +30,22 @@ namespace UltRenderer {
             std::array<std::size_t, FORMAT> get(std::size_t w, std::size_t h);
             bool save(const std::string& filename);
         };
+
+        template<ImageFormat FORMAT>
+        std::array<std::size_t, FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
+            std::array<std::size_t, FORMAT> color;
+
+            for (std::size_t idx = 0; idx < FORMAT; idx++) {
+                color[idx] = _data[(h * _width + w) * FORMAT + idx];
+            }
+        }
+
+        template<ImageFormat FORMAT>
+        void Image<FORMAT>::set(std::size_t w, std::size_t h, const std::array<std::size_t, FORMAT> &color) {
+            for (std::size_t idx = 0; idx < FORMAT; idx++) {
+                _data[(h * _width + w) * FORMAT + idx] = color[idx];
+            }
+        }
 
         template<ImageFormat FORMAT>
         bool Image<FORMAT>::save(const std::string &filename) {
