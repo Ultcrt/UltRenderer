@@ -19,6 +19,9 @@ namespace UltRenderer {
         };
 
         template<ImageFormat FORMAT>
+        using Pixel = std::array<std::uint8_t, FORMAT>;
+
+        template<ImageFormat FORMAT>
         class Image {
         private:
             std::vector<std::uint8_t> _data;
@@ -27,30 +30,32 @@ namespace UltRenderer {
 
         public:
             Image(std::size_t w, std::size_t h);
-            void set(std::size_t w, std::size_t h, const std::array<std::size_t, FORMAT>& color);
-            std::array<std::size_t, FORMAT> get(std::size_t w, std::size_t h);
+            void set(std::size_t w, std::size_t h, const Pixel<FORMAT>& pixel);
+            Pixel<FORMAT> get(std::size_t w, std::size_t h);
             bool save(const std::string& filename);
         };
 
         template<ImageFormat FORMAT>
-        std::array<std::size_t, FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
+        Pixel<FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
             assert(w < _width);
             assert(h < _height);
 
-            std::array<std::size_t, FORMAT> color;
+            Pixel<FORMAT> pixel;
 
             for (std::size_t idx = 0; idx < FORMAT; idx++) {
-                color[idx] = _data[(h * _width + w) * FORMAT + idx];
+                pixel[idx] = _data[(h * _width + w) * FORMAT + idx];
             }
+
+            return pixel;
         }
 
         template<ImageFormat FORMAT>
-        void Image<FORMAT>::set(std::size_t w, std::size_t h, const std::array<std::size_t, FORMAT> &color) {
+        void Image<FORMAT>::set(std::size_t w, std::size_t h, const Pixel<FORMAT> &pixel) {
             assert(w < _width);
             assert(h < _height);
 
             for (std::size_t idx = 0; idx < FORMAT; idx++) {
-                _data[(h * _width + w) * FORMAT + idx] = color[idx];
+                _data[(h * _width + w) * FORMAT + idx] = pixel[idx];
             }
         }
 
@@ -111,7 +116,7 @@ namespace UltRenderer {
             }
 
             // Write data
-            tga.write(reinterpret_cast<const char *>(reorderedData.data()), reorderedData.size());
+            tga.write(reinterpret_cast<const char *>(reorderedData.data()), static_cast<long>(reorderedData.size()));
             if (!tga.good()) {
                 std::cerr << "Error occurs when writing to: " << filename << std::endl;
                 return false;
