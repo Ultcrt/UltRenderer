@@ -11,6 +11,8 @@ add_executable(UltRenderer src/main.cpp
         include/data/Image.h
         src/data/Image.cpp
         src/rasterization/Rasterization.cpp
-        include/rendering/Rasterization.h)
+        include/rendering/Rasterization.h
+        src/data/Matrix.cpp
+        include/data/Matrix.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
