@@ -12,6 +12,8 @@ add_executable(UltRenderer src/main.cpp
         src/data/Image.cpp
         src/rasterization/Rasterization.cpp
         include/rendering/Rasterization.h
+        src/data/TriangleMesh.cpp
+        include/data/TriangleMesh.h
         src/data/Matrix.cpp
         include/data/Matrix.h)
 
