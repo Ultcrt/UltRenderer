@@ -23,9 +23,19 @@ namespace UltRenderer {
             Matrix();
             explicit Matrix(const std::array<T, M * N>& data);
 
+            Matrix(T x, T y);
+
+            Matrix(T x, T y, T z);
+
+            Matrix(T x, T y, T z, T w);
+
             T& operator()(std::size_t rowIdx, std::size_t colIdx);
 
+            T operator()(std::size_t rowIdx, std::size_t colIdx) const;
+
             T& operator[](std::size_t idx);
+
+            T operator[](std::size_t idx) const;
 
             [[nodiscard]] std::pair<std::size_t, std::size_t> shape() const;
 
@@ -49,7 +59,76 @@ namespace UltRenderer {
             T& z();
 
             T& w();
+
+            T x() const;
+
+            T y() const;
+
+            T z() const;
+
+            T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>::Matrix(T x, T y, T z, T w) {
+            static_assert(M * N > 3);
+            _data[0] = x;
+            _data[1] = y;
+            _data[2] = z;
+            _data[3] = w;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>::Matrix(T x, T y, T z) {
+            static_assert(M * N > 2);
+            _data[0] = x;
+            _data[1] = y;
+            _data[2] = z;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>::Matrix(T x, T y) {
+            static_assert(M * N > 1);
+            _data[0] = x;
+            _data[1] = y;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::x() const {
+            static_assert(M * N > 0);
+            return _data[0];
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::y() const {
+            static_assert(M * N > 1);
+            return _data[1];
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::z() const {
+            static_assert(M * N > 2);
+            return _data[2];
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::w() const {
+            static_assert(M * N > 3);
+            return _data[3];
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::operator()(std::size_t rowIdx, std::size_t colIdx) const {
+            assert(rowIdx < M);
+            assert(colIdx < N);
+            return _data[N * rowIdx + colIdx];
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::operator[](std::size_t idx) const {
+            assert(idx < _data.size());
+            return _data[idx];
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::x() {

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>
+#include "data/Matrix.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -19,7 +20,7 @@ namespace UltRenderer {
         };
 
         template<ImageFormat FORMAT>
-        using Pixel = std::array<std::uint8_t, FORMAT>;
+        using Pixel = Matrix<std::uint8_t, FORMAT, 1>;
 
         template<ImageFormat FORMAT>
         class Image {
