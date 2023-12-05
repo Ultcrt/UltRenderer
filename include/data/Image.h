@@ -11,6 +11,9 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>
+#include <cstdint>
+#include <exception>
+#include <format>
 #include "data/Matrix.h"
 
 namespace UltRenderer {
@@ -64,8 +67,7 @@ namespace UltRenderer {
         bool Image<FORMAT>::save(const std::string &filename) {
             std::ofstream tga(filename, std::ios::binary);
             if (!tga.is_open()) {
-                std::cerr << "Cannot open file: " << filename << std::endl;
-                return false;
+                throw std::runtime_error(std::format("Cannot open file: {}", filename));
             }
 
             // Image ID is optional, ignored here
@@ -119,14 +121,12 @@ namespace UltRenderer {
             // Write data
             tga.write(reinterpret_cast<const char *>(reorderedData.data()), static_cast<long>(reorderedData.size()));
             if (!tga.good()) {
-                std::cerr << "Error occurs when writing to: " << filename << std::endl;
-                return false;
+                throw std::runtime_error(std::format("Error occurs when writing to: {}", filename));
             }
 
             tga.close();
             if (tga.is_open()) {
-                std::cerr << "Cannot close file: " << filename << std::endl;
-                return false;
+                throw std::runtime_error(std::format("Cannot close file: {}", filename));
             }
 
             return true;
