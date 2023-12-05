@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <exception>
 #include <format>
+#include <limits>
 #include "data/Matrix.h"
 
 namespace UltRenderer {
@@ -23,12 +24,12 @@ namespace UltRenderer {
         };
 
         template<ImageFormat FORMAT>
-        using Pixel = Matrix<std::uint8_t, FORMAT, 1>;
+        using Pixel = Matrix<double, FORMAT, 1>;
 
         template<ImageFormat FORMAT>
         class Image {
         private:
-            std::vector<std::uint8_t> _data;
+            std::vector<double> _data;
             std::size_t               _width;
             std::size_t               _height;
 
@@ -108,7 +109,10 @@ namespace UltRenderer {
             tga.write(reinterpret_cast<const char *>(&imageDescriptor), sizeof(imageDescriptor));
 
             // RGB to BGR
-            std::vector<std::uint8_t> reorderedData = _data;
+            std::vector<std::uint8_t> reorderedData;
+            for (const auto& unit: _data) {
+                reorderedData.emplace_back(std::min(1.0, unit) * std::numeric_limits<std::uint8_t>::max());
+            }
             if (FORMAT != GRAY) {
                 // Alpha channel remains the same
                 for (std::size_t pixelIdx = 0; pixelIdx < _data.size() / FORMAT; pixelIdx++) {
