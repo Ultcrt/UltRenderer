@@ -48,6 +48,8 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator*(int target) const;
 
+            Matrix<T, M, N> operator/(int target) const;
+
             Matrix<T, M, N> operator-(const Matrix<T, M, N>& target) const;
 
             Matrix<T, M, N> operator-() const;
@@ -68,6 +70,15 @@ namespace UltRenderer {
 
             T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> Matrix<T, M, N>::operator/(int target) const {
+            Matrix<T, M, N> res;
+            for (std::size_t idx = 0; idx < M * N; idx++) {
+                res._data[idx] = _data[idx] / target;
+            }
+            return res;
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(T x, T y, T z, T w) {
@@ -242,10 +253,12 @@ namespace UltRenderer {
         typedef Vector3<int> Vector3I;
         typedef Vector3<double> Vector3D;
         typedef Vector3<float> Vector3F;
+        typedef Vector3<std::size_t> Vector3S;
 
         typedef Vector2<int> Vector2I;
         typedef Vector2<double> Vector2D;
         typedef Vector2<float> Vector2F;
+        typedef Vector2<std::size_t> Vector2S;
     } // UltRenderer
 } // Data
 
