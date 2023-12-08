@@ -5,6 +5,7 @@
 #ifndef ULTRENDERER_MATRIX_H
 #define ULTRENDERER_MATRIX_H
 
+#include <string>
 #include <array>
 #include <cassert>
 
@@ -36,6 +37,8 @@ namespace UltRenderer {
             T& operator[](std::size_t idx);
 
             T operator[](std::size_t idx) const;
+
+            explicit operator std::string() const;
 
             [[nodiscard]] std::pair<std::size_t, std::size_t> shape() const;
 
@@ -77,6 +80,19 @@ namespace UltRenderer {
 
             T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>::operator std::string() const {
+            std::string res;
+
+            for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
+                for (std::size_t colIdx = 0; colIdx < N; colIdx++) {
+                    res += std::to_string(_data[N * rowIdx + colIdx]) + ", ";
+                }
+                res += "\n";
+            }
+            return res;
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         bool Matrix<T, M, N>::operator==(const Matrix<T, M, N> &target) {
