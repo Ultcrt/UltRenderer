@@ -20,7 +20,7 @@ namespace UltRenderer {
             std::array<T, M * N> _data;
 
         public:
-            Matrix();
+            explicit Matrix(const T& fill=T());
             explicit Matrix(const std::array<T, M * N>& data);
 
             Matrix(T x, T y);
@@ -38,6 +38,8 @@ namespace UltRenderer {
             T operator[](std::size_t idx) const;
 
             [[nodiscard]] std::pair<std::size_t, std::size_t> shape() const;
+
+            bool operator==(const Matrix<T, M, N>& target);
 
             // TT is short for target-type
             template<typename TT>
@@ -75,6 +77,16 @@ namespace UltRenderer {
 
             T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        bool Matrix<T, M, N>::operator==(const Matrix<T, M, N> &target) {
+            for (std::size_t idx = 0; idx < M * N; idx++) {
+                if (_data[idx] == target._data[idx]) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         template<typename TT>
@@ -228,8 +240,8 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix() {
-            _data.fill(0);
+        Matrix<T, M, N>::Matrix(const T& fill) {
+            _data.fill(fill);
         }
 
         template<typename T, std::size_t M, std::size_t N>
