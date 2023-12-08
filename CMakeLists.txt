@@ -15,6 +15,8 @@ add_executable(UltRenderer src/main.cpp
         src/data/TriangleMesh.cpp
         include/data/TriangleMesh.h
         src/data/Matrix.cpp
-        include/data/Matrix.h)
+        include/data/Matrix.h
+        include/utils/String.h
+        src/utils/String.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
