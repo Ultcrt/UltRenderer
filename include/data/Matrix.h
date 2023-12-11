@@ -42,7 +42,9 @@ namespace UltRenderer {
 
             [[nodiscard]] std::pair<std::size_t, std::size_t> shape() const;
 
-            bool operator==(const Matrix<T, M, N>& target);
+            bool operator==(const Matrix<T, M, N>& target) const;
+
+            bool operator!=(const Matrix<T, M, N>& target) const;
 
             // TT is short for target-type
             template<typename TT>
@@ -112,13 +114,18 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        bool Matrix<T, M, N>::operator==(const Matrix<T, M, N> &target) {
+        bool Matrix<T, M, N>::operator==(const Matrix<T, M, N> &target) const {
             for (std::size_t idx = 0; idx < M * N; idx++) {
-                if (_data[idx] == target._data[idx]) {
+                if (_data[idx] != target._data[idx]) {
                     return false;
                 }
             }
             return true;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        bool Matrix<T, M, N>::operator!=(const Matrix<T, M, N> &target) const {
+            return !operator==(target);
         }
 
         template<typename T, std::size_t M, std::size_t N>
