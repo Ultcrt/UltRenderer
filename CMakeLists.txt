@@ -17,6 +17,8 @@ add_executable(UltRenderer src/main.cpp
         src/data/Matrix.cpp
         include/data/Matrix.h
         include/utils/String.h
-        src/utils/String.cpp)
+        src/utils/String.cpp
+        src/utils/Hash.cpp
+        include/utils/Hash.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
