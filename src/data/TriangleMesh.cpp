@@ -2,7 +2,7 @@
 // Created by ultcrt on 23-11-23.
 //
 
-#include <set>
+#include <unordered_set>
 #include <fstream>
 #include <exception>
 #include <format>
@@ -11,6 +11,7 @@
 #include <sstream>
 #include "data/TriangleMesh.h"
 #include "utils/String.h"
+#include "utils/Hash.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -23,13 +24,13 @@ namespace UltRenderer {
             }
 
             // Index in f starts at 1, so we can use index 0 as default value when index is not defined
-            std::vector<Vector3D>  vList = {{0, 0, 0}};
-            std::vector<Vector3D> vtList = {{0, 0, 0}};
-            std::vector<Vector3D> vnList = {{0, 0, 0}};
-            std::vector<Vector3D> vpList = {{0, 0, 0}};
+            std::vector<Vector3D>     vList = {{0, 0, 0}};
+            std::vector<Vector3D> colorList = {defaultColor};
+            std::vector<Vector3D>    vtList = {{0, 0, 0}};
+            std::vector<Vector3D>    vnList = {{0, 0, 0}};
+            std::vector<Vector3D>    vpList = {{0, 0, 0}};
 
             std::vector<std::array<Vector3S, 3>> fList;
-            std::set<std::string> fSet;
 
             std::string line;
             std::size_t lineIdx = 0;
@@ -53,30 +54,41 @@ namespace UltRenderer {
 
                         switch (vertexParams.size()) {
                             default:
-                                std::cerr << std::format("Warning: Unexpected number of vertex params at line {}", lineIdx);
+                                throw std::runtime_error(std::format("Warning: Unexpected number of vertex params at line {}", lineIdx));
                                 break;
                             case 3:
-                                _vertices.emplace_back(vertexParams[0], vertexParams[1], vertexParams[2]);
-                                _vertexColors.emplace_back(defaultColor);
+                                vList.emplace_back(vertexParams[0], vertexParams[1], vertexParams[2]);
                                 break;
                             case 4:
                                 if (vertexParams[3] == 0) {
-                                    std::cerr << std::format("Warning: w param of vertex line is zero at line {}", lineIdx);
+                                    throw std::runtime_error(std::format("Warning: w param of vertex line is zero at line {}", lineIdx));
                                 }
                                 else {
-                                    _vertices.emplace_back(Vector3D(vertexParams[0], vertexParams[1], vertexParams[2]) / vertexParams[3]);
-                                    _vertexColors.emplace_back(defaultColor);
+                                    vList.emplace_back(Vector3D(vertexParams[0], vertexParams[1], vertexParams[2]) / vertexParams[3]);
                                 }
                                 break;
                             case 6:
-                                _vertices.emplace_back(vertexParams[0], vertexParams[1], vertexParams[2]);
-                                _vertexColors.emplace_back(vertexParams[1], vertexParams[2], vertexParams[3]);
+                                vList.emplace_back(vertexParams[0], vertexParams[1], vertexParams[2]);
+                                colorList.emplace_back(vertexParams[1], vertexParams[2], vertexParams[3]);
                                 break;
                         }
                     }
                     else if (command == "vt") {
-                        // TODO Implement texture parser
-                        continue;
+                        std::vector<double> textureParams;
+                        for (const auto& param: params) {
+                            textureParams.emplace_back(std::stod(param));
+                        }
+
+                        if (!textureParams.empty() && textureParams.size() < 4) {
+                            Vector3D textureVec;
+                            for (std::size_t idx = 0; idx < textureParams.size(); idx++) {
+                                textureVec[idx] = textureParams[idx];
+                            }
+                            vtList.emplace_back(textureVec);
+                        }
+                        else {
+                            throw std::runtime_error(std::format("Warning: Unexpected number of texture params at line {}", lineIdx));
+                        }
                     }
                     else if (command == "vn") {
                         std::vector<double> normalParams;
@@ -88,12 +100,25 @@ namespace UltRenderer {
                             _normals.emplace_back(normalParams[0], normalParams[1], normalParams[2]);
                         }
                         else {
-                            std::cerr << std::format("Warning: Unexpected number of normal params at line {}", lineIdx);
+                            throw std::runtime_error(std::format("Warning: Unexpected number of normal params at line {}", lineIdx));
                         }
                     }
                     else if (command == "vp") {
-                        // TODO Implement parameter parser
-                        continue;
+                        std::vector<double> vpParams;
+                        for (const auto& param: params) {
+                            vpParams.emplace_back(std::stod(param));
+                        }
+
+                        if (vpParams.size() == 3) {
+                            Vector3D vpVec;
+                            for (std::size_t idx = 0; idx < vpParams.size(); idx++) {
+                                vpVec[idx] = vpParams[idx];
+                            }
+                            vpList.emplace_back(vpVec);
+                        }
+                        else {
+                            throw std::runtime_error(std::format("Warning: Unexpected number of parameter space params at line {}", lineIdx));
+                        }
                     }
                     else if (command == "f") {
                         // Split with /
@@ -115,25 +140,31 @@ namespace UltRenderer {
                                         }
                                     }
                                     faceParams[paramIdx] = indices;
-                                    fSet.insert(std::string(indices));
                                 }
                                 else {
-                                    std::cerr << std::format("Warning: Unexpected number of face params at line {}", lineIdx);
+                                    throw std::runtime_error(std::format("Warning: Unexpected number of face params at line {}", lineIdx));
                                 }
                             }
+                            fList.emplace_back(faceParams);
                         }
                         else {
-                            std::cerr << std::format("Warning: Unexpected number of face params at line {}", lineIdx);
+                            throw std::runtime_error(std::format("Warning: Unexpected number of face params at line {}", lineIdx));
                         }
                     }
                     else {
-                        std::cerr << std::format("Warning: Unknown command '{}' at line {}", line[0], lineIdx);
+                        throw std::runtime_error(std::format("Warning: Unknown command '{}' at line {}", line[0], lineIdx));
                     }
                 }
                 lineIdx++;
             }
 
-
+            const std::size_t bucketSize = 2 * fList.size();
+            std::unordered_set<Vector3S, Utils::SpatialHash3D<std::size_t>> fSet(bucketSize, Utils::SpatialHash3D<std::size_t>(bucketSize));
+            for (const auto& f: fList) {
+                for (const auto& idxGroup: f) {
+                    fSet.insert(idxGroup);
+                }
+            }
         }
     } // UltRenderer
 } // Data
