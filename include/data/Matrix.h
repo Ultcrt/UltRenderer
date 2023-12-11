@@ -81,6 +81,23 @@ namespace UltRenderer {
             T w() const;
         };
 
+        // Tips: Use using instead of typedef when creating alias of a template
+        template<typename T>
+        using Vector3 = Matrix<T, 3, 1>;
+
+        template<typename T>
+        using Vector2 = Matrix<T, 2, 1>;
+
+        typedef Vector3<int> Vector3I;
+        typedef Vector3<double> Vector3D;
+        typedef Vector3<float> Vector3F;
+        typedef Vector3<std::size_t> Vector3S;
+
+        typedef Vector2<int> Vector2I;
+        typedef Vector2<double> Vector2D;
+        typedef Vector2<float> Vector2F;
+        typedef Vector2<std::size_t> Vector2S;
+
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::operator std::string() const {
             std::string res;
@@ -279,23 +296,6 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(const std::array<T, M * N> &data): _data(data) {}
-
-        // Tips: Use using instead of typedef when creating alias of a template
-        template<typename T>
-        using Vector3 = Matrix<T, 3, 1>;
-
-        template<typename T>
-        using Vector2 = Matrix<T, 2, 1>;
-
-        typedef Vector3<int> Vector3I;
-        typedef Vector3<double> Vector3D;
-        typedef Vector3<float> Vector3F;
-        typedef Vector3<std::size_t> Vector3S;
-
-        typedef Vector2<int> Vector2I;
-        typedef Vector2<double> Vector2D;
-        typedef Vector2<float> Vector2F;
-        typedef Vector2<std::size_t> Vector2S;
     } // UltRenderer
 } // Data
 
