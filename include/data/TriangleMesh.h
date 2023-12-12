@@ -15,8 +15,8 @@ namespace UltRenderer {
         class TriangleMesh {
         private:
             std::vector<Vector3D> _vertices;
-            std::vector<Vector3D> _normals;
-            std::vector<Vector3S> _indices;
+            std::vector<Vector3D> _vertexNormals;
+            std::vector<Vector3S> _triangles;
             std::vector<Vector3D> _vertexColors;
             std::vector<Vector3D> _vertexTextures;
 
