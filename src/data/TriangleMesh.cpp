@@ -15,7 +15,7 @@
 
 namespace UltRenderer {
     namespace Data {
-        TriangleMesh::TriangleMesh(const std::vector<Vector3D> &vertices, const std::vector<Vector3S> &indices, const Vector3D& defaultColor): _vertices(vertices), _triangles(indices), _vertexColors(vertices.size(), defaultColor) {}
+        TriangleMesh::TriangleMesh(const std::vector<Vector3D> &vertices, const std::vector<Vector3S> &indices, const Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor) {}
 
         TriangleMesh::TriangleMesh(const std::string &filename, const Vector3D& defaultColor) {
             std::ifstream loader(filename);
@@ -102,7 +102,7 @@ namespace UltRenderer {
                         }
 
                         if (normalParams.size() == 3) {
-                            _vertexNormals.emplace_back(normalParams[0], normalParams[1], normalParams[2]);
+                            vertexNormals.emplace_back(normalParams[0], normalParams[1], normalParams[2]);
                         }
                         else {
                             throw std::runtime_error(std::format("Unexpected number of normal params at line {}", lineIdx));
@@ -188,22 +188,22 @@ namespace UltRenderer {
             }
 
             // Convert to OpenGL-like vertex
-            _vertices.resize(fMap.size());
-            _vertexColors.resize(fMap.size());
-            _vertexTextures.resize(fMap.size());
-            _vertexNormals.resize(fMap.size());
+            vertices.resize(fMap.size());
+            vertexColors.resize(fMap.size());
+            vertexTextures.resize(fMap.size());
+            vertexNormals.resize(fMap.size());
             for (const auto& item: fMap) {
                 const auto & key = item.first;
                 const auto & val = item.second;
-                _vertices[val] = vList[key[0]];
-                _vertexColors[val] = colorList[key[0]];
-                _vertexTextures[val] = vtList[key[1]];
-                _vertexNormals[val] = vnList[key[2]];
+                vertices[val] = vList[key[0]];
+                vertexColors[val] = colorList[key[0]];
+                vertexTextures[val] = vtList[key[1]];
+                vertexNormals[val] = vnList[key[2]];
             }
 
             // Create triangles
             for (const auto& f: fList) {
-                _triangles.emplace_back(fMap[f[0]], fMap[f[1]], fMap[f[2]]);
+                triangles.emplace_back(fMap[f[0]], fMap[f[1]], fMap[f[2]]);
             }
         }
     } // UltRenderer

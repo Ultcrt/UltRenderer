@@ -13,14 +13,13 @@ namespace UltRenderer {
     namespace Data {
 
         class TriangleMesh {
-        private:
-            std::vector<Vector3D> _vertices;
-            std::vector<Vector3D> _vertexNormals;
-            std::vector<Vector3S> _triangles;
-            std::vector<Vector3D> _vertexColors;
-            std::vector<Vector3D> _vertexTextures;
-
         public:
+            std::vector<Vector3D> vertices;
+            std::vector<Vector3D> vertexNormals;
+            std::vector<Vector3S> triangles;
+            std::vector<Vector3D> vertexColors;
+            std::vector<Vector3D> vertexTextures;
+
             TriangleMesh(const std::vector<Vector3D>& vertices, const std::vector<Vector3S>& indices, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
         };
