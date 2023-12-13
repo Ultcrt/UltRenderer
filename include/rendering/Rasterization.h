@@ -82,7 +82,7 @@ namespace UltRenderer {
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
                                      const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
-                Line(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
+                Line<FORMAT>(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
         }
     } // UltRenderer
