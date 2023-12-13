@@ -34,12 +34,46 @@ namespace UltRenderer {
             std::size_t         _height;
 
         public:
+            void fill(const Pixel<FORMAT>& filledPixel);
             Image(std::size_t w, std::size_t h);
+            Image(std::size_t w, std::size_t h, const Pixel<FORMAT>& filledPixel);
             void set(std::size_t w, std::size_t h, const Pixel<FORMAT>& pixel);
             Pixel<FORMAT> get(std::size_t w, std::size_t h);
-            bool save(const std::string& filename);
+            void save(const std::string& filename);
             [[nodiscard]] Vector2S shape() const;
         };
+
+        template<ImageFormat FORMAT>
+        void Image<FORMAT>::fill(const Pixel<FORMAT> &filledPixel) {
+            // Check all channels of filledPixel is the same or not.
+            bool sameChannelValue = true;
+            double channelValue = filledPixel[0];
+            for (auto iter = filledPixel.begin() + 1; iter != filledPixel.end(); iter++) {
+                if (channelValue != *iter) {
+                    sameChannelValue = false;
+                    break;
+                }
+            }
+
+            if (sameChannelValue) {
+                // All channel are the same, can use std::fill
+                std::fill(_data.begin(), _data.end(), filledPixel[0]);
+            }
+            else {
+                for (std::size_t w = 0; w < _width; w++) {
+                    for (std::size_t h = 0; h < _height; h++) {
+                        for (std::size_t idx = 0; idx < FORMAT; idx++) {
+                            _data[(h * _width + w) * FORMAT + idx] = filledPixel[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        template<ImageFormat FORMAT>
+        Image<FORMAT>::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel): _data(h * w * FORMAT), _width(w), _height(h) {
+            fill(filledPixel);
+        }
 
         template<ImageFormat FORMAT>
         Vector2S Image<FORMAT>::shape() const {
@@ -71,7 +105,7 @@ namespace UltRenderer {
         }
 
         template<ImageFormat FORMAT>
-        bool Image<FORMAT>::save(const std::string &filename) {
+        void Image<FORMAT>::save(const std::string &filename) {
             std::ofstream tga(filename, std::ios::binary);
             if (!tga.is_open()) {
                 throw std::runtime_error(std::format("Cannot open file: {}", filename));
@@ -138,8 +172,6 @@ namespace UltRenderer {
             if (tga.is_open()) {
                 throw std::runtime_error(std::format("Cannot close file: {}", filename));
             }
-
-            return true;
         }
 
         template<ImageFormat FORMAT>
