@@ -5,13 +5,21 @@
 #ifndef ULTRENDERER_RASTERIZATION_H
 #define ULTRENDERER_RASTERIZATION_H
 
+#include "data/Matrix.h"
 #include "data/Image.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterization {
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image<FORMAT>& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel) {
+            void Line(UltRenderer::Data::Image<FORMAT>& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+
+            template<UltRenderer::Data::ImageFormat FORMAT>
+            void Line(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+
+            template<UltRenderer::Data::ImageFormat FORMAT>
+            void Line(UltRenderer::Data::Image<FORMAT> &img, std::size_t x0, std::size_t y0, std::size_t x1,
+                                std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(x0) - static_cast<double>(x1)));
                 const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(y0) - static_cast<double>(y1)));
 
@@ -20,7 +28,7 @@ namespace UltRenderer {
 
                 std::size_t samples, longOrigin, shortOrigin;
                 std::size_t step;
-                bool shortIsIncreasing = true;
+                bool shortIsIncreasing;
                 if (xIsLonger) {
                     samples = dX;
                     if (x0 <= x1) {
@@ -69,6 +77,12 @@ namespace UltRenderer {
 
                     error += static_cast<long long>(step);
                 }
+            }
+
+            template<UltRenderer::Data::ImageFormat FORMAT>
+            void Line(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
+                                     const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+                Line(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
         }
     } // UltRenderer
