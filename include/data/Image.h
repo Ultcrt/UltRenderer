@@ -30,15 +30,21 @@ namespace UltRenderer {
         class Image {
         private:
             std::vector<double> _data;
-            std::size_t               _width;
-            std::size_t               _height;
+            std::size_t         _width;
+            std::size_t         _height;
 
         public:
             Image(std::size_t w, std::size_t h);
             void set(std::size_t w, std::size_t h, const Pixel<FORMAT>& pixel);
             Pixel<FORMAT> get(std::size_t w, std::size_t h);
             bool save(const std::string& filename);
+            [[nodiscard]] Vector2S shape() const;
         };
+
+        template<ImageFormat FORMAT>
+        Vector2S Image<FORMAT>::shape() const {
+            return {_height, _width};
+        }
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
