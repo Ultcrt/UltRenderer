@@ -15,6 +15,7 @@
 #include <exception>
 #include <format>
 #include <limits>
+#include <algorithm>
 #include "data/Matrix.h"
 
 namespace UltRenderer {
@@ -148,17 +149,16 @@ namespace UltRenderer {
             tga.write(reinterpret_cast<const char *>(&pixelDepth), sizeof(pixelDepth));
             tga.write(reinterpret_cast<const char *>(&imageDescriptor), sizeof(imageDescriptor));
 
-            // RGB to BGR
             std::vector<std::uint8_t> reorderedData;
+            // Clamp raw data to [0, 1] and rescale to [0, 255]
             for (const auto& unit: _data) {
-                reorderedData.emplace_back(std::min(1.0, unit) * std::numeric_limits<std::uint8_t>::max());
+                reorderedData.emplace_back(std::clamp(unit, 0., 1.) * std::numeric_limits<std::uint8_t>::max());
             }
+            // RGB to BGR
             if (FORMAT != GRAY) {
-                // Alpha channel remains the same
+                // Alpha channel is already filled, only need to reverse RGB
                 for (std::size_t pixelIdx = 0; pixelIdx < _data.size() / FORMAT; pixelIdx++) {
-                    for (std::size_t channelIdx = 0; channelIdx < 3; channelIdx++) {
-                        reorderedData[pixelIdx * FORMAT + channelIdx] = _data[pixelIdx * FORMAT + 2 - channelIdx];
-                    }
+                    std::swap(reorderedData[pixelIdx * FORMAT], reorderedData[pixelIdx * FORMAT + 2]);
                 }
             }
 
