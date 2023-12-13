@@ -66,6 +66,14 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator-() const;
 
+            [[nodiscard]] std::array<T, M * N>::const_iterator begin() const;
+
+            [[nodiscard]] std::array<T, M * N>::const_iterator end() const;
+
+            [[nodiscard]] std::array<T, M * N>::iterator begin();
+
+            [[nodiscard]] std::array<T, M * N>::iterator end();
+
             T& x();
 
             T& y();
@@ -82,6 +90,26 @@ namespace UltRenderer {
 
             T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::array<T, M * N>::iterator Matrix<T, M, N>::end() {
+            return _data.end();
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::array<T, M * N>::iterator Matrix<T, M, N>::begin() {
+            return _data.begin();
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::array<T, M * N>::const_iterator Matrix<T, M, N>::end() const {
+            return _data.end();
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::array<T, M * N>::const_iterator Matrix<T, M, N>::begin() const {
+            return _data.begin();
+        }
 
         // Tips: Use using instead of typedef when creating alias of a template
         template<typename T>
