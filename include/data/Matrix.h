@@ -40,7 +40,7 @@ namespace UltRenderer {
 
             explicit operator std::string() const;
 
-            [[nodiscard]] std::pair<std::size_t, std::size_t> shape() const;
+            [[nodiscard]] Matrix<std::size_t, 2, 1> shape() const;
 
             bool operator==(const Matrix<T, M, N>& target) const;
 
@@ -231,7 +231,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        std::pair<std::size_t, std::size_t> Matrix<T, M, N>::shape() const {
+        Matrix<std::size_t, 2, 1> Matrix<T, M, N>::shape() const {
             return {M, N};
         }
 
