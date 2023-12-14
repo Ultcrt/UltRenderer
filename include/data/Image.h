@@ -20,16 +20,21 @@
 
 namespace UltRenderer {
     namespace Data {
-        enum ImageFormat {
+        enum class ImageFormat: std::size_t {
             GRAY = 1, RGB = 3, RGBA = 4
         };
 
+        enum class ImageDirection: std::size_t {
+            HORIZONTAL = 1, VERTICAL = 2
+        };
+
         template<ImageFormat FORMAT>
-        using Pixel = Matrix<double, FORMAT, 1>;
+        using Pixel = Matrix<double, static_cast<std::size_t>(FORMAT), 1>;
 
         template<ImageFormat FORMAT>
         class Image {
         private:
+            const std::size_t   _format = static_cast<std::size_t>(FORMAT);
             std::vector<double> _data;
             std::size_t         _width;
             std::size_t         _height;
@@ -42,7 +47,28 @@ namespace UltRenderer {
             Pixel<FORMAT> get(std::size_t w, std::size_t h);
             void save(const std::string& filename);
             [[nodiscard]] Vector2S shape() const;
+            void flip(ImageDirection direction);
         };
+
+        template<ImageFormat FORMAT>
+        void Image<FORMAT>::flip(ImageDirection direction) {
+            std::vector<double> newData(_data.size());
+
+            for (std::size_t w = 0; w < _width; w++) {
+                for (std::size_t h = 0; h < _height; h++) {
+                    for (std::size_t idx = 0; idx < _format; idx++) {
+                        if (direction == ImageDirection::HORIZONTAL) {
+                            newData[(h * _width + w) * _format + idx] = _data[((_height - h - 1) * _width + w) * _format + idx];
+                        }
+                        else {
+                            newData[(h * _width + w) * _format + idx] = _data[(h * _width + (_width - w - 1)) * _format + idx];
+                        }
+                    }
+                }
+            }
+
+            _data = newData;
+        }
 
         template<ImageFormat FORMAT>
         void Image<FORMAT>::fill(const Pixel<FORMAT> &filledPixel) {
@@ -63,8 +89,8 @@ namespace UltRenderer {
             else {
                 for (std::size_t w = 0; w < _width; w++) {
                     for (std::size_t h = 0; h < _height; h++) {
-                        for (std::size_t idx = 0; idx < FORMAT; idx++) {
-                            _data[(h * _width + w) * FORMAT + idx] = filledPixel[idx];
+                        for (std::size_t idx = 0; idx < _format; idx++) {
+                            _data[(h * _width + w) * _format + idx] = filledPixel[idx];
                         }
                     }
                 }
@@ -72,7 +98,7 @@ namespace UltRenderer {
         }
 
         template<ImageFormat FORMAT>
-        Image<FORMAT>::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel): _data(h * w * FORMAT), _width(w), _height(h) {
+        Image<FORMAT>::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel): _data(h * w * _format), _width(w), _height(h) {
             fill(filledPixel);
         }
 
@@ -88,8 +114,8 @@ namespace UltRenderer {
 
             Pixel<FORMAT> pixel;
 
-            for (std::size_t idx = 0; idx < FORMAT; idx++) {
-                pixel[idx] = _data[(h * _width + w) * FORMAT + idx];
+            for (std::size_t idx = 0; idx < _format; idx++) {
+                pixel[idx] = _data[(h * _width + w) * _format + idx];
             }
 
             return pixel;
@@ -100,8 +126,8 @@ namespace UltRenderer {
             assert(w < _width);
             assert(h < _height);
 
-            for (std::size_t idx = 0; idx < FORMAT; idx++) {
-                _data[(h * _width + w) * FORMAT + idx] = pixel[idx];
+            for (std::size_t idx = 0; idx < _format; idx++) {
+                _data[(h * _width + w) * _format + idx] = pixel[idx];
             }
         }
 
@@ -117,7 +143,7 @@ namespace UltRenderer {
             // Has no color map
             std::uint8_t colorMapType = 0;
             // Gray or not
-            std::uint8_t imageType    = FORMAT == GRAY ? 3 : 2;
+            std::uint8_t imageType    = FORMAT == ImageFormat::GRAY ? 3 : 2;
 
             // Has no color map, set related headers to 0
             std::uint16_t firstColorMapEntryIdx = 0;
@@ -131,7 +157,7 @@ namespace UltRenderer {
             std::uint16_t width           = _width;
             std::uint16_t height          = _height;
             // Bytes number * 8
-            std::uint8_t  pixelDepth      = FORMAT << 3;
+            std::uint8_t  pixelDepth      = _format << 3;
             // Top-left order
             std::uint8_t  imageDescriptor = 0x20;
 
@@ -155,10 +181,10 @@ namespace UltRenderer {
                 reorderedData.emplace_back(std::clamp(unit, 0., 1.) * std::numeric_limits<std::uint8_t>::max());
             }
             // RGB to BGR
-            if (FORMAT != GRAY) {
+            if (FORMAT != ImageFormat::GRAY) {
                 // Alpha channel is already filled, only need to reverse RGB
-                for (std::size_t pixelIdx = 0; pixelIdx < _data.size() / FORMAT; pixelIdx++) {
-                    std::swap(reorderedData[pixelIdx * FORMAT], reorderedData[pixelIdx * FORMAT + 2]);
+                for (std::size_t pixelIdx = 0; pixelIdx < _data.size() / _format; pixelIdx++) {
+                    std::swap(reorderedData[pixelIdx * _format], reorderedData[pixelIdx * _format + 2]);
                 }
             }
 
@@ -176,11 +202,11 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         Image<FORMAT>::Image(std::size_t w, std::size_t h):
-        _data(h * w * FORMAT), _width(w), _height(h) {}
+        _data(h * w * _format), _width(w), _height(h) {}
 
-        typedef Image<GRAY> GrayImage;
-        typedef Image<RGB>  RGBImage;
-        typedef Image<RGBA> RGBAImage;
+        typedef Image<ImageFormat::GRAY> GrayImage;
+        typedef Image<ImageFormat::RGB>  RGBImage;
+        typedef Image<ImageFormat::RGBA> RGBAImage;
     } // UltRenderer
 } // Data
 
