@@ -3,7 +3,7 @@ project(UltRenderer)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(UltRenderer src/main.cpp
+add_executable(UltRenderer src/Main.cpp
         src/data/Image.cpp
         include/data/Image.h
         src/data/Image.cpp
