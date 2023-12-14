@@ -8,6 +8,7 @@
 #include <string>
 #include <array>
 #include <cassert>
+#include <cmath>
 
 namespace UltRenderer {
     namespace Data {
@@ -66,6 +67,20 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator-() const;
 
+            template<typename TT>
+            Matrix<T, 3, 1> cross(const Matrix<TT, 3, 1>& target) const;
+
+            template<typename TT>
+            T dot(const Matrix<TT, M, N>& target) const;
+
+            [[nodiscard]] T norm() const;
+
+            [[nodiscard]] T norm2() const;
+
+            void normalize();
+
+            [[nodiscard]] Matrix<T, M, N> normalized() const;
+
             [[nodiscard]] std::array<T, M * N>::const_iterator begin() const;
 
             [[nodiscard]] std::array<T, M * N>::const_iterator end() const;
@@ -82,14 +97,92 @@ namespace UltRenderer {
 
             T& w();
 
-            T x() const;
+            [[nodiscard]] T x() const;
 
-            T y() const;
+            [[nodiscard]] T y() const;
 
-            T z() const;
+            [[nodiscard]] T z() const;
 
-            T w() const;
+            [[nodiscard]] T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N, typename TT>
+        Matrix<T, M, N> operator*(TT target, const Matrix<T, M, N>& source) {
+            return source * target;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::norm2() const {
+            T sum = 0;
+            for (const T& component: _data) {
+                sum += component * component;
+            }
+            return sum;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::norm() const {
+            return std::sqrt(norm2());
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        void Matrix<T, M, N>::normalize() {
+            T len = norm();
+            for (std::size_t idx = 0; idx < M * N; idx++) {
+                _data[idx] = _data[idx] / len;
+            }
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> Matrix<T, M, N>::normalized() const {
+            Matrix<T, M, N> res = *this;
+            res.normalize();
+            return res;
+        }
+
+        // Tips: Use using instead of typedef when creating alias of a template
+        template<typename T>
+        using Vector3 = Matrix<T, 3, 1>;
+
+        template<typename T>
+        using Vector2 = Matrix<T, 2, 1>;
+
+        typedef Vector3<int> Vector3I;
+        typedef Vector3<double> Vector3D;
+        typedef Vector3<float> Vector3F;
+        typedef Vector3<std::size_t> Vector3S;
+
+        typedef Vector2<int> Vector2I;
+        typedef Vector2<double> Vector2D;
+        typedef Vector2<float> Vector2F;
+        typedef Vector2<std::size_t> Vector2S;
+
+        template<typename T, std::size_t M, std::size_t N>
+        template<typename TT>
+        T Matrix<T, M, N>::dot(const Matrix<TT, M, N> &target) const {
+            // TODO: Need to add assert prompt
+            static_assert(M == 1 || N == 1);
+
+            T res = 0;
+            for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
+                for (std::size_t colIdx = 0; colIdx < N; colIdx++) {
+                    res += _data[N * rowIdx + colIdx] * target._data[N * rowIdx + colIdx];
+                }
+            }
+            return res;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        template<typename TT>
+        Matrix<T, 3, 1> Matrix<T, M, N>::cross(const Matrix<TT, 3, 1> &target) const {
+            static_assert(M * N == 3);
+
+            return {
+                y() * target.z() - z() * target.y(),
+                z() * target.x() - x() * target.z(),
+                x() * target.y() - y() * target.x()
+            };
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         std::array<T, M * N>::iterator Matrix<T, M, N>::end() {
@@ -110,23 +203,6 @@ namespace UltRenderer {
         std::array<T, M * N>::const_iterator Matrix<T, M, N>::begin() const {
             return _data.begin();
         }
-
-        // Tips: Use using instead of typedef when creating alias of a template
-        template<typename T>
-        using Vector3 = Matrix<T, 3, 1>;
-
-        template<typename T>
-        using Vector2 = Matrix<T, 2, 1>;
-
-        typedef Vector3<int> Vector3I;
-        typedef Vector3<double> Vector3D;
-        typedef Vector3<float> Vector3F;
-        typedef Vector3<std::size_t> Vector3S;
-
-        typedef Vector2<int> Vector2I;
-        typedef Vector2<double> Vector2D;
-        typedef Vector2<float> Vector2F;
-        typedef Vector2<std::size_t> Vector2S;
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::operator std::string() const {
