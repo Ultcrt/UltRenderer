@@ -120,15 +120,15 @@ namespace UltRenderer {
                         const std::size_t xIdx02 = std::lround(static_cast<double>(points[0].x()) + step02 * static_cast<double>(idx));
                         Line<FORMAT>(img, xIdx01, yIdx, xIdx02, yIdx, pixel);
                     }
-
-                    if (points[1].y() < points[2].y()) {
-                        double step12 = (static_cast<double>(points[1].x()) - static_cast<double>(points[2].x())) / (static_cast<double>(points[1].y()) - static_cast<double>(points[2].y()));
-                        for (std::size_t idx = 0; idx < points[2].y() - points[1].y(); idx++) {
-                            const std::size_t yIdx = points[1].y() + idx;
-                            const std::size_t xIdx12 = std::lround(static_cast<double>(points[1].x()) + step12 * static_cast<double>(idx));
-                            const std::size_t xIdx02 = std::lround(static_cast<double>(points[0].x()) + step02 * static_cast<double>(yIdx - points[0].y()));
-                            Line<FORMAT>(img, xIdx12, yIdx, xIdx02, yIdx, pixel);
-                        }
+                }
+                if (points[1].y() < points[2].y()) {
+                    double step02 = (static_cast<double>(points[0].x()) - static_cast<double>(points[2].x())) / (static_cast<double>(points[0].y()) - static_cast<double>(points[2].y()));
+                    double step12 = (static_cast<double>(points[1].x()) - static_cast<double>(points[2].x())) / (static_cast<double>(points[1].y()) - static_cast<double>(points[2].y()));
+                    for (std::size_t idx = 0; idx < points[2].y() - points[1].y(); idx++) {
+                        const std::size_t yIdx = points[1].y() + idx;
+                        const std::size_t xIdx12 = std::lround(static_cast<double>(points[1].x()) + step12 * static_cast<double>(idx));
+                        const std::size_t xIdx02 = std::lround(static_cast<double>(points[0].x()) + step02 * static_cast<double>(yIdx - points[0].y()));
+                        Line<FORMAT>(img, xIdx12, yIdx, xIdx02, yIdx, pixel);
                     }
                 }
             }
