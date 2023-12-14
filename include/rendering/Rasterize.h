@@ -8,6 +8,7 @@
 #include <cmath>
 #include "data/Matrix.h"
 #include "data/Image.h"
+#include "utils/Geometry.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -17,6 +18,9 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+
+            template<UltRenderer::Data::ImageFormat FORMAT>
+            void TriangleLineSweep(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const Data::Vector2S& p2, const  UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Triangle(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const Data::Vector2S& p2, const  UltRenderer::Data::Pixel<FORMAT>& pixel);
@@ -90,9 +94,9 @@ namespace UltRenderer {
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
-                                         const Data::Vector2S &p1, const Data::Vector2S &p2,
-                                         const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+            void TriangleLineSweep(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
+                                   const Data::Vector2S &p1, const Data::Vector2S &p2,
+                                   const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 std::vector<Data::Vector2S> points{p0, p1, p2};
 
                 // Sort three point with y, only compare x when ys are equal
@@ -131,6 +135,15 @@ namespace UltRenderer {
                         Line<FORMAT>(img, xIdx12, yIdx, xIdx02, yIdx, pixel);
                     }
                 }
+            }
+
+            template<UltRenderer::Data::ImageFormat FORMAT>
+            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
+                                     const Data::Vector2S &p1, const Data::Vector2S &p2,
+                                     const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, static_cast<std::size_t>(FORMAT)>({p0, p1, p2});
+
+
             }
         }
     } // UltRenderer
