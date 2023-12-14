@@ -19,6 +19,8 @@ add_executable(UltRenderer src/Main.cpp
         include/utils/String.h
         src/utils/String.cpp
         src/utils/Hash.cpp
-        include/utils/Hash.h)
+        include/utils/Hash.h
+        src/utils/Geometry.cpp
+        include/utils/Geometry.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
