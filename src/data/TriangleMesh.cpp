@@ -179,7 +179,7 @@ namespace UltRenderer {
 
             // Create f map
             const std::size_t bucketSize = 2 * fList.size();
-            std::unordered_map<Vector3S, std::size_t, Utils::SpatialHash3D<std::size_t>> fMap(bucketSize, Utils::SpatialHash3D<std::size_t>(bucketSize));
+            std::unordered_map<Vector3S, std::size_t, Utils::Hash::SpatialHash3D<std::size_t>> fMap(bucketSize, Utils::Hash::SpatialHash3D<std::size_t>(bucketSize));
             for (const auto& f: fList) {
                 for (const auto& idxGroup: f) {
                     // Tips: map::insert will not update already-exist key-value pair
