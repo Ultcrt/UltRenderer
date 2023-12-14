@@ -1,6 +1,6 @@
 #include <iostream>
 #include "data/Image.h"
-#include "rendering/Rasterization.h"
+#include "rendering/Rasterize.h"
 #include "data/Matrix.h"
 #include "data/TriangleMesh.h"
 
@@ -32,7 +32,7 @@ int main() {
         double ratio = triangleNormal.dot(light);
 
         if (ratio > 0) {
-            UltRenderer::Rendering::Rasterization::Triangle(img, point0, point1, point2, {ratio, ratio, ratio, 1});
+            UltRenderer::Rendering::Rasterize::Triangle(img, point0, point1, point2, {ratio, ratio, ratio, 1});
         }
     }
 

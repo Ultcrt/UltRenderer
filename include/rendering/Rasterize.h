@@ -2,8 +2,8 @@
 // Created by ultcrt on 23-11-21.
 //
 
-#ifndef ULTRENDERER_RASTERIZATION_H
-#define ULTRENDERER_RASTERIZATION_H
+#ifndef ULTRENDERER_RASTERIZE_H
+#define ULTRENDERER_RASTERIZE_H
 
 #include <cmath>
 #include "data/Matrix.h"
@@ -11,7 +11,7 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        namespace Rasterization {
+        namespace Rasterize {
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image<FORMAT>& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
@@ -136,4 +136,4 @@ namespace UltRenderer {
     } // UltRenderer
 } // Rendering
 
-#endif //ULTRENDERER_RASTERIZATION_H
+#endif //ULTRENDERER_RASTERIZE_H
