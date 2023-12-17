@@ -47,8 +47,20 @@ namespace UltRenderer {
             Pixel<FORMAT> get(std::size_t w, std::size_t h);
             void save(const std::string& filename);
             [[nodiscard]] Vector2S shape() const;
+            [[nodiscard]] std::size_t width() const;
+            [[nodiscard]] std::size_t height() const;
             void flip(ImageDirection direction);
         };
+
+        template<ImageFormat FORMAT>
+        std::size_t Image<FORMAT>::height() const {
+            return _height;
+        }
+
+        template<ImageFormat FORMAT>
+        std::size_t Image<FORMAT>::width() const {
+            return _width;
+        }
 
         template<ImageFormat FORMAT>
         void Image<FORMAT>::flip(ImageDirection direction) {
@@ -104,7 +116,7 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         Vector2S Image<FORMAT>::shape() const {
-            return {_height, _width};
+            return {_width, _height};
         }
 
         template<ImageFormat FORMAT>
