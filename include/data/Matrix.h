@@ -25,6 +25,9 @@ namespace UltRenderer {
             explicit Matrix(const T& fill=T());
             explicit Matrix(const std::array<T, M * N>& data);
 
+            template<typename CAST>
+            explicit Matrix(const Matrix<CAST, M, N>& target);
+
             Matrix(T x, T y);
 
             Matrix(T x, T y, T z);
@@ -47,31 +50,24 @@ namespace UltRenderer {
 
             bool operator!=(const Matrix<T, M, N>& target) const;
 
-            // TT is short for target-type
-            template<typename TT>
-            Matrix<T, M, N> operator+(const Matrix<TT, M, N>& target) const;
+            Matrix<T, M, N> operator+(const Matrix<T, M, N>& target) const;
 
             Matrix<T, M, N> operator+() const;
 
-            template<typename TT, std::size_t K>
-            Matrix<T, M, K> operator*(const Matrix<TT, N, K>& target) const;
+            template<std::size_t K>
+            Matrix<T, M, K> operator*(const Matrix<T, N, K>& target) const;
 
-            template<typename TT>
-            Matrix<T, M, N> operator*(TT target) const;
+            Matrix<T, M, N> operator*(T target) const;
 
-            template<typename TT>
-            Matrix<T, M, N> operator/(TT target) const;
+            Matrix<T, M, N> operator/(T target) const;
 
-            template<typename TT>
-            Matrix<T, M, N> operator-(const Matrix<TT, M, N>& target) const;
+            Matrix<T, M, N> operator-(const Matrix<T, M, N>& target) const;
 
             Matrix<T, M, N> operator-() const;
 
-            template<typename TT>
-            Matrix<T, 3, 1> cross(const Matrix<TT, 3, 1>& target) const;
+            [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
 
-            template<typename TT>
-            T dot(const Matrix<TT, M, N>& target) const;
+            [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
 
             [[nodiscard]] T norm() const;
 
@@ -106,8 +102,8 @@ namespace UltRenderer {
             [[nodiscard]] T w() const;
         };
 
-        template<typename T, std::size_t M, std::size_t N, typename TT>
-        Matrix<T, M, N> operator*(TT target, const Matrix<T, M, N>& source) {
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> operator*(T target, const Matrix<T, M, N>& source) {
             return source * target;
         }
 
@@ -158,8 +154,7 @@ namespace UltRenderer {
         typedef Vector2<std::size_t> Vector2S;
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        T Matrix<T, M, N>::dot(const Matrix<TT, M, N> &target) const {
+        T Matrix<T, M, N>::dot(const Matrix<T, M, N> &target) const {
             // TODO: Need to add assert prompt
             static_assert(M == 1 || N == 1);
 
@@ -173,8 +168,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        Matrix<T, 3, 1> Matrix<T, M, N>::cross(const Matrix<TT, 3, 1> &target) const {
+        Matrix<T, 3, 1> Matrix<T, M, N>::cross(const Matrix<T, 3, 1> &target) const {
             static_assert(M * N == 3);
 
             return {
@@ -233,8 +227,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        Matrix<T, M, N> Matrix<T, M, N>::operator/(TT target) const {
+        Matrix<T, M, N> Matrix<T, M, N>::operator/(T target) const {
             Matrix<T, M, N> res;
             for (std::size_t idx = 0; idx < M * N; idx++) {
                 res._data[idx] = _data[idx] / target;
@@ -345,8 +338,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        Matrix<T, M, N> Matrix<T, M, N>::operator*(TT target) const {
+        Matrix<T, M, N> Matrix<T, M, N>::operator*(T target) const {
             Matrix<T, M, N> res;
             for (std::size_t idx = 0; idx < M * N; idx++) {
                 res._data[idx] = target * _data[idx];
@@ -360,8 +352,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        Matrix<T, M, N> Matrix<T, M, N>::operator-(const Matrix<TT, M, N> &target) const {
+        Matrix<T, M, N> Matrix<T, M, N>::operator-(const Matrix<T, M, N> &target) const {
             Matrix<T, M, N> res;
             for (std::size_t idx = 0; idx < M * N; idx++) {
                 res._data[idx] = _data[idx] - target._data[idx];
@@ -370,8 +361,8 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT, std::size_t K>
-        Matrix<T, M, K> Matrix<T, M, N>::operator*(const Matrix<TT, N, K> &target) const {
+        template<std::size_t K>
+        Matrix<T, M, K> Matrix<T, M, N>::operator*(const Matrix<T, N, K> &target) const {
             Matrix<T, M, K> res;
             for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
                 for (std::size_t colIdx = 0; colIdx < K; colIdx++) {
@@ -389,8 +380,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename TT>
-        Matrix<T, M, N> Matrix<T, M, N>::operator+(const Matrix<TT, M, N> &target) const {
+        Matrix<T, M, N> Matrix<T, M, N>::operator+(const Matrix<T, M, N> &target) const {
             Matrix<T, M, N> res;
             for (std::size_t idx = 0; idx < M * N; idx++) {
                 res._data[idx] = _data[idx] + target._data[idx];
@@ -407,6 +397,14 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(const std::array<T, M * N> &data): _data(data) {}
+
+        template<typename T, std::size_t M, std::size_t N>
+        template<typename CAST>
+        Matrix<T, M, N>::Matrix(const Matrix<CAST, M, N> &target) {
+            for (std::size_t idx = 0; idx < _data.size(); idx++) {
+                _data[idx] = static_cast<T>(target._data[idx]);
+            }
+        }
     } // UltRenderer
 } // Data
 
