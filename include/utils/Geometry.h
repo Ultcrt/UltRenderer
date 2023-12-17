@@ -27,7 +27,7 @@ namespace UltRenderer {
 
                 if (!points.empty()) {
                     minVec = points[0];
-                    maxVec = points[1];
+                    maxVec = points[0];
 
                     for (auto iter = points.begin() + 1; iter != points.end(); iter++) {
                         for (std::size_t channelIdx = 0; channelIdx < N; channelIdx++) {
