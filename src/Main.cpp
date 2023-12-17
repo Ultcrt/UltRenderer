@@ -32,7 +32,7 @@ int main() {
         double ratio = triangleNormal.dot(light);
 
         if (ratio > 0) {
-            UltRenderer::Rendering::Rasterize::TriangleLineSweep(img, point0, point1, point2, {ratio, ratio, ratio, 1});
+            UltRenderer::Rendering::Rasterize::Triangle(img, point0, point1, point2, {ratio, ratio, ratio, 1});
         }
     }
 
