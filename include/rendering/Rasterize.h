@@ -20,11 +20,13 @@ namespace UltRenderer {
             void Line(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const Data::Vector2S& p2, const  UltRenderer::Data::Pixel<FORMAT>& pixel);
+            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const std::array<Data::Vector2S, 3> &points,
+                          const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
+                          std::vector<double>& zBuffer);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image<FORMAT> &img, std::size_t x0, std::size_t y0, std::size_t x1,
-                                std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+                      std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(x0) - static_cast<double>(x1)));
                 const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(y0) - static_cast<double>(y1)));
 
@@ -86,28 +88,33 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
-                                     const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+                      const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 Line<FORMAT>(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
-                                     const Data::Vector2S &p1, const Data::Vector2S &p2,
-                                     const UltRenderer::Data::Pixel<FORMAT> &pixel) {
-                std::array<Data::Vector2D, 3> points = {
-                    static_cast<Data::Vector2D>(p0),
-                    static_cast<Data::Vector2D>(p1),
-                    static_cast<Data::Vector2D>(p2)
-                };
+            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const std::array<Data::Vector2S, 3> &points,
+                          const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
+                          std::vector<double>& zBuffer) {
+                std::size_t width = img.width();
 
-                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({p0, p1, p2});
+                std::array<Data::Vector2D, 3> doublePoints = {
+                        static_cast<Data::Vector2D>(points[0]),
+                        static_cast<Data::Vector2D>(points[1]),
+                        static_cast<Data::Vector2D>(points[2])
+                };                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
 
                 for (std::size_t xIdx = minVec.x(); xIdx < maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx < maxVec.y(); yIdx++) {
-                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D<double>({static_cast<double>(xIdx), static_cast<double>(yIdx)}, points);
+                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D<double>({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
-                            img.set(xIdx, yIdx, pixel);
+                            double depth = barycentricCoords.dot(depths);
+
+                            if (depth > zBuffer[yIdx * width + xIdx]) {
+                                zBuffer[yIdx * width + xIdx] = depth;
+                                img.set(xIdx, yIdx, pixel);
+                            }
                         }
                     }
                 }
