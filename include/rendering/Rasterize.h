@@ -141,9 +141,23 @@ namespace UltRenderer {
             void Triangle(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
                                      const Data::Vector2S &p1, const Data::Vector2S &p2,
                                      const UltRenderer::Data::Pixel<FORMAT> &pixel) {
-                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, static_cast<std::size_t>(FORMAT)>({p0, p1, p2});
+                std::array<Data::Vector2D, 3> points = {
+                    static_cast<Data::Vector2D>(p0),
+                    static_cast<Data::Vector2D>(p1),
+                    static_cast<Data::Vector2D>(p2)
+                };
 
+                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({p0, p1, p2});
 
+                for (std::size_t xIdx = minVec.x(); xIdx < maxVec.x(); xIdx++) {
+                    for (std::size_t yIdx = minVec.y(); yIdx < maxVec.y(); yIdx++) {
+                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D<double>({static_cast<double>(xIdx), static_cast<double>(yIdx)}, points);
+
+                        if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
+                            img.set(xIdx, yIdx, pixel);
+                        }
+                    }
+                }
             }
         }
     } // UltRenderer
