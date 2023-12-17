@@ -7,6 +7,7 @@
 
 #include <utility>
 #include <vector>
+#include <array>
 #include "data/Matrix.h"
 
 namespace UltRenderer {
@@ -14,6 +15,9 @@ namespace UltRenderer {
         namespace Geometry {
             template<typename T, std::size_t N>
             std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>> GetAABB(const std::vector<Data::Matrix<T, N, 1>>& points);
+
+            template<typename T>
+            Data::Vector3<T> ComputeBarycentricCoords2D(const Data::Vector2<T>& point, const std::array<Data::Vector2<T>, 3>& trianglePoints);
 
             template<typename T, std::size_t N>
             std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>>
@@ -38,6 +42,22 @@ namespace UltRenderer {
                 }
 
                 return {minVec, maxVec};
+            }
+
+            template<typename T>
+            Data::Vector3<T> ComputeBarycentricCoords2D(const Data::Vector2<T>& point,
+                                                      const std::array<Data::Vector2<T>, 3>& trianglePoints) {
+                Data::Vector2<T> vecAB = trianglePoints[1] - trianglePoints[0];
+                Data::Vector2<T> vecAC = trianglePoints[2] - trianglePoints[0];
+                Data::Vector2<T> vecAP = point - trianglePoints[0];
+
+                T triangleArea2 = vecAC.x() * vecAB.y() - vecAC.y() * vecAB.x();
+
+                T v = (vecAC.x() * vecAP.y() - vecAC.y() * vecAP.x()) / triangleArea2;
+                T w = (vecAP.x() * vecAB.y() - vecAP.y() * vecAB.x()) / triangleArea2;
+                T u = 1 - v - w;
+
+                return {u, v, w};
             }
         }
     } // Utils
