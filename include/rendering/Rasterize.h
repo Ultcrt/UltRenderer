@@ -76,10 +76,10 @@ namespace UltRenderer {
                     }
 
                     if (xIsLonger) {
-                        img.set(longPos, shortPos, pixel);
+                        img(longPos, shortPos) = pixel;
                     }
                     else {
-                        img.set(shortPos, longPos, pixel);
+                        img(shortPos, longPos) = pixel;
                     }
 
                     error += static_cast<long long>(step);
@@ -113,7 +113,7 @@ namespace UltRenderer {
 
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;
-                                img.set(xIdx, yIdx, pixel);
+                                img(xIdx, yIdx) = pixel;
                             }
                         }
                     }

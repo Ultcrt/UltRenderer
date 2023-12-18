@@ -31,6 +31,18 @@ namespace UltRenderer {
         template<ImageFormat FORMAT>
         using Pixel = Matrix<double, static_cast<std::size_t>(FORMAT), 1>;
 
+        // Proxy class of pixel to make Image::operator() can be assignable
+        template<ImageFormat FORMAT>
+        class PixelProxy {
+        private:
+            std::array<double*, static_cast<std::size_t>(FORMAT)> _componentPtrs;
+
+        public:
+            explicit PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs);
+            PixelProxy<FORMAT>& operator=(Pixel<FORMAT> target);
+            operator Pixel<FORMAT>() const;
+        };
+
         template<ImageFormat FORMAT>
         class Image {
         private:
@@ -43,14 +55,65 @@ namespace UltRenderer {
             void fill(const Pixel<FORMAT>& filledPixel);
             Image(std::size_t w, std::size_t h);
             Image(std::size_t w, std::size_t h, const Pixel<FORMAT>& filledPixel);
-            void set(std::size_t w, std::size_t h, const Pixel<FORMAT>& pixel);
-            Pixel<FORMAT> get(std::size_t w, std::size_t h);
+            PixelProxy<FORMAT> operator()(std::size_t w, std::size_t h);
+            Pixel<FORMAT> operator()(std::size_t w, std::size_t h) const;
             void save(const std::string& filename);
             [[nodiscard]] Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
             [[nodiscard]] std::size_t height() const;
             void flip(ImageDirection direction);
         };
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT>::PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs): _componentPtrs{componentPtrs} {}
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT> &PixelProxy<FORMAT>::operator=(Pixel<FORMAT> target) {
+            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
+                *_componentPtrs[idx] = target[idx];
+            }
+
+            return *this;
+        }
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT>::operator Pixel<FORMAT>() const {
+            Pixel<FORMAT> res;
+
+            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
+                res[idx] = *_componentPtrs[idx];
+            }
+
+            return UltRenderer::Data::Pixel<FORMAT>();
+        }
+
+        template<ImageFormat FORMAT>
+        Pixel<FORMAT> Image<FORMAT>::operator()(std::size_t w, std::size_t h) const {
+            assert(w < _width);
+            assert(h < _height);
+
+            Pixel<FORMAT> pixel;
+
+            for (std::size_t idx = 0; idx < _format; idx++) {
+                pixel[idx] = _data[(h * _width + w) * _format + idx];
+            }
+
+            return pixel;
+        }
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT> Image<FORMAT>::operator()(std::size_t w, std::size_t h) {
+            assert(w < _width);
+            assert(h < _height);
+
+            std::array<double*, static_cast<std::size_t>(FORMAT)> componentPtrs;
+
+            for (std::size_t idx = 0; idx < _format; idx++) {
+                componentPtrs[idx] = &(_data[(h * _width + w) * _format + idx]);
+            }
+
+            return PixelProxy<FORMAT>(componentPtrs);
+        }
 
         template<ImageFormat FORMAT>
         std::size_t Image<FORMAT>::height() const {
@@ -117,30 +180,6 @@ namespace UltRenderer {
         template<ImageFormat FORMAT>
         Vector2S Image<FORMAT>::shape() const {
             return {_width, _height};
-        }
-
-        template<ImageFormat FORMAT>
-        Pixel<FORMAT> Image<FORMAT>::get(std::size_t w, std::size_t h) {
-            assert(w < _width);
-            assert(h < _height);
-
-            Pixel<FORMAT> pixel;
-
-            for (std::size_t idx = 0; idx < _format; idx++) {
-                pixel[idx] = _data[(h * _width + w) * _format + idx];
-            }
-
-            return pixel;
-        }
-
-        template<ImageFormat FORMAT>
-        void Image<FORMAT>::set(std::size_t w, std::size_t h, const Pixel<FORMAT> &pixel) {
-            assert(w < _width);
-            assert(h < _height);
-
-            for (std::size_t idx = 0; idx < _format; idx++) {
-                _data[(h * _width + w) * _format + idx] = pixel[idx];
-            }
         }
 
         template<ImageFormat FORMAT>
