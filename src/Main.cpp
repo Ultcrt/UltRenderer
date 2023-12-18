@@ -6,7 +6,7 @@
 #include "data/TriangleMesh.h"
 
 int main() {
-    UltRenderer::Data::RGBAImage img(1920, 1920, {1, 1, 1, 1});
+    UltRenderer::Data::Image img(1920, 1920, UltRenderer::Data::Pixel<UltRenderer::Data::ImageFormat::RGBA>{0., 0., 0., 0.});
 
     UltRenderer::Data::TriangleMesh model("../data/african_head.obj");
 
@@ -35,7 +35,7 @@ int main() {
         double ratio = triangleNormal.dot(light);
 
         if (ratio > 0) {
-            UltRenderer::Rendering::Rasterize::Triangle(img, {point0, point1, point2}, {vertex0.z(), vertex1.z(), vertex2.z()}, {ratio, ratio, ratio, 1}, zBuffer);
+            UltRenderer::Rendering::Rasterize::Triangle<UltRenderer::Data::ImageFormat::RGBA>(img, {point0, point1, point2}, {vertex0.z(), vertex1.z(), vertex2.z()}, {ratio, ratio, ratio, 1}, zBuffer);
         }
     }
 

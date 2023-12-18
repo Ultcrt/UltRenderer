@@ -14,18 +14,18 @@ namespace UltRenderer {
     namespace Rendering {
         namespace Rasterize {
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image<FORMAT>& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+            void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image<FORMAT>& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+            void Line(UltRenderer::Data::Image& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const std::array<Data::Vector2S, 3> &points,
+            void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
                           const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
                           std::vector<double>& zBuffer);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image<FORMAT> &img, std::size_t x0, std::size_t y0, std::size_t x1,
+            void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1,
                       std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(x0) - static_cast<double>(x1)));
                 const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(y0) - static_cast<double>(y1)));
@@ -76,10 +76,10 @@ namespace UltRenderer {
                     }
 
                     if (xIsLonger) {
-                        img(longPos, shortPos) = pixel;
+                        img.at<FORMAT>(longPos, shortPos) = pixel;
                     }
                     else {
-                        img(shortPos, longPos) = pixel;
+                        img.at<FORMAT>(shortPos, longPos) = pixel;
                     }
 
                     error += static_cast<long long>(step);
@@ -87,13 +87,13 @@ namespace UltRenderer {
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image<FORMAT> &img, const Data::Vector2S &p0,
+            void Line(UltRenderer::Data::Image& img, const Data::Vector2S &p0,
                       const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 Line<FORMAT>(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image<FORMAT> &img, const std::array<Data::Vector2S, 3> &points,
+            void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
                           const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
                           std::vector<double>& zBuffer) {
                 std::size_t width = img.width();
@@ -113,7 +113,7 @@ namespace UltRenderer {
 
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;
-                                img(xIdx, yIdx) = pixel;
+                                img.at<FORMAT>(xIdx, yIdx) = pixel;
                             }
                         }
                     }

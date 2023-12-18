@@ -6,5 +6,178 @@
 
 namespace UltRenderer {
     namespace Data {
+        Image::Image(std::size_t w, std::size_t h, ImageFormat format):
+                _format(static_cast<std::size_t>(format)), _width(w), _height(h), _data(h * w * _format) {}
+
+        Vector2S Image::shape() const {
+            return {_width, _height};
+        }
+
+        std::size_t Image::height() const {
+            return _height;
+        }
+
+        std::size_t Image::width() const {
+            return _width;
+        }
+
+        void Image::flip(ImageDirection direction) {
+            std::vector<double> newData(_data.size());
+
+            for (std::size_t w = 0; w < _width; w++) {
+                for (std::size_t h = 0; h < _height; h++) {
+                    for (std::size_t idx = 0; idx < _format; idx++) {
+                        if (direction == ImageDirection::HORIZONTAL) {
+                            newData[(h * _width + w) * _format + idx] = _data[((_height - h - 1) * _width + w) * _format + idx];
+                        }
+                        else {
+                            newData[(h * _width + w) * _format + idx] = _data[(h * _width + (_width - w - 1)) * _format + idx];
+                        }
+                    }
+                }
+            }
+
+            _data = newData;
+        }
+
+        void Image::save(const std::string &filename) {
+            std::ofstream tga(filename, std::ios::binary);
+            if (!tga.is_open()) {
+                throw std::runtime_error(std::format("Cannot open file: {}", filename));
+            }
+
+            // Image ID is optional, ignored here
+            std::uint8_t idLen        = 0;
+            // Has no color map
+            std::uint8_t colorMapType = 0;
+            // Gray or not
+            std::uint8_t imageType    = static_cast<ImageFormat>(_format) == ImageFormat::GRAY ? 3 : 2;
+
+            // Has no color map, set related headers to 0
+            std::uint16_t firstColorMapEntryIdx = 0;
+            std::uint16_t colorMapLen           = 0;
+            std::uint8_t  colorMapEntrySize     = 0;
+
+
+            // Set image related headers
+            std::uint16_t xOrigin         = 0;
+            std::uint16_t yOrigin         = 0;
+            std::uint16_t width           = _width;
+            std::uint16_t height          = _height;
+            // Bytes number * 8
+            std::uint8_t  pixelDepth      = _format << 3;
+            // Top-left order
+            std::uint8_t  imageDescriptor = 0x20;
+
+            // Write headers
+            tga.write(reinterpret_cast<const char *>(&idLen), sizeof(idLen));
+            tga.write(reinterpret_cast<const char *>(&colorMapType), sizeof(colorMapType));
+            tga.write(reinterpret_cast<const char *>(&imageType), sizeof(imageType));
+            tga.write(reinterpret_cast<const char *>(&firstColorMapEntryIdx), sizeof(firstColorMapEntryIdx));
+            tga.write(reinterpret_cast<const char *>(&colorMapLen), sizeof(colorMapLen));
+            tga.write(reinterpret_cast<const char *>(&colorMapEntrySize), sizeof(colorMapEntrySize));
+            tga.write(reinterpret_cast<const char *>(&xOrigin), sizeof(xOrigin));
+            tga.write(reinterpret_cast<const char *>(&yOrigin), sizeof(yOrigin));
+            tga.write(reinterpret_cast<const char *>(&width), sizeof(width));
+            tga.write(reinterpret_cast<const char *>(&height), sizeof(height));
+            tga.write(reinterpret_cast<const char *>(&pixelDepth), sizeof(pixelDepth));
+            tga.write(reinterpret_cast<const char *>(&imageDescriptor), sizeof(imageDescriptor));
+
+            std::vector<std::uint8_t> reorderedData;
+            // Clamp raw data to [0, 1] and rescale to [0, 255]
+            for (const auto& unit: _data) {
+                reorderedData.emplace_back(std::clamp(unit, 0., 1.) * std::numeric_limits<std::uint8_t>::max());
+            }
+            // RGB to BGR
+            if (static_cast<ImageFormat>(_format) != ImageFormat::GRAY) {
+                // Alpha channel is already filled, only need to reverse RGB
+                for (std::size_t pixelIdx = 0; pixelIdx < width * height; pixelIdx++) {
+                    std::swap(reorderedData[pixelIdx * _format], reorderedData[pixelIdx * _format + 2]);
+                }
+            }
+
+            // Write data
+            tga.write(reinterpret_cast<const char *>(reorderedData.data()), static_cast<long>(reorderedData.size()));
+            if (!tga.good()) {
+                throw std::runtime_error(std::format("Error occurs when writing to: {}", filename));
+            }
+
+            tga.close();
+            if (tga.is_open()) {
+                throw std::runtime_error(std::format("Cannot close file: {}", filename));
+            }
+        }
+
+        Image::Image(const std::string &filename) {
+            std::ifstream tga(filename, std::ios::binary);
+            if (!tga.is_open()) {
+                throw std::runtime_error(std::format("Cannot open file: {}", filename));
+            }
+
+            // Image ID
+            std::uint8_t idLen;
+            // Color map type
+            std::uint8_t colorMapType;
+            // Image type
+            std::uint8_t imageType;
+
+            // Color map
+            std::uint16_t firstColorMapEntryIdx;
+            std::uint16_t colorMapLen;
+            std::uint8_t  colorMapEntrySize;
+
+            // Image related headers
+            std::uint16_t xOrigin;
+            std::uint16_t yOrigin;
+            std::uint16_t width;
+            std::uint16_t height;
+            // Bytes number * 8
+            std::uint8_t  pixelDepth;
+            // Pixel order
+            std::uint8_t  imageDescriptor;
+
+            // Read headers
+            tga.read(reinterpret_cast<char *>(&idLen), sizeof(idLen));
+            tga.read(reinterpret_cast<char *>(&colorMapType), sizeof(colorMapType));
+            tga.read(reinterpret_cast<char *>(&imageType), sizeof(imageType));
+            tga.read(reinterpret_cast<char *>(&firstColorMapEntryIdx), sizeof(firstColorMapEntryIdx));
+            tga.read(reinterpret_cast<char *>(&colorMapLen), sizeof(colorMapLen));
+            tga.read(reinterpret_cast<char *>(&colorMapEntrySize), sizeof(colorMapEntrySize));
+            tga.read(reinterpret_cast<char *>(&xOrigin), sizeof(xOrigin));
+            tga.read(reinterpret_cast<char *>(&yOrigin), sizeof(yOrigin));
+            tga.read(reinterpret_cast<char *>(&width), sizeof(width));
+            tga.read(reinterpret_cast<char *>(&height), sizeof(height));
+            tga.read(reinterpret_cast<char *>(&pixelDepth), sizeof(pixelDepth));
+            tga.read(reinterpret_cast<char *>(&imageDescriptor), sizeof(imageDescriptor));
+
+            // TODO: Only support 8 bits color
+            _width = width;
+            _height = height;
+            _format = pixelDepth >> 3;
+
+            // TODO: Only resolve data field, skip image ID field and color map field
+            tga.seekg(idLen, std::ios::cur);
+            tga.seekg(colorMapLen * colorMapEntrySize / 8, std::ios::cur);
+
+            std::vector<std::uint8_t> reorderedData(width * height * _format);
+            tga.read(reinterpret_cast<char *>(reorderedData.data()), static_cast<long>(reorderedData.size()));
+
+            // BGR to RGB
+            if (static_cast<ImageFormat>(_format) != ImageFormat::GRAY) {
+                // Alpha channel is already filled, only need to reverse RGB
+                for (std::size_t pixelIdx = 0; pixelIdx < width * height; pixelIdx++) {
+                    std::swap(reorderedData[pixelIdx * _format], reorderedData[pixelIdx * _format + 2]);
+                }
+            }
+
+            if (!tga.good()) {
+                throw std::runtime_error(std::format("Error occurs when reading: {}", filename));
+            }
+
+            tga.close();
+            if (tga.is_open()) {
+                throw std::runtime_error(std::format("Cannot close file: {}", filename));
+            }
+        }
     } // UltRenderer
 } // Data
