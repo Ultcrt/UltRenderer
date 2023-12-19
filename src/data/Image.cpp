@@ -176,7 +176,7 @@ namespace UltRenderer {
             if (imageType == 9 || imageType == 10 || imageType == 11) {
                 // Obtain raw bytes
                 std::uint8_t header;
-                while (tga.read(reinterpret_cast<char *>(&header), sizeof(header))) {
+                while (tga.read(reinterpret_cast<char *>(&header), sizeof(header)) && imageData.size() < _data.size()) {
                     std::uint8_t id    = header >> 7;
                     // Count is defined as 7 bit + 1
                     std::uint8_t count = (header & 0b01111111) + 1;
@@ -204,10 +204,6 @@ namespace UltRenderer {
             // Uncompressed data process
             else {
                 tga.read(reinterpret_cast<char *>(imageData.data()), static_cast<long>(width * height * _format));
-            }
-
-            for (std::size_t idx = _data.size(); idx < imageData.size(); idx++) {
-                std::cout << std::bitset<8>(imageData[idx]) << std::endl;
             }
 
             // Clean up
