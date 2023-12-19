@@ -21,7 +21,7 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
+                          const Data::Vector3D& depths, const std::array<Data::Vector2S, 3> &uvs, const UltRenderer::Data::Image& texture,
                           std::vector<double>& zBuffer);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
@@ -94,7 +94,7 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const UltRenderer::Data::Pixel<FORMAT> &pixel,
+                          const Data::Vector3D& depths, const std::array<Data::Vector2S, 3> &uvs, const UltRenderer::Data::Image& texture,
                           std::vector<double>& zBuffer) {
                 std::size_t width = img.width();
 
@@ -102,7 +102,15 @@ namespace UltRenderer {
                         static_cast<Data::Vector2D>(points[0]),
                         static_cast<Data::Vector2D>(points[1]),
                         static_cast<Data::Vector2D>(points[2])
-                };                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
+                };
+
+                std::array<Data::Vector2D, 3> doubleUVs = {
+                        static_cast<Data::Vector2D>(uvs[0]),
+                        static_cast<Data::Vector2D>(uvs[1]),
+                        static_cast<Data::Vector2D>(uvs[2])
+                };
+
+                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
 
                 for (std::size_t xIdx = minVec.x(); xIdx < maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx < maxVec.y(); yIdx++) {
@@ -110,10 +118,11 @@ namespace UltRenderer {
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
                             double depth = barycentricCoords.dot(depths);
+                            Data::Vector2S uv = static_cast<Data::Vector2S>(doubleUVs[0] * barycentricCoords[0] + doubleUVs[1] * barycentricCoords[1] + doubleUVs[2] * barycentricCoords[2]);
 
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;
-                                img.at<FORMAT>(xIdx, yIdx) = pixel;
+                                img.at<FORMAT>(xIdx, yIdx) = texture.at<FORMAT>(uv.x(), uv.y());
                             }
                         }
                     }
