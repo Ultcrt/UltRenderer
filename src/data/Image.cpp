@@ -2,6 +2,15 @@
 // Created by ultcrt on 23-11-15.
 //
 
+#include <bitset>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <exception>
+#include <format>
+#include <limits>
+#include <algorithm>
+#include <cstdint>
 #include "../../include/data/Image.h"
 
 namespace UltRenderer {
@@ -67,7 +76,7 @@ namespace UltRenderer {
             // Bytes number * 8
             std::uint8_t  pixelDepth      = _format << 3;
             // Top-left order
-            std::uint8_t  imageDescriptor = 0x20;
+            std::uint8_t  imageDescriptor = static_cast<ImageFormat>(_format) == ImageFormat::RGBA ? 0b00001000 : 0b00000000;
 
             // Write headers
             tga.write(reinterpret_cast<const char *>(&idLen), sizeof(idLen));
@@ -150,33 +159,81 @@ namespace UltRenderer {
             tga.read(reinterpret_cast<char *>(&pixelDepth), sizeof(pixelDepth));
             tga.read(reinterpret_cast<char *>(&imageDescriptor), sizeof(imageDescriptor));
 
-            // TODO: Only support 8 bits color
+            // TODO: Only support 8 bits color channel
             _width = width;
             _height = height;
             _format = pixelDepth >> 3;
+            _data = std::vector<double>(_width * _height * _format);
 
             // TODO: Only resolve data field, skip image ID field and color map field
             tga.seekg(idLen, std::ios::cur);
             tga.seekg(colorMapLen * colorMapEntrySize / 8, std::ios::cur);
 
-            std::vector<std::uint8_t> reorderedData(width * height * _format);
-            tga.read(reinterpret_cast<char *>(reorderedData.data()), static_cast<long>(reorderedData.size()));
+            std::vector<std::uint8_t> imageData;
+
+            // TODO: Cannot process color map for now
+            // Run-length data process
+            if (imageType == 9 || imageType == 10 || imageType == 11) {
+                // Obtain raw bytes
+                std::uint8_t header;
+                while (tga.read(reinterpret_cast<char *>(&header), sizeof(header))) {
+                    std::uint8_t id    = header >> 7;
+                    // Count is defined as 7 bit + 1
+                    std::uint8_t count = (header & 0b01111111) + 1;
+
+                    // Run-length packet
+                    if (id == 1) {
+                        std::vector<std::uint8_t> runLengthColor(_format);
+                        tga.read(reinterpret_cast<char *>(runLengthColor.data()), static_cast<long>(runLengthColor.size()));
+
+                        for (std::size_t idx = 0; idx < count; idx++) {
+                            imageData.insert(imageData.end(), runLengthColor.begin(), runLengthColor.end());
+                        }
+                    }
+                    // Raw packet
+                    else {
+                        std::vector<std::uint8_t> rawColors(count * _format);
+                        tga.read(reinterpret_cast<char *>(rawColors.data()), static_cast<long>(rawColors.size()));
+                        if (tga.good()) {
+
+                        }
+                        imageData.insert(imageData.end(), rawColors.begin(), rawColors.end());
+                    }
+                }
+            }
+            // Uncompressed data process
+            else {
+                tga.read(reinterpret_cast<char *>(imageData.data()), static_cast<long>(width * height * _format));
+            }
+
+            for (std::size_t idx = _data.size(); idx < imageData.size(); idx++) {
+                std::cout << std::bitset<8>(imageData[idx]) << std::endl;
+            }
+
+            // Clean up
+            if (!tga.good()) {
+                throw std::runtime_error(std::format("Error occurs when reading: {}", filename));
+            }
+            tga.close();
+            if (tga.is_open()) {
+                throw std::runtime_error(std::format("Cannot close file: {}", filename));
+            }
+
+            if (imageData.size() != _data.size()) {
+                throw std::runtime_error(std::format("TGA file has unexpected size of image data field: {}", filename));
+            }
 
             // BGR to RGB
             if (static_cast<ImageFormat>(_format) != ImageFormat::GRAY) {
                 // Alpha channel is already filled, only need to reverse RGB
                 for (std::size_t pixelIdx = 0; pixelIdx < width * height; pixelIdx++) {
-                    std::swap(reorderedData[pixelIdx * _format], reorderedData[pixelIdx * _format + 2]);
+                    std::swap(imageData[pixelIdx * _format], imageData[pixelIdx * _format + 2]);
                 }
             }
 
-            if (!tga.good()) {
-                throw std::runtime_error(std::format("Error occurs when reading: {}", filename));
-            }
-
-            tga.close();
-            if (tga.is_open()) {
-                throw std::runtime_error(std::format("Cannot close file: {}", filename));
+            // Rescale to 0.0~1.0
+            for (std::size_t idx = 0; idx < _data.size(); idx++) {
+                _data[idx] = (static_cast<double>(imageData[idx]) / static_cast<double>(std::numeric_limits<std::uint8_t>::max()));
             }
         }
     } // UltRenderer

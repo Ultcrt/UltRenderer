@@ -6,16 +6,6 @@
 #define ULTRENDERER_INCLUDE_DATA_IMAGE_H_
 
 #include <vector>
-#include <array>
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <cassert>
-#include <cstdint>
-#include <exception>
-#include <format>
-#include <limits>
-#include <algorithm>
 #include "data/Matrix.h"
 
 namespace UltRenderer {
