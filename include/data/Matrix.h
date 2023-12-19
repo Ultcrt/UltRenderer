@@ -18,7 +18,7 @@ namespace UltRenderer {
             template<typename, std::size_t, std::size_t>
             friend class Matrix;
 
-        private:
+        protected:
             std::array<T, M * N> _data;
 
         public:
@@ -85,6 +85,8 @@ namespace UltRenderer {
 
             [[nodiscard]] std::array<T, M * N>::iterator end();
 
+            [[nodiscard]] Matrix<T, M, N> componentWiseProduct(const Matrix<T, M, N>& target) const;
+
             T& x();
 
             T& y();
@@ -101,6 +103,15 @@ namespace UltRenderer {
 
             [[nodiscard]] T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> Matrix<T, M, N>::componentWiseProduct(const Matrix<T, M, N> &target) const {
+            Matrix<T, M, N> res;
+            for (std::size_t idx = 0; idx < M * N; idx++) {
+                res._data[idx] = _data[idx] * target._data[idx];
+            }
+            return res;
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N> operator*(T target, const Matrix<T, M, N>& source) {
