@@ -21,7 +21,7 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const std::array<Data::Vector2S, 3> &uvs, const UltRenderer::Data::Image& texture,
+                          const Data::Vector3D& depths, const std::array<Data::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           std::vector<double>& zBuffer);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
@@ -94,9 +94,11 @@ namespace UltRenderer {
 
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const std::array<Data::Vector2S, 3> &uvs, const UltRenderer::Data::Image& texture,
+                          const Data::Vector3D& depths, const std::array<Data::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           std::vector<double>& zBuffer) {
                 std::size_t width = img.width();
+
+                Data::Vector3D textureShapeVec(static_cast<double >(texture.width()), static_cast<double >(texture.height()), 0);
 
                 std::array<Data::Vector2D, 3> doublePoints = {
                         static_cast<Data::Vector2D>(points[0]),
@@ -104,10 +106,10 @@ namespace UltRenderer {
                         static_cast<Data::Vector2D>(points[2])
                 };
 
-                std::array<Data::Vector2D, 3> doubleUVs = {
-                        static_cast<Data::Vector2D>(uvs[0]),
-                        static_cast<Data::Vector2D>(uvs[1]),
-                        static_cast<Data::Vector2D>(uvs[2])
+                std::array<Data::Vector3D, 3> scaledUVs = {
+                        uvs[0].componentWiseProduct(textureShapeVec),
+                        uvs[1].componentWiseProduct(textureShapeVec),
+                        uvs[2].componentWiseProduct(textureShapeVec)
                 };
 
                 auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
@@ -118,11 +120,12 @@ namespace UltRenderer {
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
                             double depth = barycentricCoords.dot(depths);
-                            Data::Vector2S uv = static_cast<Data::Vector2S>(doubleUVs[0] * barycentricCoords[0] + doubleUVs[1] * barycentricCoords[1] + doubleUVs[2] * barycentricCoords[2]);
+                            Data::Vector3S uv = static_cast<Data::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
 
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;
-                                img.at<FORMAT>(xIdx, yIdx) = texture.at<FORMAT>(uv.x(), uv.y());
+                                // TODO: Not support 3D texture for now
+                                img.at<FORMAT>(xIdx, yIdx) = texture.at<FORMAT>(uv.x(), uv.y()) * colorScale;
                             }
                         }
                     }
