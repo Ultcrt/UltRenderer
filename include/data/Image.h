@@ -22,8 +22,11 @@ namespace UltRenderer {
         // Because compiler cannot infer template parameter from above line
         template<ImageFormat FORMAT>
         class Pixel: public Matrix<double, static_cast<std::size_t>(FORMAT), 1> {
+        public:
             // Tips: Inherit all constructor of base class
             using Matrix<double, static_cast<std::size_t>(FORMAT), 1>::Matrix;
+
+            Pixel(const Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target);
         };
 
         // Proxy class of pixel to make Image::operator() can be assignable
@@ -34,7 +37,7 @@ namespace UltRenderer {
 
         public:
             explicit PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs);
-            PixelProxy<FORMAT>& operator=(Pixel<FORMAT> target);
+            PixelProxy<FORMAT>& operator=(const Pixel<FORMAT>& target);
             operator Pixel<FORMAT>() const;
         };
 
@@ -74,7 +77,7 @@ namespace UltRenderer {
         PixelProxy<FORMAT>::PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs): _componentPtrs{componentPtrs} {}
 
         template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> &PixelProxy<FORMAT>::operator=(Pixel<FORMAT> target) {
+        PixelProxy<FORMAT> &PixelProxy<FORMAT>::operator=(const Pixel<FORMAT>& target) {
             for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
                 *_componentPtrs[idx] = target[idx];
             }
@@ -92,6 +95,9 @@ namespace UltRenderer {
 
             return UltRenderer::Data::Pixel<FORMAT>();
         }
+
+        template<ImageFormat FORMAT>
+        Pixel<FORMAT>::Pixel(const Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target): Matrix<double, static_cast<std::size_t>(FORMAT), 1>(target) {}
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
