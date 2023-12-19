@@ -206,5 +206,9 @@ namespace UltRenderer {
                 triangles.emplace_back(fMap[f[0]], fMap[f[1]], fMap[f[2]]);
             }
         }
+
+        void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
+            _pTexture = pTexture;
+        }
     } // UltRenderer
 } // Data

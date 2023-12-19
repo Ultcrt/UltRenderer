@@ -8,11 +8,16 @@
 #include <vector>
 #include <string>
 #include "data/Matrix.h"
+#include <memory>
+#include "data/Image.h"
 
 namespace UltRenderer {
     namespace Data {
 
         class TriangleMesh {
+        private:
+            std::shared_ptr<Image> _pTexture;
+
         public:
             std::vector<Vector3D> vertices;
             std::vector<Vector3D> vertexNormals;
@@ -22,6 +27,7 @@ namespace UltRenderer {
 
             TriangleMesh(const std::vector<Vector3D>& vertices, const std::vector<Vector3S>& indices, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
+            void setTexture(const std::shared_ptr<Image>& pTexture);
         };
 
     } // UltRenderer
