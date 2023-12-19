@@ -6,7 +6,11 @@
 #include "data/TriangleMesh.h"
 
 int main() {
-    UltRenderer::Data::Image img(1920, 1920, UltRenderer::Data::Pixel<UltRenderer::Data::ImageFormat::RGBA>{0., 0., 0., 0.});
+    UltRenderer::Data::Image texture("../data/african_head_diffuse.tga");
+
+    texture.save("./da.tga");
+
+    UltRenderer::Data::Image img(1920, 1920, UltRenderer::Data::Pixel<UltRenderer::Data::ImageFormat::RGB>{0., 0., 0.});
 
     UltRenderer::Data::TriangleMesh model("../data/african_head.obj");
 
@@ -18,6 +22,11 @@ int main() {
         UltRenderer::Data::Vector3D vertex0 = model.vertices[tri[0]];
         UltRenderer::Data::Vector3D vertex1 = model.vertices[tri[1]];
         UltRenderer::Data::Vector3D vertex2 = model.vertices[tri[2]];
+
+        UltRenderer::Data::Vector3D uv0 = model.vertexTextures[tri[0]];
+        UltRenderer::Data::Vector3D uv1 = model.vertexTextures[tri[1]];
+        UltRenderer::Data::Vector3D uv2 = model.vertexTextures[tri[2]];
+
         UltRenderer::Data::Vector2S point0 = {
                 static_cast<std::size_t>((vertex0.x() + 1) * static_cast<double>(img.shape().x() - 1) / 2),
                 static_cast<std::size_t>((vertex0.y() + 1) * static_cast<double>(img.shape().y() - 1) / 2)
@@ -35,11 +44,9 @@ int main() {
         double ratio = triangleNormal.dot(light);
 
         if (ratio > 0) {
-            UltRenderer::Rendering::Rasterize::Triangle<UltRenderer::Data::ImageFormat::RGBA>(img, {point0, point1, point2}, {vertex0.z(), vertex1.z(), vertex2.z()}, {ratio, ratio, ratio, 1}, zBuffer);
+            UltRenderer::Rendering::Rasterize::Triangle<UltRenderer::Data::ImageFormat::RGB>(img, {point0, point1, point2}, {vertex0.z(), vertex1.z(), vertex2.z()}, {uv0, uv1, uv2}, texture, ratio, zBuffer);
         }
     }
-
-    img.flip(UltRenderer::Data::ImageDirection::HORIZONTAL);
 
     img.save("test.tga");
 
