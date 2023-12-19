@@ -66,6 +66,7 @@ namespace UltRenderer {
             [[nodiscard]] Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
             [[nodiscard]] std::size_t height() const;
+            [[nodiscard]] ImageFormat type() const;
             void flip(ImageDirection direction);
         };
 

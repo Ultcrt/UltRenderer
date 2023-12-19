@@ -236,5 +236,9 @@ namespace UltRenderer {
                 _data[idx] = (static_cast<double>(imageData[idx]) / static_cast<double>(std::numeric_limits<std::uint8_t>::max()));
             }
         }
+
+        ImageFormat Image::type() const {
+            return static_cast<ImageFormat>(_format);
+        }
     } // UltRenderer
 } // Data
