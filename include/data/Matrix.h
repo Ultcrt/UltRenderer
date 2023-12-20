@@ -164,6 +164,18 @@ namespace UltRenderer {
         typedef Vector2<float> Vector2F;
         typedef Vector2<std::size_t> Vector2S;
 
+        template<typename T>
+        using Matrix4 = Matrix<T, 4, 4>;
+
+        template<typename T>
+        using Matrix3 = Matrix<T, 3, 3>;
+
+        typedef Matrix4<double> Matrix4D;
+        typedef Matrix4<float> Matrix4F;
+
+        typedef Matrix3<double> Matrix3D;
+        typedef Matrix3<float> Matrix3F;
+
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::dot(const Matrix<T, M, N> &target) const {
             // TODO: Need to add assert prompt
