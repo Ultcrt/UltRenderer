@@ -8,8 +8,6 @@
 int main() {
     UltRenderer::Data::Image texture("../data/african_head_diffuse.tga");
 
-    texture.save("./da.tga");
-
     UltRenderer::Data::Image img(1920, 1920, UltRenderer::Data::Pixel<UltRenderer::Data::ImageFormat::RGB>{0., 0., 0.});
 
     UltRenderer::Data::TriangleMesh model("../data/african_head.obj");
