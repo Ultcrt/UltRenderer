@@ -70,6 +70,7 @@ namespace UltRenderer {
                 for (std::size_t sampleIdx = 0; sampleIdx < samples; sampleIdx++) {
                     const std::size_t longPos = longOrigin + sampleIdx;
 
+                    // error multiply 2 means the center point of the pixel represent the whole pixel
                     if (2 * error > static_cast<long long>(samples)) {
                         shortPos += shortIsIncreasing ? 1 : -1;
                         error -= static_cast<long long>(samples);
@@ -114,9 +115,9 @@ namespace UltRenderer {
 
                 auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
 
-                for (std::size_t xIdx = minVec.x(); xIdx < maxVec.x(); xIdx++) {
-                    for (std::size_t yIdx = minVec.y(); yIdx < maxVec.y(); yIdx++) {
-                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D<double>({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
+                for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
+                    for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
+                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, doublePoints);
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
                             double depth = barycentricCoords.dot(depths);
