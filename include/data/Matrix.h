@@ -65,6 +65,10 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator-() const;
 
+            [[nodiscard]] Matrix<T, N, M> transpose();
+
+            [[nodiscard]] T determinant();
+
             [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
 
             [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
@@ -103,6 +107,57 @@ namespace UltRenderer {
 
             [[nodiscard]] T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        T Matrix<T, M, N>::determinant() {
+            static_assert(M == N);
+
+            // TODO: Current recursive resolution is very slow
+
+            // The stop condition of recursion
+            // Tips: if-else must be used here to make compiler stop recursive template instantiation correctly
+            if constexpr(M == 1)      return + _data[0];
+            else if constexpr(M == 2) return + _data[0] * _data[3]
+                                             - _data[1] * _data[2];
+            else if constexpr(M == 3) return + _data[0] * _data[4] * _data[8]
+                                             + _data[1] * _data[5] * _data[6]
+                                             + _data[2] * _data[3] * _data[7]
+                                             - _data[0] * _data[5] * _data[7]
+                                             - _data[1] * _data[3] * _data[8]
+                                             - _data[2] * _data[4] * _data[6];
+            else {
+                T det = T();
+                for (std::size_t subIdx = 0; subIdx < M; subIdx++) {
+                    Matrix<T, M - 1, N - 1> subMat;
+                    for (std::size_t rowIdx = 1; rowIdx < M; rowIdx++) {
+                        for (std::size_t colIdx = 0; colIdx < M; colIdx++) {
+                            if (colIdx < subIdx) {
+                                subMat(rowIdx - 1, colIdx) = _data[rowIdx * N + colIdx];
+                            }
+                            else if (colIdx > subIdx) {
+                                subMat(rowIdx - 1, colIdx - 1) = _data[rowIdx * N + colIdx];
+                            }
+                        }
+                    }
+                    det += _data[subIdx] * std::pow(-1, subIdx) * subMat.determinant();
+                }
+
+                return det;
+            }
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, N, M> Matrix<T, M, N>::transpose() {
+            Matrix<T, N, M> res(_data);
+
+            for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
+                for (std::size_t colIdx = 0; colIdx < N; colIdx++) {
+                    res._data[colIdx * M + rowIdx] = _data[rowIdx * N + colIdx];
+                }
+            }
+
+            return res;
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N> Matrix<T, M, N>::componentWiseProduct(const Matrix<T, M, N> &target) const {
