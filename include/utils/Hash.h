@@ -11,6 +11,7 @@
 namespace UltRenderer {
     namespace Utils {
         namespace Hash {
+            /*----------Declaration----------*/
             template <typename T>
             struct SpatialHash3D {
             private:
@@ -31,6 +32,7 @@ namespace UltRenderer {
                 std::size_t operator() (const Data::Vector2<T>& target) const;
             };
 
+            /*----------Definition----------*/
             template<typename T>
             SpatialHash3D<T>::SpatialHash3D(std::size_t n): _n(n) {}
 

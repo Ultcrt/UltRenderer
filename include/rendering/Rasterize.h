@@ -13,6 +13,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterize {
+            /*----------Declaration----------*/
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
@@ -24,6 +25,7 @@ namespace UltRenderer {
                           const Data::Vector3D& depths, const std::array<Data::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           std::vector<double>& zBuffer);
 
+            /*----------Definition----------*/
             template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1,
                       std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {

@@ -10,6 +10,7 @@
 
 namespace UltRenderer {
     namespace Data {
+        /*----------Declaration----------*/
         enum class ImageFormat: std::size_t {
             GRAY = 1, RGB = 3, RGBA = 4
         };
@@ -73,6 +74,7 @@ namespace UltRenderer {
             void flip(ImageDirection direction);
         };
 
+        /*----------Definition----------*/
         template<ImageFormat FORMAT>
         PixelProxy<FORMAT>::PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs): _componentPtrs{componentPtrs} {}
 

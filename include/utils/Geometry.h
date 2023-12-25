@@ -13,12 +13,14 @@
 namespace UltRenderer {
     namespace Utils {
         namespace Geometry {
+            /*----------Declaration----------*/
             template<typename T, std::size_t N>
             std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>> GetAABB(const std::vector<Data::Matrix<T, N, 1>>& points);
 
             template<typename T>
             Data::Vector3<T> ComputeBarycentricCoords2D(const Data::Vector2<T>& point, const std::array<Data::Vector2<T>, 3>& trianglePoints);
 
+            /*----------Definition----------*/
             template<typename T, std::size_t N>
             std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>>
             GetAABB(const std::vector<Data::Matrix<T, N, 1>> &points) {
