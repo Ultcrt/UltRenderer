@@ -39,6 +39,8 @@ namespace UltRenderer {
 
             Matrix(T x, T y, T z, T w);
 
+            static Matrix<T, M, N> Identity();
+
             T& operator()(std::size_t rowIdx, std::size_t colIdx);
 
             T operator()(std::size_t rowIdx, std::size_t colIdx) const;
@@ -122,6 +124,19 @@ namespace UltRenderer {
         std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
 
         /*----------Definition----------*/
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> Matrix<T, M, N>::Identity() {
+            Matrix<T, M, N> res;
+
+            std::size_t maxSize = std::max(M, N);
+
+            for (std::size_t idx = 0; idx < maxSize; idx++) {
+                res._data[idx * N + idx] = 1;
+            }
+
+            return Matrix<T, M, N>();
+        }
+
         template<typename T, std::size_t M, std::size_t N>
         std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target) {
             return stream << static_cast<std::string>(target);
@@ -364,7 +379,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y, T z, T w) {
+        Matrix<T, M, N>::Matrix(T x, T y, T z, T w): _data(0) {
             static_assert(M * N > 3);
             _data[0] = x;
             _data[1] = y;
@@ -373,7 +388,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y, T z) {
+        Matrix<T, M, N>::Matrix(T x, T y, T z): _data(0) {
             static_assert(M * N > 2);
             _data[0] = x;
             _data[1] = y;
@@ -381,7 +396,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y) {
+        Matrix<T, M, N>::Matrix(T x, T y): _data(0) {
             static_assert(M * N > 1);
             _data[0] = x;
             _data[1] = y;
