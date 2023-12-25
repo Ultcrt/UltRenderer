@@ -23,10 +23,11 @@ namespace UltRenderer {
 
         public:
             explicit Matrix(const T& fill=T());
-            explicit Matrix(const std::array<T, M * N>& data);
 
             template<typename CAST>
             explicit Matrix(const Matrix<CAST, M, N>& target);
+
+            Matrix(const std::array<T, M * N>& data);
 
             Matrix(T x, T y);
 
@@ -69,6 +70,8 @@ namespace UltRenderer {
 
             [[nodiscard]] T determinant();
 
+            [[nodiscard]] Matrix<T, M, N> inverse();
+
             [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
 
             [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
@@ -109,10 +112,35 @@ namespace UltRenderer {
         };
 
         template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> Matrix<T, M, N>::inverse() {
+            static_assert(M == N);
+
+            // TODO: Current cofactor matrix method may be very slow
+            Matrix<T, M, N> cofMat;
+            for (std::size_t i = 0; i < M; i++) {
+                for (std::size_t j = 0; j < N; j++){
+                    Matrix<T, M - 1, N - 1> subMat;
+                    for (std::size_t subRowIdx = 0; subRowIdx < M - 1; subRowIdx++) {
+                        for (std::size_t subColIdx = 0; subColIdx < N - 1; subColIdx++) {
+                            std::size_t rowIdx = subRowIdx < i ? subRowIdx : subRowIdx + 1;
+                            std::size_t colIdx = subColIdx < j ? subColIdx : subColIdx + 1;
+
+                            subMat[subRowIdx * (N - 1) + subColIdx] = _data[rowIdx * N + colIdx];
+                        }
+                    }
+                    // Transposed here
+                    cofMat[j * N + i] = std::pow(-1, (i + j) % 2) * subMat.determinant();
+                }
+            }
+
+            return cofMat / determinant();
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::determinant() {
             static_assert(M == N);
 
-            // TODO: Current recursive resolution is very slow
+            // TODO: Current recursive resolution may be very slow
 
             // The stop condition of recursion
             // Tips: if-else must be used here to make compiler stop recursive template instantiation correctly
@@ -129,17 +157,15 @@ namespace UltRenderer {
                 T det = T();
                 for (std::size_t subIdx = 0; subIdx < M; subIdx++) {
                     Matrix<T, M - 1, N - 1> subMat;
-                    for (std::size_t rowIdx = 1; rowIdx < M; rowIdx++) {
-                        for (std::size_t colIdx = 0; colIdx < M; colIdx++) {
-                            if (colIdx < subIdx) {
-                                subMat(rowIdx - 1, colIdx) = _data[rowIdx * N + colIdx];
-                            }
-                            else if (colIdx > subIdx) {
-                                subMat(rowIdx - 1, colIdx - 1) = _data[rowIdx * N + colIdx];
-                            }
+                    for (std::size_t subRowIdx = 0; subRowIdx < M - 1; subRowIdx++) {
+                        for (std::size_t subColIdx = 0; subColIdx < N - 1; subColIdx++) {
+                            std::size_t rowIdx = subRowIdx + 1;
+                            std::size_t colIdx = subColIdx < subIdx ? subColIdx : subColIdx + 1;
+
+                            subMat[subRowIdx * (N - 1) + subColIdx] = _data[rowIdx * N + colIdx];
                         }
                     }
-                    det += _data[subIdx] * std::pow(-1, subIdx) * subMat.determinant();
+                    det += _data[subIdx] * std::pow(-1, subIdx % 2) * subMat.determinant();
                 }
 
                 return det;
