@@ -31,6 +31,8 @@ namespace UltRenderer {
 
             Matrix(const std::array<T, M * N>& data);
 
+            Matrix(const std::array<std::array<T, N>, M>& target);
+
             Matrix(T x, T y);
 
             Matrix(T x, T y, T z);
@@ -529,6 +531,13 @@ namespace UltRenderer {
         Matrix<T, M, N>::Matrix(const Matrix<CAST, M, N> &target) {
             for (std::size_t idx = 0; idx < _data.size(); idx++) {
                 _data[idx] = static_cast<T>(target._data[idx]);
+            }
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>::Matrix(const std::array<std::array<T, N>, M> &target) {
+            for (std::size_t idx = 0; idx < M; idx++) {
+                std::copy(target[idx].cbegin(), target[idx].cend(), _data.begin() + idx * N);
             }
         }
     } // UltRenderer
