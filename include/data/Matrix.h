@@ -9,9 +9,11 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <format>
 
 namespace UltRenderer {
     namespace Data {
+        /*----------Declaration----------*/
         template<typename T, std::size_t M, std::size_t N>
         class Matrix {
             // Tips: Foo<int> and Foo<float> is not the same class
@@ -110,6 +112,18 @@ namespace UltRenderer {
 
             [[nodiscard]] T w() const;
         };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> operator*(T target, const Matrix<T, M, N>& source);
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
+
+        /*----------Definition----------*/
+        template<typename T, std::size_t M, std::size_t N>
+        std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target) {
+            return stream << static_cast<std::string>(target);
+        }
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N> Matrix<T, M, N>::inverse() {
@@ -308,10 +322,14 @@ namespace UltRenderer {
 
             for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
                 for (std::size_t colIdx = 0; colIdx < N; colIdx++) {
-                    res += std::to_string(_data[N * rowIdx + colIdx]) + ", ";
+                    T val = _data[N * rowIdx + colIdx];
+
+                    res += (val >= 0 ? " " : "-") + std::to_string(std::abs(val)) + "\t";
                 }
                 res += "\n";
             }
+            res += std::format("[{} rows x {} columns]\n", M, N);
+
             return res;
         }
 
