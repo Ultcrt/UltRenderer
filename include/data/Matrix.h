@@ -129,6 +129,10 @@ namespace UltRenderer {
         Matrix<T, M, N> Matrix<T, M, N>::inverse() {
             static_assert(M == N);
 
+            T det = determinant();
+
+            assert(det != 0);
+
             // TODO: Current cofactor matrix method may be very slow
             Matrix<T, M, N> cofMat;
             for (std::size_t i = 0; i < M; i++) {
