@@ -21,6 +21,8 @@ add_executable(UltRenderer src/Main.cpp
         src/utils/Hash.cpp
         include/utils/Hash.h
         src/math/Geometry.cpp
-        include/math/Geometry.h)
+        include/math/Geometry.h
+        src/utils/Proxy.cpp
+        include/utils/Proxy.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

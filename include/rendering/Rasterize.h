@@ -6,6 +6,7 @@
 #define ULTRENDERER_RASTERIZE_H
 
 #include <cmath>
+#include <iostream>
 #include "math/Matrix.h"
 #include "data/Image.h"
 #include "math/Geometry.h"
@@ -128,7 +129,7 @@ namespace UltRenderer {
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;
                                 // TODO: Not support 3D texture for now
-                                img.at<FORMAT>(xIdx, yIdx) = texture.at<FORMAT>(uv.x(), uv.y()) * colorScale;
+                                img.at<FORMAT>(xIdx, yIdx) = static_cast<Data::Pixel<FORMAT>>(texture.at<FORMAT>(uv.x(), uv.y())) * colorScale;
                             }
                         }
                     }

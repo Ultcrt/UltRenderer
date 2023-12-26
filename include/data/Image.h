@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "math/Matrix.h"
+#include "utils/Proxy.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -19,6 +20,9 @@ namespace UltRenderer {
             HORIZONTAL = 1, VERTICAL = 2
         };
 
+        template<ImageFormat FORMAT>
+        using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
+
         // Why not "using Pixel = Matrix<double, static_cast<std::size_t>(FORMAT), 1>;" ?
         // Because compiler cannot infer template parameter from above line
         template<ImageFormat FORMAT>
@@ -28,18 +32,6 @@ namespace UltRenderer {
             using Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>::Matrix;
 
             Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target);
-        };
-
-        // Proxy class of pixel to make Image::operator() can be assignable
-        template<ImageFormat FORMAT>
-        class PixelProxy {
-        private:
-            std::array<double*, static_cast<std::size_t>(FORMAT)> _componentPtrs;
-
-        public:
-            explicit PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs);
-            PixelProxy<FORMAT>& operator=(const Pixel<FORMAT>& target);
-            operator Pixel<FORMAT>() const;
         };
 
         class Image {
@@ -75,29 +67,6 @@ namespace UltRenderer {
         };
 
         /*----------Definition----------*/
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT>::PixelProxy(const std::array<double*, static_cast<std::size_t>(FORMAT)>& componentPtrs): _componentPtrs{componentPtrs} {}
-
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> &PixelProxy<FORMAT>::operator=(const Pixel<FORMAT>& target) {
-            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
-                *_componentPtrs[idx] = target[idx];
-            }
-
-            return *this;
-        }
-
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT>::operator Pixel<FORMAT>() const {
-            Pixel<FORMAT> res;
-
-            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
-                res[idx] = *_componentPtrs[idx];
-            }
-
-            return UltRenderer::Data::Pixel<FORMAT>();
-        }
-
         template<ImageFormat FORMAT>
         Pixel<FORMAT>::Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target): Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>(target) {}
 
