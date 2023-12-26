@@ -18,7 +18,7 @@ namespace UltRenderer {
         Image::Image(std::size_t w, std::size_t h, ImageFormat format):
                 _format(static_cast<std::size_t>(format)), _width(w), _height(h), _data(h * w * _format) {}
 
-        Vector2S Image::shape() const {
+        Math::Vector2S Image::shape() const {
             return {_width, _height};
         }
 

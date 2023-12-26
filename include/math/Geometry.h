@@ -8,24 +8,24 @@
 #include <utility>
 #include <vector>
 #include <array>
-#include "data/Matrix.h"
+#include "Matrix.h"
 
 namespace UltRenderer {
     namespace Utils {
         namespace Geometry {
             /*----------Declaration----------*/
             template<typename T, std::size_t N>
-            std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>> GetAABB(const std::vector<Data::Matrix<T, N, 1>>& points);
+            std::pair<Math::Matrix<T, N, 1>, Math::Matrix<T, N, 1>> GetAABB(const std::vector<Math::Matrix<T, N, 1>>& points);
 
             template<typename T>
-            Data::Vector3<T> ComputeBarycentricCoords2D(const Data::Vector2<T>& point, const std::array<Data::Vector2<T>, 3>& trianglePoints);
+            Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point, const std::array<Math::Vector2<T>, 3>& trianglePoints);
 
             /*----------Definition----------*/
             template<typename T, std::size_t N>
-            std::pair<Data::Matrix<T, N, 1>, Data::Matrix<T, N, 1>>
-            GetAABB(const std::vector<Data::Matrix<T, N, 1>> &points) {
-                Data::Matrix<T, N, 1> minVec;
-                Data::Matrix<T, N, 1> maxVec;
+            std::pair<Math::Matrix<T, N, 1>, Math::Matrix<T, N, 1>>
+            GetAABB(const std::vector<Math::Matrix<T, N, 1>> &points) {
+                Math::Matrix<T, N, 1> minVec;
+                Math::Matrix<T, N, 1> maxVec;
 
                 if (!points.empty()) {
                     minVec = points[0];
@@ -47,11 +47,11 @@ namespace UltRenderer {
             }
 
             template<typename T>
-            Data::Vector3<T> ComputeBarycentricCoords2D(const Data::Vector2<T>& point,
-                                                      const std::array<Data::Vector2<T>, 3>& trianglePoints) {
-                Data::Vector2<T> vecAB = trianglePoints[1] - trianglePoints[0];
-                Data::Vector2<T> vecAC = trianglePoints[2] - trianglePoints[0];
-                Data::Vector2<T> vecAP = point - trianglePoints[0];
+            Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point,
+                                                      const std::array<Math::Vector2<T>, 3>& trianglePoints) {
+                Math::Vector2<T> vecAB = trianglePoints[1] - trianglePoints[0];
+                Math::Vector2<T> vecAC = trianglePoints[2] - trianglePoints[0];
+                Math::Vector2<T> vecAP = point - trianglePoints[0];
 
                 T triangleArea2 = vecAC.x() * vecAB.y() - vecAC.y() * vecAB.x();
 

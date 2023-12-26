@@ -2,7 +2,7 @@
 // Created by ultcrt on 23-11-23.
 //
 
-#include "data/Matrix.h"
+#include "math/Matrix.h"
 
 namespace UltRenderer {
     namespace Data {

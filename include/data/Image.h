@@ -6,7 +6,7 @@
 #define ULTRENDERER_INCLUDE_DATA_IMAGE_H_
 
 #include <vector>
-#include "data/Matrix.h"
+#include "math/Matrix.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -22,12 +22,12 @@ namespace UltRenderer {
         // Why not "using Pixel = Matrix<double, static_cast<std::size_t>(FORMAT), 1>;" ?
         // Because compiler cannot infer template parameter from above line
         template<ImageFormat FORMAT>
-        class Pixel: public Matrix<double, static_cast<std::size_t>(FORMAT), 1> {
+        class Pixel: public Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1> {
         public:
             // Tips: Inherit all constructor of base class
-            using Matrix<double, static_cast<std::size_t>(FORMAT), 1>::Matrix;
+            using Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>::Matrix;
 
-            Pixel(const Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target);
+            Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target);
         };
 
         // Proxy class of pixel to make Image::operator() can be assignable
@@ -67,7 +67,7 @@ namespace UltRenderer {
             Pixel<FORMAT> at(std::size_t w, std::size_t h) const;
 
             void save(const std::string& filename);
-            [[nodiscard]] Vector2S shape() const;
+            [[nodiscard]] Math::Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
             [[nodiscard]] std::size_t height() const;
             [[nodiscard]] ImageFormat type() const;
@@ -99,7 +99,7 @@ namespace UltRenderer {
         }
 
         template<ImageFormat FORMAT>
-        Pixel<FORMAT>::Pixel(const Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target): Matrix<double, static_cast<std::size_t>(FORMAT), 1>(target) {}
+        Pixel<FORMAT>::Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target): Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>(target) {}
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {

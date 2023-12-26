@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <string>
-#include "data/Matrix.h"
+#include "math/Matrix.h"
 #include <memory>
 #include "data/Image.h"
 
@@ -19,14 +19,14 @@ namespace UltRenderer {
             std::shared_ptr<Image> _pTexture;
 
         public:
-            std::vector<Vector3D> vertices;
-            std::vector<Vector3D> vertexNormals;
-            std::vector<Vector3S> triangles;
-            std::vector<Vector3D> vertexColors;
-            std::vector<Vector3D> vertexTextures;
+            std::vector<Math::Vector3D> vertices;
+            std::vector<Math::Vector3D> vertexNormals;
+            std::vector<Math::Vector3S> triangles;
+            std::vector<Math::Vector3D> vertexColors;
+            std::vector<Math::Vector3D> vertexTextures;
 
-            TriangleMesh(const std::vector<Vector3D>& vertices, const std::vector<Vector3S>& indices, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
-            explicit TriangleMesh(const std::string& filename, const Vector3D& defaultColor = {0.5, 0.5, 0.5});
+            TriangleMesh(const std::vector<Math::Vector3D>& vertices, const std::vector<Math::Vector3S>& indices, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
+            explicit TriangleMesh(const std::string& filename, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
             void setTexture(const std::shared_ptr<Image>& pTexture);
         };
 

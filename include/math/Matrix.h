@@ -12,7 +12,7 @@
 #include <format>
 
 namespace UltRenderer {
-    namespace Data {
+    namespace Math {
         /*----------Declaration----------*/
         template<typename T, std::size_t M, std::size_t N>
         class Matrix {
@@ -122,6 +122,35 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
+
+        // Tips: Use using instead of typedef when creating alias of a template
+        template<typename T>
+        using Vector3 = Matrix<T, 3, 1>;
+
+        template<typename T>
+        using Vector2 = Matrix<T, 2, 1>;
+
+        typedef Vector3<int> Vector3I;
+        typedef Vector3<double> Vector3D;
+        typedef Vector3<float> Vector3F;
+        typedef Vector3<std::size_t> Vector3S;
+
+        typedef Vector2<int> Vector2I;
+        typedef Vector2<double> Vector2D;
+        typedef Vector2<float> Vector2F;
+        typedef Vector2<std::size_t> Vector2S;
+
+        template<typename T>
+        using Matrix4 = Matrix<T, 4, 4>;
+
+        template<typename T>
+        using Matrix3 = Matrix<T, 3, 3>;
+
+        typedef Matrix4<double> Matrix4D;
+        typedef Matrix4<float> Matrix4F;
+
+        typedef Matrix3<double> Matrix3D;
+        typedef Matrix3<float> Matrix3F;
 
         /*----------Definition----------*/
         template<typename T, std::size_t M, std::size_t N>
@@ -263,35 +292,6 @@ namespace UltRenderer {
             return res;
         }
 
-        // Tips: Use using instead of typedef when creating alias of a template
-        template<typename T>
-        using Vector3 = Matrix<T, 3, 1>;
-
-        template<typename T>
-        using Vector2 = Matrix<T, 2, 1>;
-
-        typedef Vector3<int> Vector3I;
-        typedef Vector3<double> Vector3D;
-        typedef Vector3<float> Vector3F;
-        typedef Vector3<std::size_t> Vector3S;
-
-        typedef Vector2<int> Vector2I;
-        typedef Vector2<double> Vector2D;
-        typedef Vector2<float> Vector2F;
-        typedef Vector2<std::size_t> Vector2S;
-
-        template<typename T>
-        using Matrix4 = Matrix<T, 4, 4>;
-
-        template<typename T>
-        using Matrix3 = Matrix<T, 3, 3>;
-
-        typedef Matrix4<double> Matrix4D;
-        typedef Matrix4<float> Matrix4F;
-
-        typedef Matrix3<double> Matrix3D;
-        typedef Matrix3<float> Matrix3F;
-
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::dot(const Matrix<T, M, N> &target) const {
             // TODO: Need to add assert prompt
@@ -379,7 +379,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y, T z, T w): _data(0) {
+        Matrix<T, M, N>::Matrix(T x, T y, T z, T w): Matrix() {
             static_assert(M * N > 3);
             _data[0] = x;
             _data[1] = y;
@@ -388,7 +388,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y, T z): _data(0) {
+        Matrix<T, M, N>::Matrix(T x, T y, T z): Matrix(0) {
             static_assert(M * N > 2);
             _data[0] = x;
             _data[1] = y;
@@ -396,7 +396,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y): _data(0) {
+        Matrix<T, M, N>::Matrix(T x, T y): Matrix(0) {
             static_assert(M * N > 1);
             _data[0] = x;
             _data[1] = y;

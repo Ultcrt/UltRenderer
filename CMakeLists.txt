@@ -14,13 +14,13 @@ add_executable(UltRenderer src/Main.cpp
         include/rendering/Rasterize.h
         src/data/TriangleMesh.cpp
         include/data/TriangleMesh.h
-        src/data/Matrix.cpp
-        include/data/Matrix.h
+        src/math/Matrix.cpp
+        include/math/Matrix.h
         include/utils/String.h
         src/utils/String.cpp
         src/utils/Hash.cpp
         include/utils/Hash.h
-        src/utils/Geometry.cpp
-        include/utils/Geometry.h)
+        src/math/Geometry.cpp
+        include/math/Geometry.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

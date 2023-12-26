@@ -15,22 +15,22 @@
 
 namespace UltRenderer {
     namespace Data {
-        TriangleMesh::TriangleMesh(const std::vector<Vector3D> &vertices, const std::vector<Vector3S> &indices, const Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor) {}
+        TriangleMesh::TriangleMesh(const std::vector<Math::Vector3D> &vertices, const std::vector<Math::Vector3S> &indices, const Math::Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor) {}
 
-        TriangleMesh::TriangleMesh(const std::string &filename, const Vector3D& defaultColor) {
+        TriangleMesh::TriangleMesh(const std::string &filename, const Math::Vector3D& defaultColor) {
             std::ifstream loader(filename);
             if (!loader.is_open()) {
                 throw std::runtime_error(std::format("Can not open file: {}", filename));
             }
 
             // Index in f starts at 1, so we can use index 0 as default value when index is not defined
-            std::vector<Vector3D>     vList = {{0, 0, 0}};
-            std::vector<Vector3D> colorList = {defaultColor};
-            std::vector<Vector3D>    vtList = {{0, 0, 0}};
-            std::vector<Vector3D>    vnList = {{0, 0, 0}};
-            std::vector<Vector3D>    vpList = {{0, 0, 0}};
+            std::vector<Math::Vector3D>     vList = {{0, 0, 0}};
+            std::vector<Math::Vector3D> colorList = {defaultColor};
+            std::vector<Math::Vector3D>    vtList = {{0, 0, 0}};
+            std::vector<Math::Vector3D>    vnList = {{0, 0, 0}};
+            std::vector<Math::Vector3D>    vpList = {{0, 0, 0}};
 
-            std::vector<std::array<Vector3S, 3>> fList;
+            std::vector<std::array<Math::Vector3S, 3>> fList;
 
             std::string line;
             std::size_t lineIdx = 0;
@@ -65,7 +65,7 @@ namespace UltRenderer {
                                     throw std::runtime_error(std::format("w param of vertex line is zero at line {}", lineIdx));
                                 }
                                 else {
-                                    vList.emplace_back(Vector3D(vertexParams[0], vertexParams[1], vertexParams[2]) / vertexParams[3]);
+                                    vList.emplace_back(Math::Vector3D(vertexParams[0], vertexParams[1], vertexParams[2]) / vertexParams[3]);
                                 }
                                 break;
                             case 6:
@@ -83,7 +83,7 @@ namespace UltRenderer {
                         }
 
                         if (!textureParams.empty() && textureParams.size() < 4) {
-                            Vector3D textureVec;
+                            Math::Vector3D textureVec;
                             for (std::size_t idx = 0; idx < textureParams.size(); idx++) {
                                 textureVec[idx] = textureParams[idx];
                             }
@@ -117,7 +117,7 @@ namespace UltRenderer {
                         }
 
                         if (vpParams.size() == 3) {
-                            Vector3D vpVec;
+                            Math::Vector3D vpVec;
                             for (std::size_t idx = 0; idx < vpParams.size(); idx++) {
                                 vpVec[idx] = vpParams[idx];
                             }
@@ -130,13 +130,13 @@ namespace UltRenderer {
                     else if (command == "f") {
                         // Split with /
                         if (params.size() == 3) {
-                            std::array<Vector3S, 3> faceParams;
+                            std::array<Math::Vector3S, 3> faceParams;
                             for (std::size_t paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                                 const auto& param = params[paramIdx];
                                 std::vector<std::string> fIndices = Utils::String::Split(param, '/');
 
                                 if (fIndices.size() <= 3) {
-                                    Vector3S indices;
+                                    Math::Vector3S indices;
                                     for (std::size_t idx = 0; idx < fIndices.size(); idx++) {
                                         if (fIndices[idx].empty()) {
                                             // Set to default idx when index is ignored
@@ -179,7 +179,7 @@ namespace UltRenderer {
 
             // Create f map
             const std::size_t bucketSize = 2 * fList.size();
-            std::unordered_map<Vector3S, std::size_t, Utils::Hash::SpatialHash3D<std::size_t>> fMap(bucketSize, Utils::Hash::SpatialHash3D<std::size_t>(bucketSize));
+            std::unordered_map<Math::Vector3S, std::size_t, Utils::Hash::SpatialHash3D<std::size_t>> fMap(bucketSize, Utils::Hash::SpatialHash3D<std::size_t>(bucketSize));
             for (const auto& f: fList) {
                 for (const auto& idxGroup: f) {
                     // Tips: map::insert will not update already-exist key-value pair

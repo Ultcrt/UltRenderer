@@ -6,9 +6,9 @@
 #define ULTRENDERER_RASTERIZE_H
 
 #include <cmath>
-#include "data/Matrix.h"
+#include "math/Matrix.h"
 #include "data/Image.h"
-#include "utils/Geometry.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -18,11 +18,11 @@ namespace UltRenderer {
             void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, const Data::Vector2S& p0, const Data::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+            void Line(UltRenderer::Data::Image& img, const Math::Vector2S& p0, const Math::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const std::array<Data::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
+            void Triangle(UltRenderer::Data::Image& img, const std::array<Math::Vector2S, 3> &points,
+                          const Math::Vector3D& depths, const std::array<Math::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           std::vector<double>& zBuffer);
 
             /*----------Definition----------*/
@@ -90,26 +90,26 @@ namespace UltRenderer {
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, const Data::Vector2S &p0,
-                      const Data::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+            void Line(UltRenderer::Data::Image& img, const Math::Vector2S &p0,
+                      const Math::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
                 Line<FORMAT>(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image& img, const std::array<Data::Vector2S, 3> &points,
-                          const Data::Vector3D& depths, const std::array<Data::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
+            void Triangle(UltRenderer::Data::Image& img, const std::array<Math::Vector2S, 3> &points,
+                          const Math::Vector3D& depths, const std::array<Math::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           std::vector<double>& zBuffer) {
                 std::size_t width = img.width();
 
-                Data::Vector3D textureShapeVec(static_cast<double >(texture.width()), static_cast<double >(texture.height()), 0);
+                Math::Vector3D textureShapeVec(static_cast<double >(texture.width()), static_cast<double >(texture.height()), 0);
 
-                std::array<Data::Vector2D, 3> doublePoints = {
-                        static_cast<Data::Vector2D>(points[0]),
-                        static_cast<Data::Vector2D>(points[1]),
-                        static_cast<Data::Vector2D>(points[2])
+                std::array<Math::Vector2D, 3> doublePoints = {
+                        static_cast<Math::Vector2D>(points[0]),
+                        static_cast<Math::Vector2D>(points[1]),
+                        static_cast<Math::Vector2D>(points[2])
                 };
 
-                std::array<Data::Vector3D, 3> scaledUVs = {
+                std::array<Math::Vector3D, 3> scaledUVs = {
                         uvs[0].componentWiseProduct(textureShapeVec),
                         uvs[1].componentWiseProduct(textureShapeVec),
                         uvs[2].componentWiseProduct(textureShapeVec)
@@ -123,7 +123,7 @@ namespace UltRenderer {
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
                             double depth = barycentricCoords.dot(depths);
-                            Data::Vector3S uv = static_cast<Data::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
+                            Math::Vector3S uv = static_cast<Math::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
 
                             if (depth > zBuffer[yIdx * width + xIdx]) {
                                 zBuffer[yIdx * width + xIdx] = depth;

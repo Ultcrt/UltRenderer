@@ -2,7 +2,7 @@
 // Created by ultcrt on 23-12-14.
 //
 
-#include "utils/Geometry.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Utils {
