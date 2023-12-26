@@ -22,6 +22,12 @@ add_executable(UltRenderer src/Main.cpp
         include/utils/Hash.h
         src/math/Geometry.cpp
         include/math/Geometry.h
+        src/rendering/Camera.cpp
+        include/rendering/Camera.h
+        src/rendering/Scene.cpp
+        include/rendering/Scene.h
+        src/math/Transform.cpp
+        include/math/Transform.h
         src/utils/Proxy.cpp
         include/utils/Proxy.h)
 
