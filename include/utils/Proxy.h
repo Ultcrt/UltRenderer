@@ -17,7 +17,7 @@ namespace UltRenderer {
             std::array<T*, M * N> _componentPtrs;
 
         public:
-            explicit MatrixProxy(const std::array<double*, M * N>& componentPtrs);
+            explicit MatrixProxy(const std::array<T*, M * N>& componentPtrs);
 
             MatrixProxy<T, M, N>& operator=(const Math::Matrix<T, M, N>& target);
 
@@ -99,7 +99,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        MatrixProxy<T, M, N>::MatrixProxy(const std::array<double *, M * N> &componentPtrs): _componentPtrs(componentPtrs) {}
+        MatrixProxy<T, M, N>::MatrixProxy(const std::array<T*, M * N> &componentPtrs): _componentPtrs(componentPtrs) {}
     } // Utils
 } // UltRenderer
 
