@@ -39,6 +39,9 @@ namespace UltRenderer {
 
             Matrix(T x, T y, T z, T w);
 
+            template<typename ...Ts>
+            Matrix(T x, T y, T z, T w, Ts... components);
+
             static Matrix<T, M, N> Identity();
 
             T& operator()(std::size_t rowIdx, std::size_t colIdx);
@@ -388,7 +391,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y, T z): Matrix(0) {
+        Matrix<T, M, N>::Matrix(T x, T y, T z): Matrix() {
             static_assert(M * N > 2);
             _data[0] = x;
             _data[1] = y;
@@ -396,7 +399,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N>::Matrix(T x, T y): Matrix(0) {
+        Matrix<T, M, N>::Matrix(T x, T y): Matrix() {
             static_assert(M * N > 1);
             _data[0] = x;
             _data[1] = y;
@@ -555,6 +558,10 @@ namespace UltRenderer {
                 std::copy(target[idx].cbegin(), target[idx].cend(), _data.begin() + idx * N);
             }
         }
+
+        template<typename T, std::size_t M, std::size_t N>
+        template<typename... Ts>
+        Matrix<T, M, N>::Matrix(T x, T y, T z, T w, Ts... components):_data{x, y, z, w, static_cast<T>(components)...} {}
     } // UltRenderer
 } // Data
 
