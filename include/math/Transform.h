@@ -13,7 +13,7 @@ namespace UltRenderer {
         public:
             Transform3D();
 
-            explicit Transform3D(const Vector3D& scaling, const Vector3D& position, const Vector3D& rotation);
+            explicit Transform3D(const Vector3D& scaling, const Vector3D& rotation, const Vector3D& position);
         };
 
     } // Math
