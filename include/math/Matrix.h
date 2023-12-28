@@ -129,10 +129,18 @@ namespace UltRenderer {
 
         // Tips: Use using instead of typedef when creating alias of a template
         template<typename T>
+        using Vector4 = Matrix<T, 4, 1>;
+
+        template<typename T>
         using Vector3 = Matrix<T, 3, 1>;
 
         template<typename T>
         using Vector2 = Matrix<T, 2, 1>;
+
+        typedef Vector4<int> Vector4I;
+        typedef Vector4<double> Vector4D;
+        typedef Vector4<float> Vector4F;
+        typedef Vector4<std::size_t> Vector4S;
 
         typedef Vector3<int> Vector3I;
         typedef Vector3<double> Vector3D;
