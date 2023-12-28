@@ -210,5 +210,15 @@ namespace UltRenderer {
         void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
             _pTexture = pTexture;
         }
+
+        std::vector<Math::Vector3D> TriangleMesh::transform() const {
+            std::vector<Math::Vector3D> res;
+
+            for (const auto& vertex: vertices) {
+                res.emplace_back((modelMatrix * vertex.toHomogeneousCoordinates(1)).toCartesianCoordinates());
+            }
+
+            return res;
+        }
     } // UltRenderer
 } // Data
