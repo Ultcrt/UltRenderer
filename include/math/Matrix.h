@@ -82,6 +82,8 @@ namespace UltRenderer {
 
             [[nodiscard]] Matrix<T, M, N> inverse();
 
+            [[nodiscard]] Matrix<T, M+1, N> toHomogeneousCoordinates(T lastDim) const;
+
             [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
 
             [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
@@ -165,6 +167,21 @@ namespace UltRenderer {
         typedef Matrix3<float> Matrix3F;
 
         /*----------Definition----------*/
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M + 1, N> Matrix<T, M, N>::toHomogeneousCoordinates(T lastDim) const {
+            static_assert(N == 1);
+
+            Matrix<T, M + 1, N> res;
+
+            for (std::size_t idx = 0; idx < M; idx++) {
+                res._data[idx] = _data[idx];
+            }
+
+            res._data[M + 1] = lastDim;
+
+            return res;
+        }
+
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N> Matrix<T, M, N>::Identity() {
             Matrix<T, M, N> res;
