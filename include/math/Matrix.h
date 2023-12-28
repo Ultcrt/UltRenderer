@@ -76,11 +76,11 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator-() const;
 
-            [[nodiscard]] Matrix<T, N, M> transpose();
+            [[nodiscard]] Matrix<T, N, M> transpose() const;
 
-            [[nodiscard]] T determinant();
+            [[nodiscard]] T determinant() const;
 
-            [[nodiscard]] Matrix<T, M, N> inverse();
+            [[nodiscard]] Matrix<T, M, N> inverse() const;
 
             [[nodiscard]] Matrix<T, M+1, N> toHomogeneousCoordinates(T lastDim) const;
 
@@ -201,7 +201,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N> Matrix<T, M, N>::inverse() {
+        Matrix<T, M, N> Matrix<T, M, N>::inverse() const {
             static_assert(M == N);
 
             T det = determinant();
@@ -230,7 +230,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        T Matrix<T, M, N>::determinant() {
+        T Matrix<T, M, N>::determinant() const {
             static_assert(M == N);
 
             // TODO: Current recursive resolution may be very slow
@@ -266,7 +266,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, N, M> Matrix<T, M, N>::transpose() {
+        Matrix<T, N, M> Matrix<T, M, N>::transpose() const {
             Matrix<T, N, M> res(_data);
 
             for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
