@@ -84,6 +84,8 @@ namespace UltRenderer {
 
             [[nodiscard]] Matrix<T, M+1, N> toHomogeneousCoordinates(T lastDim) const;
 
+            [[nodiscard]] Matrix<T, M-1, N> toCartesianCoordinates() const;
+
             [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
 
             [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
@@ -178,6 +180,20 @@ namespace UltRenderer {
             }
 
             res._data[M + 1] = lastDim;
+
+            return res;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M - 1, N> Matrix<T, M, N>::toCartesianCoordinates() const {
+            static_assert(N == 1);
+            static_assert(M > 1);
+
+            Matrix<T, M - 1, N> res;
+
+            for (std::size_t idx = 0; idx < M - 1; idx++) {
+                res._data[idx] = _data[idx];
+            }
 
             return res;
         }
