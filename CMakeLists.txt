@@ -30,6 +30,8 @@ add_executable(UltRenderer src/Main.cpp
         include/math/Transform.h
         src/utils/Proxy.cpp
         include/utils/Proxy.h
+        src/hierarchy/Node.cpp
+        include/hierarchy/Node.h
         src/rendering/Light.cpp
         include/rendering/Light.h)
 
