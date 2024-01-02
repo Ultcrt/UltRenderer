@@ -16,10 +16,9 @@
 namespace UltRenderer {
     namespace Data {
         class TriangleMesh: public Hierarchy::TransformNode {
-        private:
-            std::shared_ptr<Image> _pTexture;
-
         public:
+            std::shared_ptr<Image> pTexture;
+
             std::vector<Math::Vector3D> vertices;
             std::vector<Math::Vector3D> vertexNormals;
             std::vector<Math::Vector3S> triangles;
