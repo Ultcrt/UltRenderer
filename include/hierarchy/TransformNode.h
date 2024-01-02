@@ -10,6 +10,7 @@
 namespace UltRenderer {
     namespace Hierarchy {
         class TransformNode: public Node {
+        public:
             Math::Transform3D transformMatrix;
         };
     } // Hierarchy

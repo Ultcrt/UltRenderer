@@ -12,7 +12,7 @@ namespace UltRenderer {
     namespace Hierarchy {
         // Class can be inserted into hierarchy
         class Node {
-        private:
+        protected:
             std::shared_ptr<Rendering::Scene> _pScene;
 
         public:
