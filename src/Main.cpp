@@ -14,7 +14,7 @@ int main() {
 
     UltRenderer::Math::Vector3D light = {0, 0, -1};
 
-    std::vector<double> zBuffer(img.height() * img.width(), std::numeric_limits<double>::lowest());
+    UltRenderer::Data::Image zBuffer(img.height(), img.width(), UltRenderer::Data::ImageFormat::GRAY);
 
     for (const auto& tri: model.triangles) {
         UltRenderer::Math::Vector3D vertex0 = model.vertices[tri[0]];
