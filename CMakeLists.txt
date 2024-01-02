@@ -29,6 +29,8 @@ add_executable(UltRenderer src/Main.cpp
         src/math/Transform.cpp
         include/math/Transform.h
         src/utils/Proxy.cpp
-        include/utils/Proxy.h)
+        include/utils/Proxy.h
+        src/rendering/Light.cpp
+        include/rendering/Light.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
