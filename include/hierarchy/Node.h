@@ -8,6 +8,7 @@
 #include <memory>
 
 namespace UltRenderer {
+    // Tips: Forward declaration to avoid circular dependency
     namespace Rendering {
         class Scene;
     }
