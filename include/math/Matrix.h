@@ -192,7 +192,7 @@ namespace UltRenderer {
             Matrix<T, M - 1, N> res;
 
             for (std::size_t idx = 0; idx < M - 1; idx++) {
-                res._data[idx] = _data[idx];
+                res._data[idx] = _data[idx] / _data[M - 1];
             }
 
             return res;
