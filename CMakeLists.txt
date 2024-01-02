@@ -33,6 +33,8 @@ add_executable(UltRenderer src/Main.cpp
         src/hierarchy/Node.cpp
         include/hierarchy/Node.h
         src/rendering/Light.cpp
-        include/rendering/Light.h)
+        include/rendering/Light.h
+        src/hierarchy/TransformNode.cpp
+        include/hierarchy/TransformNode.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
