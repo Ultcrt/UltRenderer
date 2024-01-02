@@ -10,8 +10,8 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        enum class FOVType {
-            H, V, D
+        enum class ProjectionType {
+            ORTHOGONAL, PERSPECTIVE
         };
 
         class Camera {
@@ -21,26 +21,28 @@ namespace UltRenderer {
 
             double _zMin = 0.1;
             double _zMax = 10;
+
+            ProjectionType _projectionType;
         public:
             Math::Transform3D viewMatrix;
             Math::Transform3D projectionMatrix;
 
-            static Math::Vector2D ConvertFOVToSize(FOVType fovType, double len, bool isWidth = true);
+            Camera(double width, double height, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
 
-            Camera(double width, FOVType fovType, double zMin=0.1, double zMax=0.1);
-            Camera(double width, double height, double zMin=0.1, double zMax=0.1);
+            [[nodiscard]] double width() const;
+            [[nodiscard]] double height() const;
+            [[nodiscard]] double zMin() const;
+            [[nodiscard]] double zMax() const;
 
-            double width() const;
-            double height() const;
-            double zMin() const;
-            double zMax() const;
+            void updateProjectionMatrix();
 
+            void setProjectionType(ProjectionType projectionType);
             void setWidth(double width);
             void setHeight(double height);
             void setZMin(double zMin);
             void setZMax(double zMax);
 
-            void render(std::size_t width, std::size_t height);
+            void render(std::size_t width, std::size_t height) const;
         };
 
     } // Rendering
