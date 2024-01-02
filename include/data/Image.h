@@ -52,6 +52,8 @@ namespace UltRenderer {
             template<ImageFormat FORMAT>
             void fill(const Pixel<FORMAT>& filledPixel);
 
+            void fill(double val);
+
             template<ImageFormat FORMAT>
             PixelProxy<FORMAT> at(std::size_t w, std::size_t h);
 
@@ -117,7 +119,7 @@ namespace UltRenderer {
 
             if (sameChannelValue) {
                 // All channel are the same, can use std::fill
-                std::fill(_data.begin(), _data.end(), filledPixel[0]);
+                fill(filledPixel[0]);
             }
             else {
                 for (std::size_t w = 0; w < _width; w++) {

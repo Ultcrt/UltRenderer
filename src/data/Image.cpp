@@ -236,5 +236,9 @@ namespace UltRenderer {
         ImageFormat Image::type() const {
             return static_cast<ImageFormat>(_format);
         }
+
+        void Image::fill(double val) {
+            std::fill(_data.begin(), _data.end(), val);
+        }
     } // UltRenderer
 } // Data
