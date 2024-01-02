@@ -4,7 +4,7 @@
 
 #include "rendering/Scene.h"
 
-namespace UltRendering {
+namespace UltRenderer {
     namespace Rendering {
     } // Rendering
-} // UltRendering
+} // UltRenderer

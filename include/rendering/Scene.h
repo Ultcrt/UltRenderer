@@ -5,12 +5,12 @@
 #ifndef ULTRENDERER_SCENE_H
 #define ULTRENDERER_SCENE_H
 
-namespace UltRendering {
+namespace UltRenderer {
     namespace Rendering {
         class Scene {
 
         };
     } // Rendering
-} // UltRendering
+} // UltRenderer
 
 #endif //ULTRENDERER_SCENE_H
