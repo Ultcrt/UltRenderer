@@ -6,10 +6,11 @@
 #define ULTRENDERER_LIGHT_H
 
 #include "math/Matrix.h"
+#include "hierarchy/Node.h"
 
 namespace UltRenderer {
     namespace Rendering {
-        class Light {
+        class Light: public Hierarchy::Node {
         public:
             Math::Vector3D position;
         };

@@ -11,11 +11,11 @@
 #include <memory>
 #include "data/Image.h"
 #include "math/Transform.h"
+#include "hierarchy/TransformNode.h"
 
 namespace UltRenderer {
     namespace Data {
-
-        class TriangleMesh {
+        class TriangleMesh: public Hierarchy::TransformNode {
         private:
             std::shared_ptr<Image> _pTexture;
 
@@ -25,7 +25,6 @@ namespace UltRenderer {
             std::vector<Math::Vector3S> triangles;
             std::vector<Math::Vector3D> vertexColors;
             std::vector<Math::Vector3D> vertexTextures;
-            Math::Transform3D modelMatrix;
 
             TriangleMesh(const std::vector<Math::Vector3D>& vertices, const std::vector<Math::Vector3S>& indices, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});

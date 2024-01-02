@@ -7,6 +7,8 @@
 
 #include "math/Matrix.h"
 #include "math/Transform.h"
+#include "data/TriangleMesh.h"
+#include "hierarchy/TransformNode.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -14,7 +16,7 @@ namespace UltRenderer {
             ORTHOGONAL, PERSPECTIVE
         };
 
-        class Camera {
+        class Camera: public Hierarchy::TransformNode {
         private:
             double _width;
             double _height;
@@ -24,7 +26,6 @@ namespace UltRenderer {
 
             ProjectionType _projectionType;
         public:
-            Math::Transform3D viewMatrix;
             Math::Transform3D projectionMatrix;
 
             Camera(double width, double height, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
@@ -42,7 +43,7 @@ namespace UltRenderer {
             void setZMin(double zMin);
             void setZMax(double zMax);
 
-            void render(std::size_t width, std::size_t height) const;
+            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Data::ImageFormat format) const;
         };
 
     } // Rendering
