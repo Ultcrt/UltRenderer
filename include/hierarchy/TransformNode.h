@@ -6,6 +6,7 @@
 #define ULTRENDERER_TRANSFORMNODE_H
 
 #include "Node.h"
+#include "math/Transform.h"
 
 namespace UltRenderer {
     namespace Hierarchy {

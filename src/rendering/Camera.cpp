@@ -4,6 +4,7 @@
 
 #include "rendering/Camera.h"
 #include "rendering/Rasterize.h"
+#include "rendering/Scene.h"
 
 namespace UltRenderer {
     namespace Rendering {

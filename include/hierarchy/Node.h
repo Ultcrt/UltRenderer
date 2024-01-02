@@ -6,9 +6,12 @@
 #define ULTRENDERER_NODE_H
 
 #include <memory>
-#include "rendering/Scene.h"
 
 namespace UltRenderer {
+    namespace Rendering {
+        class Scene;
+    }
+
     namespace Hierarchy {
         // Class can be inserted into hierarchy
         class Node {
