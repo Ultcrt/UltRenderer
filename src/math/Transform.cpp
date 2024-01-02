@@ -42,5 +42,7 @@ namespace UltRenderer {
         }
 
         Transform3D::Transform3D(): Matrix4D(Matrix4D::Identity()) {}
+
+        Transform3D::Transform3D(const Matrix4D &target) : Matrix(target) {}
     } // Math
 } // UltRenderer
