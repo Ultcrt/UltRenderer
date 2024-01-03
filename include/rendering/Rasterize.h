@@ -100,8 +100,6 @@ namespace UltRenderer {
             void Triangle(UltRenderer::Data::Image& img, const std::array<Math::Vector2S, 3> &points,
                           const Math::Vector3D& depths, const std::array<Math::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
                           UltRenderer::Data::Image& zBuffer) {
-                std::size_t width = img.width();
-
                 Math::Vector3D textureShapeVec(static_cast<double >(texture.width()), static_cast<double >(texture.height()), 0);
 
                 std::array<Math::Vector2D, 3> doublePoints = {
@@ -126,7 +124,7 @@ namespace UltRenderer {
                             double depth = barycentricCoords.dot(depths);
                             Math::Vector3S uv = static_cast<Math::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
 
-                            if (depth > zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
+                            if (depth < zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
                                 zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
                                 // TODO: Not support 3D texture for now
                                 img.at<FORMAT>(xIdx, yIdx) = static_cast<Data::Pixel<FORMAT>>(texture.at<FORMAT>(uv.x(), uv.y())) * colorScale;
