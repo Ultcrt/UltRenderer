@@ -127,6 +127,8 @@ namespace UltRenderer {
                     }
                 }
             }
+
+            return result;
         }
     } // Rendering
 } // UltRenderer
