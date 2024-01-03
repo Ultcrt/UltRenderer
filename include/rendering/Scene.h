@@ -8,12 +8,13 @@
 #include <vector>
 #include "data/TriangleMesh.h"
 #include "rendering/Light.h"
-#include "rendering/Camera.h"
 
 namespace UltRenderer {
     namespace Rendering {
+        class Camera;
+
         // Tips: Make it possible to access shared_ptr of this
-        class Scene: public std::enable_shared_from_this<Scene> {
+        class Scene {
         private:
             std::vector<std::shared_ptr<Data::TriangleMesh>> _meshes;
             std::vector<std::shared_ptr<Rendering::Light>>   _lights;
