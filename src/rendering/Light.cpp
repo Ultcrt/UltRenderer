@@ -6,5 +6,6 @@
 
 namespace UltRenderer {
     namespace Rendering {
+        Light::Light(const Math::Vector3D &pos): position(pos) {}
     } // Rendering
 } // UltRenderer
