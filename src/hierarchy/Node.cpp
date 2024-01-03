@@ -6,7 +6,7 @@
 
 namespace UltRenderer {
     namespace Hierarchy {
-        void Hierarchy::Node::setScene(const std::shared_ptr<Rendering::Scene> &pScene) {
+        void Hierarchy::Node::setScene(Rendering::Scene *pScene) {
             _pScene = pScene;
         }
     } // Hierarchy

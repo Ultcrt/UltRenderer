@@ -3,21 +3,22 @@
 //
 
 #include "rendering/Scene.h"
+#include "rendering/Camera.h"
 
 namespace UltRenderer {
     namespace Rendering {
         void Scene::addMesh(const std::shared_ptr<Data::TriangleMesh> &target) {
-            target->setScene(shared_from_this());
+            target->setScene(this);
             _meshes.emplace_back(target);
         }
 
         void Scene::addLight(const std::shared_ptr<Rendering::Light> &target) {
-            target->setScene(shared_from_this());
+            target->setScene(this);
             _lights.emplace_back(target);
         }
 
         void Scene::addCamera(const std::shared_ptr<Rendering::Camera> &target) {
-            target->setScene(shared_from_this());
+            target->setScene(this);
             _cameras.emplace_back(target);
         }
 

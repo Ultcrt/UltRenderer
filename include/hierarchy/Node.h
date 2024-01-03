@@ -17,10 +17,11 @@ namespace UltRenderer {
         // Class can be inserted into hierarchy
         class Node {
         protected:
-            std::shared_ptr<Rendering::Scene> _pScene;
+            // Tips: No ownership involved, so instead of smart ptr, use raw ptr here
+            Rendering::Scene* _pScene;
 
         public:
-            void setScene(const std::shared_ptr<Rendering::Scene>& pScene);
+            void setScene(Rendering::Scene* pScene);
         };
     } // Hierarchy
 } // UltRenderer
