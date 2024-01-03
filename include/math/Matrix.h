@@ -208,7 +208,7 @@ namespace UltRenderer {
                 res._data[idx * N + idx] = 1;
             }
 
-            return Matrix<T, M, N>();
+            return res;
         }
 
         template<typename T, std::size_t M, std::size_t N>
