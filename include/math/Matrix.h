@@ -179,7 +179,7 @@ namespace UltRenderer {
                 res._data[idx] = _data[idx];
             }
 
-            res._data[M + 1] = lastDim;
+            res._data[M] = lastDim;
 
             return res;
         }
