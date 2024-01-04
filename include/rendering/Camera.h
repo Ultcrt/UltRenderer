@@ -63,7 +63,6 @@ namespace UltRenderer {
 
             UltRenderer::Data::Image result(width, height, FORMAT);
             UltRenderer::Data::Image zBuffer(width, height, Data::ImageFormat::GRAY);
-            zBuffer.fill(1);
 
             // viewport * projection * view
             const Math::Transform3D constTransform = viewport * projectionMatrix * transformMatrix.inverse();
@@ -111,7 +110,7 @@ namespace UltRenderer {
                                 }
                             }
                         }
-                        }
+                    }
                 }
             }
 

@@ -118,13 +118,14 @@ namespace UltRenderer {
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
+                        // TODO: Barycentric coordinates is not the same before and after perspective projection
                         auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, doublePoints);
 
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
                             double depth = barycentricCoords.dot(depths);
                             Math::Vector3S uv = static_cast<Math::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
 
-                            if (depth < zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
+                            if (depth > zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
                                 zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
                                 // TODO: Not support 3D texture for now
                                 img.at<FORMAT>(xIdx, yIdx) = static_cast<Data::Pixel<FORMAT>>(texture.at<FORMAT>(uv.x(), uv.y())) * colorScale;
