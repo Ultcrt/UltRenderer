@@ -22,12 +22,14 @@ namespace UltRenderer {
         // Base vertex shader
         class VertexShader {
         public:
+            // Return type should be upcast from Varying-derived struct
             virtual std::unique_ptr<Varying> vertex(const Math::Vector3D& vertex) = 0;
         };
 
         // Base fragment shader
         class FragmentShader {
         public:
+            // Input Varying ptr is guaranteed that it can be downcast to Varying-derived struct returned by corresponding vertex shader
             virtual std::unique_ptr<Varying> vertex(Varying* pVarying) = 0;
         };
     } // Rendering
