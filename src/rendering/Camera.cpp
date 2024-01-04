@@ -7,7 +7,9 @@
 namespace UltRenderer {
     namespace Rendering {
         Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):
-        _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {}
+        _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {
+            updateProjectionMatrix();
+        }
 
         double Camera::width() const {
             return _width;
@@ -38,7 +40,7 @@ namespace UltRenderer {
                 press(2, 2) = (n + f) / n;
                 press(2, 3) = -f;
                 press(3, 2) = 1 / n;
-                press(0, 0) = 0;
+                press(3, 3) = 0;
             }
 
             // Orthogonal projection can be decomposed into translation and scaling
