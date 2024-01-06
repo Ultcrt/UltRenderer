@@ -15,8 +15,9 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        // A struct used to pass values from vertex shader to fragment shader in the same primitive, just like varying
-        // User can derive this class to add more varying variables
+        /**
+         * A struct used to pass values from vertex shader to fragment shader in the same primitive, just like varying. User can derive this class to add more varying variables
+         */
         struct Varying {
             Math::Vector4D position;    // Works like gl_Position
         };
@@ -29,7 +30,7 @@ namespace UltRenderer {
         // Tips: Use concepts (c++20) to make VARYING must be derived from Varying class
         class VertexShader {
         public:
-            /***
+            /**
              * Callback function of vertex shader
              * @param vertex The vertex need processing
              * @return A user defined struct derived from Varying
@@ -37,7 +38,7 @@ namespace UltRenderer {
             virtual VARYING operator()(const Math::Vector3D& vertex) = 0;
         };
 
-        /***
+        /**
          * Base fragment shader, user can derive this class to implement their own fragment shader
          * @tparam VARYING A user defined struct accepted by fragment shader, need deriving from Varying, works like varying in GLSL.
          * @tparam VERTEX_NUM_IN_PRIMITIVE The number of vertex in a primitive
@@ -45,8 +46,7 @@ namespace UltRenderer {
         template <std::derived_from<Varying> VARYING, std::size_t VERTEX_NUM_IN_PRIMITIVE>
         class FragmentShader {
         public:
-            //
-            /***
+            /**
              * Callback function of fragment shader
              * @param varyings Comes from primitive assembly procedure, is a group of the vertex shader output in the same primitive, works like varying in GLSL.
              * @param weights The Weights used to interpolate in primitive
