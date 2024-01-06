@@ -132,14 +132,29 @@ namespace UltRenderer {
         std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
 
         // Tips: Use using instead of typedef when creating alias of a template
-        template<typename T>
-        using Vector4 = Matrix<T, 4, 1>;
+        template<typename T, std::size_t M>
+        using VectorX = Matrix<T, M, 1>;
+
+        template<std::size_t M>
+        using VectorXI = VectorX<int, M>;
+
+        template<std::size_t M>
+        using VectorXD = VectorX<double, M>;
+
+        template<std::size_t M>
+        using VectorXF = VectorX<float, M>;
+
+        template<std::size_t M>
+        using VectorXS = VectorX<std::size_t, M>;
 
         template<typename T>
-        using Vector3 = Matrix<T, 3, 1>;
+        using Vector4 = VectorX<T, 4>;
 
         template<typename T>
-        using Vector2 = Matrix<T, 2, 1>;
+        using Vector3 = VectorX<T, 3>;
+
+        template<typename T>
+        using Vector2 = VectorX<T, 2>;
 
         typedef Vector4<int> Vector4I;
         typedef Vector4<double> Vector4D;
@@ -156,11 +171,20 @@ namespace UltRenderer {
         typedef Vector2<float> Vector2F;
         typedef Vector2<std::size_t> Vector2S;
 
-        template<typename T>
-        using Matrix4 = Matrix<T, 4, 4>;
+        template<typename T, std::size_t M>
+        using MatrixX = Matrix<T, M, M>;
+
+        template<std::size_t M>
+        using MatrixXD = MatrixX<double, M>;
+
+        template<std::size_t M>
+        using MatrixXF = MatrixX<float, M>;
 
         template<typename T>
-        using Matrix3 = Matrix<T, 3, 3>;
+        using Matrix4 = MatrixX<T, 4>;
+
+        template<typename T>
+        using Matrix3 = MatrixX<T, 3>;
 
         typedef Matrix4<double> Matrix4D;
         typedef Matrix4<float> Matrix4F;
