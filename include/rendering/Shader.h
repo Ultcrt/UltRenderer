@@ -54,7 +54,7 @@ namespace UltRenderer {
              * @return Return true means color is processed, false means discarded
              */
             virtual bool operator()(const std::array<V, V_NUM>& varyings,
-                                    const Math::Matrix<double, V_NUM, 1>& weights,
+                                    const Math::VectorXD<V_NUM>& weights,
                                     Math::Vector4D& color) = 0;
         };
     } // Rendering

@@ -15,17 +15,17 @@ namespace UltRenderer {
         namespace Geometry {
             /*----------Declaration----------*/
             template<typename T, std::size_t N>
-            std::pair<Math::Matrix<T, N, 1>, Math::Matrix<T, N, 1>> GetAABB(const std::vector<Math::Matrix<T, N, 1>>& points);
+            std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>> GetAABB(const std::vector<Math::VectorX<T, N>>& points);
 
             template<typename T>
             Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point, const std::array<Math::Vector2<T>, 3>& trianglePoints);
 
             /*----------Definition----------*/
             template<typename T, std::size_t N>
-            std::pair<Math::Matrix<T, N, 1>, Math::Matrix<T, N, 1>>
-            GetAABB(const std::vector<Math::Matrix<T, N, 1>> &points) {
-                Math::Matrix<T, N, 1> minVec;
-                Math::Matrix<T, N, 1> maxVec;
+            std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>>
+            GetAABB(const std::vector<Math::VectorX<T, N>> &points) {
+                Math::VectorX<T, N> minVec;
+                Math::VectorX<T, N> maxVec;
 
                 if (!points.empty()) {
                     minVec = points[0];

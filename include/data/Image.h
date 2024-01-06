@@ -23,15 +23,15 @@ namespace UltRenderer {
         template<ImageFormat FORMAT>
         using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
 
-        // Why not "using Pixel = Matrix<double, static_cast<std::size_t>(FORMAT), 1>;" ?
+        // Why not "using Pixel = Math::VectorXD<static_cast<std::size_t>(FORMAT)>;" ?
         // Because compiler cannot infer template parameter from above line
         template<ImageFormat FORMAT>
-        class Pixel: public Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1> {
+        class Pixel: public Math::VectorXD<static_cast<std::size_t>(FORMAT)> {
         public:
             // Tips: Inherit all constructor of base class
-            using Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>::Matrix;
+            using Math::VectorXD<static_cast<std::size_t>(FORMAT)>::Matrix;
 
-            Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target);
+            Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target);
         };
 
         class Image {
@@ -70,7 +70,7 @@ namespace UltRenderer {
 
         /*----------Definition----------*/
         template<ImageFormat FORMAT>
-        Pixel<FORMAT>::Pixel(const Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>& target): Math::Matrix<double, static_cast<std::size_t>(FORMAT), 1>(target) {}
+        Pixel<FORMAT>::Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target): Math::VectorXD<static_cast<std::size_t>(FORMAT)>(target) {}
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
