@@ -14,122 +14,8 @@
 namespace UltRenderer {
     namespace Math {
         /*----------Declaration----------*/
-        template<typename T, std::size_t M, std::size_t N>
-        class Matrix {
-            // Tips: Foo<int> and Foo<float> is not the same class
-            template<typename, std::size_t, std::size_t>
-            friend class Matrix;
-
-        protected:
-            std::array<T, M * N> _data;
-
-        public:
-            explicit Matrix(const T& fill=T());
-
-            template<typename CAST>
-            explicit Matrix(const Matrix<CAST, M, N>& target);
-
-            Matrix(const std::array<T, M * N>& data);
-
-            Matrix(const std::array<std::array<T, N>, M>& target);
-
-            Matrix(T x, T y);
-
-            Matrix(T x, T y, T z);
-
-            Matrix(T x, T y, T z, T w);
-
-            // Tips: Use parameter pack to make initialization easier, xyzw is used to make sure this constructor will not hide the default constructors
-            template<typename ...Ts>
-            Matrix(T x, T y, T z, T w, Ts... components);
-
-            static Matrix<T, M, N> Identity();
-
-            T& operator()(std::size_t rowIdx, std::size_t colIdx);
-
-            T operator()(std::size_t rowIdx, std::size_t colIdx) const;
-
-            T& operator[](std::size_t idx);
-
-            T operator[](std::size_t idx) const;
-
-            explicit operator std::string() const;
-
-            [[nodiscard]] Matrix<std::size_t, 2, 1> shape() const;
-
-            bool operator==(const Matrix<T, M, N>& target) const;
-
-            bool operator!=(const Matrix<T, M, N>& target) const;
-
-            Matrix<T, M, N> operator+(const Matrix<T, M, N>& target) const;
-
-            Matrix<T, M, N> operator+() const;
-
-            template<std::size_t K>
-            Matrix<T, M, K> operator*(const Matrix<T, N, K>& target) const;
-
-            Matrix<T, M, N> operator*(T target) const;
-
-            Matrix<T, M, N> operator/(T target) const;
-
-            Matrix<T, M, N> operator-(const Matrix<T, M, N>& target) const;
-
-            Matrix<T, M, N> operator-() const;
-
-            [[nodiscard]] Matrix<T, N, M> transpose() const;
-
-            [[nodiscard]] T determinant() const;
-
-            [[nodiscard]] Matrix<T, M, N> inverse() const;
-
-            [[nodiscard]] Matrix<T, M+1, N> toHomogeneousCoordinates(T lastDim) const;
-
-            [[nodiscard]] Matrix<T, M-1, N> toCartesianCoordinates() const;
-
-            [[nodiscard]] Matrix<T, 3, 1> cross(const Matrix<T, 3, 1>& target) const;
-
-            [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
-
-            [[nodiscard]] T norm() const;
-
-            [[nodiscard]] T norm2() const;
-
-            void normalize();
-
-            [[nodiscard]] Matrix<T, M, N> normalized() const;
-
-            [[nodiscard]] std::array<T, M * N>::const_iterator begin() const;
-
-            [[nodiscard]] std::array<T, M * N>::const_iterator end() const;
-
-            [[nodiscard]] std::array<T, M * N>::iterator begin();
-
-            [[nodiscard]] std::array<T, M * N>::iterator end();
-
-            [[nodiscard]] Matrix<T, M, N> componentWiseProduct(const Matrix<T, M, N>& target) const;
-
-            T& x();
-
-            T& y();
-
-            T& z();
-
-            T& w();
-
-            [[nodiscard]] T x() const;
-
-            [[nodiscard]] T y() const;
-
-            [[nodiscard]] T z() const;
-
-            [[nodiscard]] T w() const;
-        };
-
-        template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, M, N> operator*(T target, const Matrix<T, M, N>& source);
-
-        template<typename T, std::size_t M, std::size_t N>
-        std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
+        // Tips: Use forward declaration to make Matrix alias can be used in Matrix definition
+        template<typename T, std::size_t M, std::size_t N> class Matrix;
 
         // Tips: Use using instead of typedef when creating alias of a template
         template<typename T, std::size_t M>
@@ -191,6 +77,123 @@ namespace UltRenderer {
 
         typedef Matrix3<double> Matrix3D;
         typedef Matrix3<float> Matrix3F;
+
+        template<typename T, std::size_t M, std::size_t N>
+        class Matrix {
+            // Tips: Foo<int> and Foo<float> is not the same class
+            template<typename, std::size_t, std::size_t>
+            friend class Matrix;
+
+        protected:
+            std::array<T, M * N> _data;
+
+        public:
+            explicit Matrix(const T& fill=T());
+
+            template<typename CAST>
+            explicit Matrix(const Matrix<CAST, M, N>& target);
+
+            Matrix(const std::array<T, M * N>& data);
+
+            Matrix(const std::array<std::array<T, N>, M>& target);
+
+            Matrix(T x, T y);
+
+            Matrix(T x, T y, T z);
+
+            Matrix(T x, T y, T z, T w);
+
+            // Tips: Use parameter pack to make initialization easier, xyzw is used to make sure this constructor will not hide the default constructors
+            template<typename ...Ts>
+            Matrix(T x, T y, T z, T w, Ts... components);
+
+            static Matrix<T, M, N> Identity();
+
+            T& operator()(std::size_t rowIdx, std::size_t colIdx);
+
+            T operator()(std::size_t rowIdx, std::size_t colIdx) const;
+
+            T& operator[](std::size_t idx);
+
+            T operator[](std::size_t idx) const;
+
+            explicit operator std::string() const;
+
+            [[nodiscard]] Vector2S shape() const;
+
+            bool operator==(const Matrix<T, M, N>& target) const;
+
+            bool operator!=(const Matrix<T, M, N>& target) const;
+
+            Matrix<T, M, N> operator+(const Matrix<T, M, N>& target) const;
+
+            Matrix<T, M, N> operator+() const;
+
+            template<std::size_t K>
+            Matrix<T, M, K> operator*(const Matrix<T, N, K>& target) const;
+
+            Matrix<T, M, N> operator*(T target) const;
+
+            Matrix<T, M, N> operator/(T target) const;
+
+            Matrix<T, M, N> operator-(const Matrix<T, M, N>& target) const;
+
+            Matrix<T, M, N> operator-() const;
+
+            [[nodiscard]] Matrix<T, N, M> transpose() const;
+
+            [[nodiscard]] T determinant() const;
+
+            [[nodiscard]] Matrix<T, M, N> inverse() const;
+
+            [[nodiscard]] Matrix<T, M+1, N> toHomogeneousCoordinates(T lastDim) const;
+
+            [[nodiscard]] Matrix<T, M-1, N> toCartesianCoordinates() const;
+
+            [[nodiscard]] Vector3<T> cross(const Vector3<T>& target) const;
+
+            [[nodiscard]] T dot(const Matrix<T, M, N>& target) const;
+
+            [[nodiscard]] T norm() const;
+
+            [[nodiscard]] T norm2() const;
+
+            void normalize();
+
+            [[nodiscard]] Matrix<T, M, N> normalized() const;
+
+            [[nodiscard]] std::array<T, M * N>::const_iterator begin() const;
+
+            [[nodiscard]] std::array<T, M * N>::const_iterator end() const;
+
+            [[nodiscard]] std::array<T, M * N>::iterator begin();
+
+            [[nodiscard]] std::array<T, M * N>::iterator end();
+
+            [[nodiscard]] Matrix<T, M, N> componentWiseProduct(const Matrix<T, M, N>& target) const;
+
+            T& x();
+
+            T& y();
+
+            T& z();
+
+            T& w();
+
+            [[nodiscard]] T x() const;
+
+            [[nodiscard]] T y() const;
+
+            [[nodiscard]] T z() const;
+
+            [[nodiscard]] T w() const;
+        };
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N> operator*(T target, const Matrix<T, M, N>& source);
+
+        template<typename T, std::size_t M, std::size_t N>
+        std::ostream& operator<< (std::ostream& stream, const Matrix<T, M, N>& target);
 
         /*----------Definition----------*/
         template<typename T, std::size_t M, std::size_t N>
@@ -376,7 +379,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<T, 3, 1> Matrix<T, M, N>::cross(const Matrix<T, 3, 1> &target) const {
+        Vector3<T> Matrix<T, M, N>::cross(const Vector3<T> &target) const {
             static_assert(M * N == 3);
 
             return {
@@ -540,7 +543,7 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        Matrix<std::size_t, 2, 1> Matrix<T, M, N>::shape() const {
+        Vector2S Matrix<T, M, N>::shape() const {
             return {M, N};
         }
 
