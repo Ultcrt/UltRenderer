@@ -23,8 +23,8 @@ namespace UltRenderer {
         };
 
         /***
-         * Base vertex shader, user can derive this class to implement their own vertex shader
-         * @tparam V A user defined struct returned by vertex shader, need deriving from Varying, works like varying in GLSL.
+         * Base vertex shader, user can derive or full specialize this class to implement their own vertex shader
+         * @tparam V A user defined struct returned by vertex shader, need to be derived from Varying, works like varying in GLSL.
          */
         template <std::derived_from<Varying> V>
         // Tips: Use concepts (c++20) to make VARYING must be derived from Varying class
@@ -39,23 +39,19 @@ namespace UltRenderer {
         };
 
         /**
-         * Base fragment shader, user can derive this class to implement their own fragment shader
-         * @tparam V A user defined struct accepted by fragment shader, need deriving from Varying, works like varying in GLSL.
-         * @tparam V_NUM The number of vertex in a primitive
+         * Base fragment shader, user can derive or full specialize this class to implement their own fragment shader
+         * @tparam V A user defined struct accepted by fragment shader, need to be derived from Varying, works like varying in GLSL.
          */
-        template <std::derived_from<Varying> V, std::size_t V_NUM>
+        template <std::derived_from<Varying> V>
         class FragmentShader {
         public:
             /**
              * Callback function of fragment shader
-             * @param varyings Comes from primitive assembly procedure, is a group of the vertex shader output in the same primitive, works like varying in GLSL.
-             * @param weights The Weights used to interpolate in primitive
+             * @param varying The interpolated variables from rasterization procedure, works like varying in GLSL.
              * @param color The reference of color that need processing
              * @return Return true means color is processed, false means discarded
              */
-            virtual bool operator()(const std::array<V, V_NUM>& varyings,
-                                    const Math::VectorXD<V_NUM>& weights,
-                                    Math::Vector4D& color) = 0 const;
+            virtual bool operator()(const V& varying, Math::Vector4D& color) = 0 const;
         };
     } // Rendering
 } // UltRender
