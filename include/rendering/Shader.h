@@ -35,7 +35,7 @@ namespace UltRenderer {
              * @param vertex The vertex need processing
              * @return A user defined struct derived from Varying
              */
-            virtual V operator()(const Math::Vector3D& vertex) = 0;
+            virtual V operator()(const Math::Vector3D& vertex) = 0 const;
         };
 
         /**
@@ -55,7 +55,7 @@ namespace UltRenderer {
              */
             virtual bool operator()(const std::array<V, V_NUM>& varyings,
                                     const Math::VectorXD<V_NUM>& weights,
-                                    Math::Vector4D& color) = 0;
+                                    Math::Vector4D& color) = 0 const;
         };
     } // Rendering
 } // UltRender
