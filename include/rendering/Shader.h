@@ -24,9 +24,9 @@ namespace UltRenderer {
 
         /***
          * Base vertex shader, user can derive this class to implement their own vertex shader
-         * @tparam VARYING A user defined struct returned by vertex shader, need deriving from Varying, works like varying in GLSL.
+         * @tparam V A user defined struct returned by vertex shader, need deriving from Varying, works like varying in GLSL.
          */
-        template <std::derived_from<Varying> VARYING>
+        template <std::derived_from<Varying> V>
         // Tips: Use concepts (c++20) to make VARYING must be derived from Varying class
         class VertexShader {
         public:
@@ -35,15 +35,15 @@ namespace UltRenderer {
              * @param vertex The vertex need processing
              * @return A user defined struct derived from Varying
              */
-            virtual VARYING operator()(const Math::Vector3D& vertex) = 0;
+            virtual V operator()(const Math::Vector3D& vertex) = 0;
         };
 
         /**
          * Base fragment shader, user can derive this class to implement their own fragment shader
-         * @tparam VARYING A user defined struct accepted by fragment shader, need deriving from Varying, works like varying in GLSL.
-         * @tparam VERTEX_NUM_IN_PRIMITIVE The number of vertex in a primitive
+         * @tparam V A user defined struct accepted by fragment shader, need deriving from Varying, works like varying in GLSL.
+         * @tparam V_NUM The number of vertex in a primitive
          */
-        template <std::derived_from<Varying> VARYING, std::size_t VERTEX_NUM_IN_PRIMITIVE>
+        template <std::derived_from<Varying> V, std::size_t V_NUM>
         class FragmentShader {
         public:
             /**
@@ -53,8 +53,8 @@ namespace UltRenderer {
              * @param color The reference of color that need processing
              * @return Return true means color is processed, false means discarded
              */
-            virtual bool operator()(const std::array<VARYING, VERTEX_NUM_IN_PRIMITIVE>& varyings,
-                                    const Math::Matrix<double, VERTEX_NUM_IN_PRIMITIVE, 1>& weights,
+            virtual bool operator()(const std::array<V, V_NUM>& varyings,
+                                    const Math::Matrix<double, V_NUM, 1>& weights,
                                     Math::Vector4D& color) = 0;
         };
     } // Rendering
