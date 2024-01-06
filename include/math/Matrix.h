@@ -104,8 +104,8 @@ namespace UltRenderer {
             Matrix(T x, T y, T z, T w);
 
             // Tips: Use parameter pack to make initialization easier, xyzw is used to make sure this constructor will not hide the default constructors
-            template<typename ...Ts>
-            Matrix(T x, T y, T z, T w, Ts... components);
+            template<typename ...TS>
+            Matrix(T x, T y, T z, T w, TS... components);
 
             static Matrix<T, M, N> Identity();
 
@@ -629,9 +629,9 @@ namespace UltRenderer {
         }
 
         template<typename T, std::size_t M, std::size_t N>
-        template<typename... Ts>
+        template<typename... TS>
         // Tips: Cast can be used on parameter packs
-        Matrix<T, M, N>::Matrix(T x, T y, T z, T w, Ts... components):_data{x, y, z, w, static_cast<T>(components)...} {}
+        Matrix<T, M, N>::Matrix(T x, T y, T z, T w, TS... components):_data{x, y, z, w, static_cast<T>(components)...} {}
     } // UltRenderer
 } // Data
 
