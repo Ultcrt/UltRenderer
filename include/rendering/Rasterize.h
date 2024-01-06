@@ -16,9 +16,6 @@ namespace UltRenderer {
         namespace Rasterize {
             /*----------Declaration----------*/
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1, std::size_t y1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
-
-            template<UltRenderer::Data::ImageFormat FORMAT>
             void Line(UltRenderer::Data::Image& img, const Math::Vector2S& p0, const Math::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
 
             template<UltRenderer::Data::ImageFormat FORMAT>
@@ -28,10 +25,10 @@ namespace UltRenderer {
 
             /*----------Definition----------*/
             template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, std::size_t x0, std::size_t y0, std::size_t x1,
-                      std::size_t y1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
-                const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(x0) - static_cast<double>(x1)));
-                const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(y0) - static_cast<double>(y1)));
+            void Line(UltRenderer::Data::Image& img, const Math::Vector2S &p0,
+                      const Math::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+                const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(p0.x()) - static_cast<double>(p1.x())));
+                const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(p0.y()) - static_cast<double>(p1.y())));
 
                 // Set longer axis as sampling direction
                 bool xIsLonger = dX >= dY;
@@ -41,29 +38,29 @@ namespace UltRenderer {
                 bool shortIsIncreasing;
                 if (xIsLonger) {
                     samples = dX;
-                    if (x0 <= x1) {
-                        longOrigin = x0;
-                        shortOrigin = y0;
-                        shortIsIncreasing = y0 < y1;
+                    if (p0.x() <= p1.x()) {
+                        longOrigin = p0.x();
+                        shortOrigin = p0.y();
+                        shortIsIncreasing = p0.y() < p1.y();
                     }
                     else {
-                        longOrigin = x1;
-                        shortOrigin = y1;
-                        shortIsIncreasing = y1 < y0;
+                        longOrigin = p1.x();
+                        shortOrigin = p1.y();
+                        shortIsIncreasing = p1.y() < p0.y();
                     }
                     step = dY;
                 }
                 else {
                     samples = dY;
-                    if (y0 <= y1) {
-                        longOrigin = y0;
-                        shortOrigin = x0;
-                        shortIsIncreasing = x0 < x1;
+                    if (p0.y() <= p1.y()) {
+                        longOrigin = p0.y();
+                        shortOrigin = p0.x();
+                        shortIsIncreasing = p0.x() < p1.x();
                     }
                     else {
-                        longOrigin = y1;
-                        shortOrigin = x1;
-                        shortIsIncreasing = x1 < x0;
+                        longOrigin = p1.y();
+                        shortOrigin = p1.x();
+                        shortIsIncreasing = p1.x() < p0.x();
                     }
                     step = dX;
                 }
@@ -88,12 +85,6 @@ namespace UltRenderer {
 
                     error += static_cast<long long>(step);
                 }
-            }
-
-            template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, const Math::Vector2S &p0,
-                      const Math::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
-                Line<FORMAT>(img, p0.x(), p0.y(), p1.x(), p1.y(), pixel);
             }
 
             template<UltRenderer::Data::ImageFormat FORMAT>
