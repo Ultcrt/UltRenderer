@@ -74,7 +74,7 @@ namespace UltRenderer {
              * @param color The reference of color that need processing
              * @return Return true means color is processed, false means discarded
              */
-            virtual bool operator()(const V& varying, Math::Vector4D& color) const = 0;
+            virtual bool operator()(const V& varying, Math::Vector4D& color, double& depth) const = 0;
         };
     } // Rendering
 } // UltRender
