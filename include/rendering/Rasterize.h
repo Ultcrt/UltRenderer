@@ -10,23 +10,28 @@
 #include "math/Matrix.h"
 #include "data/Image.h"
 #include "math/Geometry.h"
+#include "shaders/IShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterize {
             /*----------Declaration----------*/
-            template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, const Math::Vector2S& p0, const Math::Vector2S& p1, const UltRenderer::Data::Pixel<FORMAT>& pixel);
+            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
+            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings, const IT& interpolator, const FS& fragmentShader);
 
-            template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image& img, const std::array<Math::Vector2S, 3> &points,
-                          const Math::Vector3D& depths, const std::array<Math::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
-                          UltRenderer::Data::Image& zBuffer);
+            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings, const FS& fragmentShader, const IT& interpolator = {});
 
             /*----------Definition----------*/
-            template<UltRenderer::Data::ImageFormat FORMAT>
-            void Line(UltRenderer::Data::Image& img, const Math::Vector2S &p0,
-                      const Math::Vector2S &p1, const UltRenderer::Data::Pixel<FORMAT> &pixel) {
+            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
+            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings, const IT& interpolator, const FS& fragmentShader) {
+                const Math::Vector2S p0 = {varyings[0].position.x(), varyings[0].position.y()};
+                const Math::Vector2S p1 = {varyings[1].position.x(), varyings[1].position.y()};
+
+                const Math::Vector2D doubleP0 = {varyings[0].position.x(), varyings[0].position.y()};
+                const Math::Vector2D doubleP1 = {varyings[1].position.x(), varyings[1].position.y()};
+                const double len = (doubleP0 - doubleP1).norm();
+
                 const auto dX = static_cast<std::size_t>(std::abs(static_cast<double>(p0.x()) - static_cast<double>(p1.x())));
                 const auto dY = static_cast<std::size_t>(std::abs(static_cast<double>(p0.y()) - static_cast<double>(p1.y())));
 
@@ -76,50 +81,65 @@ namespace UltRenderer {
                         error -= static_cast<long long>(samples);
                     }
 
+                    // TODO: Need to update zBuffer
+                    double depth = 0;
                     if (xIsLonger) {
-                        img.at<FORMAT>(longPos, shortPos) = pixel;
+                        const Math::Vector2D doubleP = {static_cast<double>(longPos), static_cast<double>(shortPos)};
+                        const Math::Vector2D weights = {(doubleP - doubleP0).norm() / len, (doubleP - doubleP1).norm() / len};
+                        const V& interpolatedVarying = interpolator(varyings, weights);
+
+                        Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(longPos, shortPos);
+                        // TODO: Need to deal with discard
+                        fragmentShader(interpolatedVarying, color, depth);
+                        fBuffer.at<Data::ImageFormat::RGBA>(longPos, shortPos) = color;
                     }
                     else {
-                        img.at<FORMAT>(shortPos, longPos) = pixel;
+                        const Math::Vector2D doubleP = {static_cast<double>(shortPos), static_cast<double>(longPos)};
+                        const Math::Vector2D weights = {(doubleP - doubleP0).norm() / len, (doubleP - doubleP1).norm() / len};
+                        const V& interpolatedVarying = interpolator(varyings, weights);
+
+                        Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(shortPos, longPos);
+                        fragmentShader(interpolatedVarying, color, depth);
+                        fBuffer.at<Data::ImageFormat::RGBA>(shortPos, longPos) = color;
                     }
 
                     error += static_cast<long long>(step);
                 }
             }
 
-            template<UltRenderer::Data::ImageFormat FORMAT>
-            void Triangle(UltRenderer::Data::Image& img, const std::array<Math::Vector2S, 3> &points,
-                          const Math::Vector3D& depths, const std::array<Math::Vector3D, 3> &uvs, const UltRenderer::Data::Image& texture, double colorScale,
-                          UltRenderer::Data::Image& zBuffer) {
-                Math::Vector3D textureShapeVec(static_cast<double >(texture.width()), static_cast<double >(texture.height()), 0);
-
-                std::array<Math::Vector2D, 3> doublePoints = {
-                        static_cast<Math::Vector2D>(points[0]),
-                        static_cast<Math::Vector2D>(points[1]),
-                        static_cast<Math::Vector2D>(points[2])
+            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings, const FS& fragmentShader, const IT& interpolator) {
+                std::array<Math::Vector2S, 3> points = {
+                        Math::Vector2S{static_cast<std::size_t>(varyings[0].position.x()), static_cast<std::size_t>(varyings[0].position.y())},
+                        Math::Vector2S{static_cast<std::size_t>(varyings[1].position.x()), static_cast<std::size_t>(varyings[1].position.y())},
+                        Math::Vector2S{static_cast<std::size_t>(varyings[2].position.x()), static_cast<std::size_t>(varyings[2].position.y())},
                 };
 
-                std::array<Math::Vector3D, 3> scaledUVs = {
-                        uvs[0].componentWiseProduct(textureShapeVec),
-                        uvs[1].componentWiseProduct(textureShapeVec),
-                        uvs[2].componentWiseProduct(textureShapeVec)
+                std::array<Math::Vector2D, 3> doublePoints = {
+                        Math::Vector2D{varyings[0].position.x(), varyings[0].position.y()},
+                        Math::Vector2D{varyings[1].position.x(), varyings[1].position.y()},
+                        Math::Vector2D{varyings[2].position.x(), varyings[2].position.y()},
                 };
 
                 auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
-                        // TODO: Barycentric coordinates is not the same before and after perspective projection
                         auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, doublePoints);
 
+                        // Check the point is inside triangle or not
                         if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
-                            double depth = barycentricCoords.dot(depths);
-                            Math::Vector3S uv = static_cast<Math::Vector3S>(scaledUVs[0] * barycentricCoords[0] + scaledUVs[1] * barycentricCoords[1] + scaledUVs[2] * barycentricCoords[2]);
+                            const V& interpolatedVarying = interpolator(varyings, barycentricCoords);
+                            Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx);
+                            // TODO: Barycentric coordinates is not the same before and after perspective projection (perspective correct)
+                            double depth = interpolatedVarying.position.z();
 
-                            if (depth > zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
-                                zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
-                                // TODO: Not support 3D texture for now
-                                img.at<FORMAT>(xIdx, yIdx) = static_cast<Data::Pixel<FORMAT>>(texture.at<FORMAT>(uv.x(), uv.y())) * colorScale;
+                            // Only update when not discard
+                            if (fragmentShader(interpolatedVarying, color, depth)) {
+                                if (depth > zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
+                                    zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
+                                    fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx) = color;
+                                }
                             }
                         }
                     }
