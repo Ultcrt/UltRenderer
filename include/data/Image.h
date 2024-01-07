@@ -32,6 +32,9 @@ namespace UltRenderer {
             using Math::VectorXD<static_cast<std::size_t>(FORMAT)>::VectorXD;
 
             Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target);
+
+            template<ImageFormat TARGET>
+            Pixel<TARGET> convertTo() const;
         };
 
         class Image {
@@ -70,12 +73,39 @@ namespace UltRenderer {
 
         /*----------Definition----------*/
         template<ImageFormat FORMAT>
+        template<ImageFormat TARGET>
+        Pixel<TARGET> Pixel<FORMAT>::convertTo() const {
+            if constexpr (FORMAT == TARGET) {
+                return *this;
+            }
+            else if constexpr (FORMAT == ImageFormat::GRAY && TARGET == ImageFormat::RGB) {
+                return Pixel<TARGET>{1, 1, 1} * this->x();
+            }
+            else if constexpr (FORMAT == ImageFormat::GRAY && TARGET == ImageFormat::RGBA) {
+                return Pixel<TARGET>{this->x(), this->x(), this->x(), 1};
+            }
+            else if constexpr (FORMAT == ImageFormat::RGB && TARGET == ImageFormat::GRAY) {
+                return Pixel<TARGET>{0.299 * this->x() + 0.587 * this->y() + 0.114 * this->z()};
+            }
+            else if constexpr (FORMAT == ImageFormat::RGB && TARGET == ImageFormat::RGBA) {
+                return Pixel<TARGET>{this->x(), this->y(), this->z(), 1};
+            }
+            else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::GRAY) {
+                Pixel<ImageFormat::RGB> rgb = convertTo<ImageFormat::RGB>();
+                return rgb.convertTo<TARGET>();
+            }
+            else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::RGB) {
+                return Pixel<TARGET>{this->x(), this->y(), this->z()};
+            }
+        }
+
+        template<ImageFormat FORMAT>
         Pixel<FORMAT>::Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target): Math::VectorXD<static_cast<std::size_t>(FORMAT)>(target) {}
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
             // Only fill when given pixel has more dimension than image
-            assert(_format <= static_cast<std::size_t>(FORMAT));
+            assert(static_cast<std::size_t>(FORMAT) <= _format);
             assert(w < _width);
             assert(h < _height);
 
@@ -90,7 +120,7 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         PixelProxy<FORMAT> Image::at(std::size_t w, std::size_t h) {
-            assert(_format <= static_cast<std::size_t>(FORMAT));
+            assert(static_cast<std::size_t>(FORMAT) <= _format);
             assert(w < _width);
             assert(h < _height);
 
@@ -105,7 +135,7 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         void Image::fill(const Pixel<FORMAT> &filledPixel) {
-            assert(_format <= static_cast<std::size_t>(FORMAT));
+            assert(static_cast<std::size_t>(FORMAT) <= _format);
 
             // Check all channels of filledPixel is the same or not.
             bool sameChannelValue = true;
