@@ -36,7 +36,7 @@ add_executable(UltRenderer src/Main.cpp
         include/rendering/Light.h
         src/hierarchy/TransformNode.cpp
         include/hierarchy/TransformNode.h
-        include/rendering/Shader.cpp
-        include/rendering/Shader.h)
+        src/shaders/IShader.cpp
+        include/shaders/IShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

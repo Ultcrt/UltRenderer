@@ -2,8 +2,8 @@
 // Created by ultcrt on 24-1-4.
 //
 
-#ifndef ULTRENDERER_SHADER_H
-#define ULTRENDERER_SHADER_H
+#ifndef ULTRENDERER_ISHADER_H
+#define ULTRENDERER_ISHADER_H
 
 #include <array>
 #include <memory>
@@ -14,21 +14,22 @@
 #include "data/Image.h"
 
 namespace UltRenderer {
-    namespace Rendering {
+    namespace Shaders {
         /**
          * A struct used to pass values from vertex shader to fragment shader in the same primitive, just like varying. User can derive this class to add more varying variables
          */
-        struct Varying {
+        struct IVarying {
             Math::Vector4D position;    // Works like gl_Position
         };
 
         /**
          * Base interpolator, user can derive or full specialize this class to implement interpolator for varying variables
-         * @tparam V A user defined struct would be interpolated by this class, need to be derived from Varying, works like varying in GLSL.
+         * @tparam V A user defined struct would be interpolated by this class, need to be derived from IVarying, works like varying in GLSL.
          */
-        template <std::derived_from<Varying> V>
-        // Tips: Use concepts (c++20) to make V must be derived from Varying class
-        class Interpolator {
+        template <std::derived_from<IVarying> V>
+        // Tips: Use concepts (c++20) to make V must be derived from IVarying class
+        class IInterpolator {
+        public:
             /**
              * Callback function of interpolating triangle primitive
              * @param varyings Comes from primitive assembly procedure, is a group of the vertex shader output in the same primitive.
@@ -48,25 +49,25 @@ namespace UltRenderer {
 
         /***
          * Base vertex shader, user can derive or full specialize this class to implement their own vertex shader
-         * @tparam V A user defined struct returned by vertex shader, need to be derived from Varying, works like varying in GLSL.
+         * @tparam V A user defined struct returned by vertex shader, need to be derived from IVarying, works like varying in GLSL.
          */
-        template <std::derived_from<Varying> V>
-        class VertexShader {
+        template <std::derived_from<IVarying> V>
+        class IVertexShader {
         public:
-            /**
-             * Callback function of vertex shader
-             * @param vertex The vertex need processing
-             * @return A user defined struct derived from Varying
-             */
-            virtual V operator()(const Math::Vector3D& vertex) const = 0;
+             /**
+              * Callback function of vertex shader
+              * @param vIdx The index of current vertex, user can use it to get attribute variables (User should set vertex buffer as member of this class)
+              * @return A user defined struct derived from IVarying
+              */
+            virtual V operator()(std::size_t vIdx) const = 0;
         };
 
         /**
          * Base fragment shader, user can derive or full specialize this class to implement their own fragment shader
-         * @tparam V A user defined struct accepted by fragment shader, need to be derived from Varying, works like varying in GLSL.
+         * @tparam V A user defined struct accepted by fragment shader, need to be derived from IVarying, works like varying in GLSL.
          */
-        template <std::derived_from<Varying> V>
-        class FragmentShader {
+        template <std::derived_from<IVarying> V>
+        class IFragmentShader {
         public:
             /**
              * Callback function of fragment shader
@@ -79,4 +80,4 @@ namespace UltRenderer {
     } // Rendering
 } // UltRender
 
-#endif //ULTRENDERER_SHADER_H
+#endif //ULTRENDERER_ISHADER_H

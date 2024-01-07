@@ -2,9 +2,9 @@
 // Created by ultcrt on 24-1-4.
 //
 
-#include "rendering/Shader.h"
+#include "shaders/IShader.h"
 
 namespace UltRenderer {
-    namespace Rendering {
+    namespace Shaders {
     } // Rendering
 } // UltRender
