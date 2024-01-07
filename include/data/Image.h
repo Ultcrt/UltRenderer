@@ -29,7 +29,7 @@ namespace UltRenderer {
         class Pixel: public Math::VectorXD<static_cast<std::size_t>(FORMAT)> {
         public:
             // Tips: Inherit all constructor of base class
-            using Math::VectorXD<static_cast<std::size_t>(FORMAT)>::Matrix;
+            using Math::VectorXD<static_cast<std::size_t>(FORMAT)>::VectorXD;
 
             Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target);
         };
