@@ -102,7 +102,7 @@ namespace UltRenderer {
                         }
 
                         if (normalParams.size() == 3) {
-                            vertexNormals.emplace_back(normalParams[0], normalParams[1], normalParams[2]);
+                            vnList.emplace_back(Math::Vector3D{normalParams[0], normalParams[1], normalParams[2]}.normalized());
                         }
                         else {
                             throw std::runtime_error(std::format("Unexpected number of normal params at line {}", lineIdx));
