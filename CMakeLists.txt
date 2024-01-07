@@ -39,6 +39,10 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/IShader.cpp
         include/shaders/IShader.h
         src/rendering/Pipeline.cpp
-        include/rendering/Pipeline.h)
+        include/rendering/Pipeline.h
+        src/shaders/FlatShader.cpp
+        include/shaders/FlatShader.h
+        src/shaders/GouraudShader.cpp
+        include/shaders/GouraudShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
