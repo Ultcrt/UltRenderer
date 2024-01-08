@@ -45,6 +45,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/GouraudShader.cpp
         include/shaders/GouraudShader.h
         src/shaders/PhongShader.cpp
-        include/shaders/PhongShader.h)
+        include/shaders/PhongShader.h
+        src/rendering/ICamera.cpp
+        include/rendering/ICamera.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

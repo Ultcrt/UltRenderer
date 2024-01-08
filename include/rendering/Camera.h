@@ -8,54 +8,34 @@
 #include "math/Matrix.h"
 #include "math/Transform.h"
 #include "data/TriangleMesh.h"
-#include "hierarchy/TransformNode.h"
 #include "rendering/Scene.h"
 #include "rendering/Rasterize.h"
-#include "shaders/FlatShader.h"
 #include "rendering/Pipeline.h"
-#include "shaders/GouraudShader.h"
 #include "shaders/PhongShader.h"
+#include "rendering/ICamera.h"
 
 namespace UltRenderer {
     namespace Rendering {
-        enum class ProjectionType {
-            ORTHOGONAL, PERSPECTIVE
-        };
-
-        class Camera: public Hierarchy::TransformNode {
+        template <
+                std::derived_from<Shaders::IVarying> V = Shaders::PhongVarying,
+                std::derived_from<Shaders::IInterpolator<V>> IT = Shaders::PhongInterpolator,
+                std::derived_from<Shaders::IVertexShader<V>> VS = Shaders::PhongVertexShader,
+                std::derived_from<Shaders::IFragmentShader<V>> FS = Shaders::PhongFragmentShader
+                >
+        class Camera: public ICamera {
         private:
-            double _width;
-            double _height;
+            const VS& _vertexShader;
+            const FS& _fragmentShader;
+            const IT& _interpolator;
 
-            double _zMin = 0.1;
-            double _zMax = 10;
-
-            ProjectionType _projectionType;
         public:
-            Math::Transform3D projectionMatrix;
+            Camera(double width, double height, const VS& vertexShader, const FS& fragmentShader, const IT& interpolator = {}, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
 
-            Camera(double width, double height, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
-
-            [[nodiscard]] double width() const;
-            [[nodiscard]] double height() const;
-            [[nodiscard]] double zMin() const;
-            [[nodiscard]] double zMax() const;
-
-            void updateProjectionMatrix();
-
-            void setProjectionType(ProjectionType projectionType);
-            void setWidth(double width);
-            void setHeight(double height);
-            void setZMin(double zMin);
-            void setZMax(double zMax);
-
-            template<Data::ImageFormat FORMAT>
-            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const;
+            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const override;
         };
 
-        template<Data::ImageFormat FORMAT>
-        Data::Image
-        Camera::render(std::size_t width, std::size_t height) const {
+        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
+        Data::Image Camera<V, IT, VS, FS>::render(std::size_t width, std::size_t height) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
             Math::Transform3D viewport;
             viewport(0, 0) = static_cast<double>(width) / 2.;
@@ -93,6 +73,13 @@ namespace UltRenderer {
 
             return fBuffer;
         }
+
+        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
+        Camera<V, IT, VS, FS>::Camera(double width, double height,
+                                      const VS& vertexShader, const FS& fragmentShader, const IT& interpolator,
+                                      double zMin, double zMax, ProjectionType projectionType) :
+                                      ICamera(width, height, zMin, zMax, projectionType),
+                                      _vertexShader(vertexShader), _fragmentShader(fragmentShader), _interpolator(interpolator){}
     } // Rendering
 } // UltRenderer
 
