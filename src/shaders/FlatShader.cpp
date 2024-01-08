@@ -13,6 +13,7 @@ namespace UltRenderer {
 
             res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
+            res.normal = (varyings[0].normal + varyings[1].normal).normalized();
 
             return res;
         }
