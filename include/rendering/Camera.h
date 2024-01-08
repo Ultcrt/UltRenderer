@@ -14,6 +14,7 @@
 #include "shaders/FlatShader.h"
 #include "rendering/Pipeline.h"
 #include "shaders/GouraudShader.h"
+#include "shaders/PhongShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -73,15 +74,20 @@ namespace UltRenderer {
                 Math::Vector3D light = _pScene->lights()[0]->position;
 
                 // TODO: Should pass by Scene
-                Shaders::GouraudVertexShader vertexShader(light, pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
-                Shaders::GouraudFragmentShader fragmentShader(*pMesh->pTexture);
-
-                Pipeline::Execute<Shaders::GouraudVarying, Shaders::GouraudInterpolator, Shaders::GouraudVertexShader, Shaders::GouraudFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
+//                Shaders::GouraudVertexShader vertexShader(light, pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
+//                Shaders::GouraudFragmentShader fragmentShader(*pMesh->pTexture);
+//
+//                Pipeline::Execute<Shaders::GouraudVarying, Shaders::GouraudInterpolator, Shaders::GouraudVertexShader, Shaders::GouraudFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
 
 //                Shaders::FlatVertexShader vertexShader(pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
 //                Shaders::FlatFragmentShader fragmentShader(*pMesh->pTexture, light);
 //
 //                Pipeline::Execute<Shaders::FlatVarying, Shaders::FlatInterpolator, Shaders::FlatVertexShader, Shaders::FlatFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
+
+                Shaders::PhongVertexShader vertexShader(pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
+                Shaders::PhongFragmentShader fragmentShader(*pMesh->pTexture, light);
+
+                Pipeline::Execute<Shaders::PhongVarying, Shaders::PhongInterpolator, Shaders::PhongVertexShader, Shaders::PhongFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
 
             }
 
