@@ -43,6 +43,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/FlatShader.cpp
         include/shaders/FlatShader.h
         src/shaders/GouraudShader.cpp
-        include/shaders/GouraudShader.h)
+        include/shaders/GouraudShader.h
+        src/shaders/PhongShader.cpp
+        include/shaders/PhongShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
