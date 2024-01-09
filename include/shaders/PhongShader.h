@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_PHONGSHADER_H
 #define ULTRENDERER_PHONGSHADER_H
 
-#include "shaders/IShader.h"
+#include "shaders/IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {
@@ -21,18 +21,8 @@ namespace UltRenderer {
             PhongVarying operator()(const std::array<PhongVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class PhongVertexShader: public IVertexShader<PhongVarying> {
+        class PhongVertexShader: public IMeshVertexShader<PhongVarying> {
         public:
-            // Uniforms
-            const Math::Transform3D& model;
-            const Math::Transform3D& view;
-            const Math::Transform3D& projection;
-
-            // Attributes
-            const std::vector<Math::Vector3D>& vertices;
-            const std::vector<Math::Vector3D>& normals;
-            const std::vector<Math::Vector3D>& uvs;
-
             PhongVertexShader(const std::vector<Math::Vector3D>& vs, const std::vector<Math::Vector3D>& ns, const std::vector<Math::Vector3D>& uvs, const Math::Transform3D& model, const Math::Transform3D& view, const Math::Transform3D& projection);
 
             PhongVarying operator()(std::size_t vIdx) const override;
@@ -40,10 +30,6 @@ namespace UltRenderer {
 
         class PhongFragmentShader: public IFragmentShader<PhongVarying> {
         public:
-            // Uniforms
-            const Data::Image& texture;
-            const Math::Vector3D& light;
-
             PhongFragmentShader(const Data::Image& t, const Math::Vector3D& l);
 
             bool operator()(const PhongVarying& varying, Math::Vector4D& color, double& depth) const override;

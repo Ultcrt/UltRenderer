@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_GOURAUDSHADER_H
 #define ULTRENDERER_GOURAUDSHADER_H
 
-#include "shaders/IShader.h"
+#include "shaders/IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {
@@ -21,30 +21,15 @@ namespace UltRenderer {
             GouraudVarying operator()(const std::array<GouraudVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class GouraudVertexShader: public IVertexShader<GouraudVarying> {
+        class GouraudVertexShader: public IMeshVertexShader<GouraudVarying> {
         public:
-            // Uniforms
-            const Math::Transform3D& model;
-            const Math::Transform3D& view;
-            const Math::Transform3D& projection;
-
-            // Attributes
-            const std::vector<Math::Vector3D>& vertices;
-            const std::vector<Math::Vector3D>& normals;
-            const std::vector<Math::Vector3D>& uvs;
-
-            const Math::Vector3D& light;
-
             GouraudVertexShader(const Math::Vector3D& l, const std::vector<Math::Vector3D>& vs, const std::vector<Math::Vector3D>& ns, const std::vector<Math::Vector3D>& uvs, const Math::Transform3D& model, const Math::Transform3D& view, const Math::Transform3D& projection);
 
             GouraudVarying operator()(std::size_t vIdx) const override;
         };
 
-        class GouraudFragmentShader: public IFragmentShader<GouraudVarying> {
+        class GouraudFragmentShader: public IMeshFragmentShader<GouraudVarying> {
         public:
-            // Uniforms
-            const Data::Image& texture;
-
             GouraudFragmentShader(const Data::Image& t);
 
             bool operator()(const GouraudVarying& varying, Math::Vector4D& color, double& depth) const override;

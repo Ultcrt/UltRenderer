@@ -47,6 +47,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/PhongShader.cpp
         include/shaders/PhongShader.h
         src/rendering/ICamera.cpp
-        include/rendering/ICamera.h)
+        include/rendering/ICamera.h
+        src/shaders/IMeshShader.cpp
+        include/shaders/IMeshShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
