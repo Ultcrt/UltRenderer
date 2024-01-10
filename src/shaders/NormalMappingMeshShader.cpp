@@ -43,14 +43,12 @@ namespace UltRenderer {
             std::size_t nmWidth = (*pNormalMap).width();
             std::size_t nmHeight = (*pNormalMap).height();
 
+            // TODO: Too slow
             auto mvp = (*pProjection) * (*pView) * (*pModel);
-            Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(std::lround(static_cast<double>(nmWidth) * varying.uv[0]), std::lround(static_cast<double>(nmHeight) * varying.uv[1])) * 2 - Math::Vector3D{1, 1, 1};
-            normal = {normal.z(), normal.y(), normal.x()};
-            Math::Vector4D tmp = mvp.transpose().inverse() * normal.toHomogeneousCoordinates(0);
-            normal = Math::Vector3D {tmp.x(), tmp.y(), tmp.z()}.normalized();
+            Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(std::lround(static_cast<double>(nmWidth) * varying.uv[0]), std::lround(static_cast<double>(nmHeight) * varying.uv[1])) * 2. - Math::Vector3D{1, 1, 1};
+            normal = (mvp.transpose().inverse() * normal.toHomogeneousCoordinates(1)).toCartesianCoordinates();
 
-            tmp = mvp * (*pLight).toHomogeneousCoordinates(0);
-            Math::Vector3D light = Math::Vector3D {tmp.x(), tmp.y(), tmp.z()}.normalized();
+            Math::Vector3D light = (mvp * (*pLight).toHomogeneousCoordinates(1)).toCartesianCoordinates();
 
             Math::Vector3D rgb;
             switch ((*pTexture).type()) {
