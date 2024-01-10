@@ -90,8 +90,13 @@ namespace UltRenderer {
                 vertexShader.pNormals = &pMesh->vertexNormals;
                 vertexShader.pUvs = &pMesh->vertexTextures;
 
-                // Set IMeshFragmentShader general attributes
+                // Set IMeshFragmentShader general uniforms
+                fragmentShader.pModel = &pMesh->transformMatrix;
+                fragmentShader.pView = &view;
+                fragmentShader.pProjection = &projectionMatrix;
                 fragmentShader.pTexture = pMesh->pTexture.get();
+                fragmentShader.pNormalMap = pMesh->pNormalMap.get();
+                fragmentShader.pNormalMapType = &pMesh->normalMapType;
                 fragmentShader.pLight = &light;
 
                 Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},

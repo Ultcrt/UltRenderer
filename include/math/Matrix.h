@@ -216,10 +216,12 @@ namespace UltRenderer {
             static_assert(N == 1);
             static_assert(M > 1);
 
-            Matrix<T, M - 1, N> res;
+            // Zero represent vector, no need to scale
+            const T scaling = _data[M - 1] != 0 ? _data[M - 1] : 1;
 
+            Matrix<T, M - 1, N> res;
             for (std::size_t idx = 0; idx < M - 1; idx++) {
-                res._data[idx] = _data[idx] / _data[M - 1];
+                res._data[idx] = _data[idx] / scaling;
             }
 
             return res;

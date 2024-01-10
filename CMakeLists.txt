@@ -47,6 +47,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/PhongMeshShader.cpp
         include/shaders/PhongMeshShader.h
         src/shaders/IMeshShader.cpp
-        include/shaders/IMeshShader.h)
+        include/shaders/IMeshShader.h
+        src/shaders/NormalMappingMeshShader.cpp
+        include/shaders/NormalMappingMeshShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

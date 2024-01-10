@@ -115,7 +115,7 @@ namespace UltRenderer {
 
             Pixel<FORMAT> pixel;
 
-            for (std::size_t idx = 0; idx < _format; idx++) {
+            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
                 pixel[idx] = _data[(h * _width + w) * _format + idx];
             }
 
@@ -130,7 +130,7 @@ namespace UltRenderer {
 
             std::array<double*, static_cast<std::size_t>(FORMAT)> componentPtrs;
 
-            for (std::size_t idx = 0; idx < _format; idx++) {
+            for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
                 componentPtrs[idx] = &(_data[(h * _width + w) * _format + idx]);
             }
 

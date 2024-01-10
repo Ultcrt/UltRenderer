@@ -30,7 +30,12 @@ namespace UltRenderer {
         class IMeshFragmentShader: public IFragmentShader<V> {
         public:
             // Uniforms
+            const Math::Transform3D* pModel;
+            const Math::Transform3D* pView;
+            const Math::Transform3D* pProjection;
             const Data::Image* pTexture;
+            const Data::Image* pNormalMap;
+            const Data::NormalMapType* pNormalMapType;
             const Math::Vector3D* pLight;
 
             bool operator()(const V& varying, Math::Vector4D& color, double& depth) const override = 0;

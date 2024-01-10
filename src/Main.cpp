@@ -6,25 +6,35 @@
 #include "rendering/Light.h"
 #include "rendering/Scene.h"
 #include "shaders/FlatMeshShader.h"
+#include "shaders/NormalMappingMeshShader.h"
+
+using namespace UltRenderer;
 
 int main() {
-    auto pTexture = std::make_shared<UltRenderer::Data::Image>("../data/african_head_diffuse.tga");
-    auto pMesh = std::make_shared<UltRenderer::Data::TriangleMesh>("../data/african_head.obj");
-    auto pCamera = std::make_shared<UltRenderer::Rendering::Camera>(2, 2, 4);
-    auto pLight = std::make_shared<UltRenderer::Rendering::Light>(UltRenderer::Math::Vector3D{0, 0, -1});
+    Shaders::NormalMappingMeshInterpolator it;
+    Shaders::NormalMappingMeshVertexShader vs;
+    Shaders::NormalMappingMeshFragmentShader fs;
+    
+    auto pTexture = std::make_shared<Data::Image>("../data/african_head_diffuse.tga");
+    auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm.tga");
+    auto pMesh = std::make_shared<Data::TriangleMesh>("../data/african_head.obj");
+    auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
+    auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1});
 
     // Use 3.14 and a large z, will cause head not at center
-    pCamera->transformMatrix = UltRenderer::Math::Transform3D({1, 1, 1}, {0, M_PI / 8, -M_PI / 10}, {2.1, 1.8, 5});
+    pCamera->transformMatrix = Math::Transform3D({1, 1, 1}, {0, M_PI / 8, -M_PI / 10}, {2.1, 1.8, 5});
 
     pMesh->pTexture = pTexture;
+    pMesh->pNormalMap = pNormalMap;
+    pMesh->normalMapType = Data::NormalMapType::CARTESIAN;
 
-    UltRenderer::Rendering::Scene scene;
+    Rendering::Scene scene;
 
     scene.addCamera(pCamera);
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    auto img = pCamera->render(1920, 1920);
+    auto img = pCamera->render(1920, 1920, vs, fs, it);
 
     img.save("test.tga");
 
