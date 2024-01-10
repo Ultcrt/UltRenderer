@@ -46,8 +46,6 @@ add_executable(UltRenderer src/Main.cpp
         include/shaders/GouraudMeshShader.h
         src/shaders/PhongMeshShader.cpp
         include/shaders/PhongMeshShader.h
-        src/rendering/ICameraNode.cpp
-        include/rendering/ICameraNode.h
         src/shaders/IMeshShader.cpp
         include/shaders/IMeshShader.h)
 

@@ -8,13 +8,9 @@
 #include "shaders/FlatMeshShader.h"
 
 int main() {
-    UltRenderer::Shaders::PhongMeshVertexShader vs;
-    UltRenderer::Shaders::PhongMeshFragmentShader fs;
-    UltRenderer::Shaders::PhongMeshInterpolator it;
-
     auto pTexture = std::make_shared<UltRenderer::Data::Image>("../data/african_head_diffuse.tga");
     auto pMesh = std::make_shared<UltRenderer::Data::TriangleMesh>("../data/african_head.obj");
-    auto pCamera = std::make_shared<UltRenderer::Rendering::Camera<UltRenderer::Shaders::PhongMeshVarying>>(2, 2, vs, fs, it, 4);
+    auto pCamera = std::make_shared<UltRenderer::Rendering::Camera>(2, 2, 4);
     auto pLight = std::make_shared<UltRenderer::Rendering::Light>(UltRenderer::Math::Vector3D{0, 0, -1});
 
     // Use 3.14 and a large z, will cause head not at center
