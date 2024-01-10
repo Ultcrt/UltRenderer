@@ -40,12 +40,12 @@ add_executable(UltRenderer src/Main.cpp
         include/shaders/IShader.h
         src/rendering/Pipeline.cpp
         include/rendering/Pipeline.h
-        src/shaders/FlatShader.cpp
-        include/shaders/FlatShader.h
-        src/shaders/GouraudShader.cpp
-        include/shaders/GouraudShader.h
-        src/shaders/PhongShader.cpp
-        include/shaders/PhongShader.h
+        src/shaders/FlatMeshShader.cpp
+        include/shaders/FlatMeshShader.h
+        src/shaders/GouraudMeshShader.cpp
+        include/shaders/GouraudMeshShader.h
+        src/shaders/PhongMeshShader.cpp
+        include/shaders/PhongMeshShader.h
         src/rendering/ICamera.cpp
         include/rendering/ICamera.h
         src/shaders/IMeshShader.cpp

@@ -16,6 +16,7 @@ namespace UltRenderer {
             const Math::Transform3D* pModel;
             const Math::Transform3D* pView;
             const Math::Transform3D* pProjection;
+            const Math::Vector3D* pLight;
 
             // Attributes
             const std::vector<Math::Vector3D>* pVertices;

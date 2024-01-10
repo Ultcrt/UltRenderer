@@ -11,30 +11,31 @@
 #include "rendering/Scene.h"
 #include "rendering/Rasterize.h"
 #include "rendering/Pipeline.h"
-#include "shaders/PhongShader.h"
+#include "shaders/IMeshShader.h"
 #include "rendering/ICamera.h"
+#include "shaders/PhongMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
         template <
-                std::derived_from<Shaders::IVarying> V = Shaders::PhongVarying,
-                std::derived_from<Shaders::IInterpolator<V>> IT = Shaders::PhongInterpolator,
-                std::derived_from<Shaders::IVertexShader<V>> VS = Shaders::PhongVertexShader,
-                std::derived_from<Shaders::IFragmentShader<V>> FS = Shaders::PhongFragmentShader
+                std::derived_from<Shaders::IVarying> V = Shaders::PhongMeshVarying,
+                std::derived_from<Shaders::IInterpolator<V>> IT = Shaders::PhongMeshInterpolator,
+                std::derived_from<Shaders::IMeshVertexShader<V>> VS = Shaders::PhongMeshVertexShader,
+                std::derived_from<Shaders::IMeshFragmentShader<V>> FS = Shaders::PhongMeshFragmentShader
                 >
         class Camera: public ICamera {
         private:
-            const VS& _vertexShader;
-            const FS& _fragmentShader;
+            VS& _vertexShader;
+            FS& _fragmentShader;
             const IT& _interpolator;
 
         public:
-            Camera(double width, double height, const VS& vertexShader, const FS& fragmentShader, const IT& interpolator = {}, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
+            Camera(double width, double height, VS& vertexShader, FS& fragmentShader, const IT& interpolator, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
 
             [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const override;
         };
 
-        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
+        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IMeshVertexShader<V>> VS, std::derived_from<Shaders::IMeshFragmentShader<V>> FS>
         Data::Image Camera<V, IT, VS, FS>::render(std::size_t width, std::size_t height) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
             Math::Transform3D viewport;
@@ -50,33 +51,36 @@ namespace UltRenderer {
 
             // viewport * projection * view
             for (const auto& pMesh: _pScene->meshes()) {
+                const Math::Transform3D view = transformMatrix.inverse();
+
                 // TODO: Compute only the first light here for simplicity, which is wrong
                 Math::Vector3D light = _pScene->lights()[0]->position;
 
-                // TODO: Should pass by Scene
-//                Shaders::GouraudVertexShader vertexShader(light, pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
-//                Shaders::GouraudFragmentShader fragmentShader(*pMesh->pTexture);
-//
-//                Pipeline::Execute<Shaders::GouraudVarying, Shaders::GouraudInterpolator, Shaders::GouraudVertexShader, Shaders::GouraudFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
+                // Set IMeshVertexShader general uniforms
+                _vertexShader.pModel = &pMesh->transformMatrix;
+                _vertexShader.pView = &view;
+                _vertexShader.pProjection = &projectionMatrix;
+                _vertexShader.pLight = &light;
 
-//                Shaders::FlatVertexShader vertexShader(pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
-//                Shaders::FlatFragmentShader fragmentShader(*pMesh->pTexture, light);
-//
-//                Pipeline::Execute<Shaders::FlatVarying, Shaders::FlatInterpolator, Shaders::FlatVertexShader, Shaders::FlatFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
+                // Set IMeshVertexShader general attributes
+                _vertexShader.pVertices = &pMesh->vertices;
+                _vertexShader.pNormals = &pMesh->vertexNormals;
+                _vertexShader.pUvs = &pMesh->vertexTextures;
 
-                Shaders::PhongVertexShader vertexShader(pMesh->vertices, pMesh->vertexNormals, pMesh->vertexTextures, pMesh->transformMatrix, transformMatrix.inverse(), projectionMatrix);
-                Shaders::PhongFragmentShader fragmentShader(*pMesh->pTexture, light);
+                // Set IMeshFragmentShader general attributes
+                _fragmentShader.pTexture = pMesh->pTexture.get();
+                _fragmentShader.pLight = &light;
 
-                Pipeline::Execute<Shaders::PhongVarying, Shaders::PhongInterpolator, Shaders::PhongVertexShader, Shaders::PhongFragmentShader>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, vertexShader, fragmentShader);
+                Pipeline::Execute<V, IT, VS, FS>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {}, _vertexShader, _fragmentShader, _interpolator);
 
             }
 
             return fBuffer;
         }
 
-        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
+        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IMeshVertexShader<V>> VS, std::derived_from<Shaders::IMeshFragmentShader<V>> FS>
         Camera<V, IT, VS, FS>::Camera(double width, double height,
-                                      const VS& vertexShader, const FS& fragmentShader, const IT& interpolator,
+                                      VS& vertexShader, FS& fragmentShader, const IT& interpolator,
                                       double zMin, double zMax, ProjectionType projectionType) :
                                       ICamera(width, height, zMin, zMax, projectionType),
                                       _vertexShader(vertexShader), _fragmentShader(fragmentShader), _interpolator(interpolator){}
