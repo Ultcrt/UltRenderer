@@ -17,7 +17,7 @@ namespace UltRenderer {
             _lights.emplace_back(target);
         }
 
-        void Scene::addCamera(const std::shared_ptr<Rendering::ICamera> &target) {
+        void Scene::addCamera(const std::shared_ptr<Rendering::ICameraNode> &target) {
             target->setScene(this);
             _cameras.emplace_back(target);
         }
@@ -30,7 +30,7 @@ namespace UltRenderer {
             return _lights;
         }
 
-        std::vector<std::shared_ptr<Rendering::ICamera>> Scene::cameras() {
+        std::vector<std::shared_ptr<Rendering::ICameraNode>> Scene::cameras() {
             return _cameras;
         }
 

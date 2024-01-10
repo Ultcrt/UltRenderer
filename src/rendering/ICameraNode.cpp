@@ -2,35 +2,35 @@
 // Created by ultcrt on 24-1-8.
 //
 
-#include "rendering/ICamera.h"
+#include "rendering/ICameraNode.h"
 
 namespace UltRenderer {
     namespace Rendering {
-        ICamera::ICamera(double width, double height, double zMin, double zMax, ProjectionType projectionType):
+        ICameraNode::ICameraNode(double width, double height, double zMin, double zMax, ProjectionType projectionType):
                 _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {
             updateProjectionMatrix();
         }
 
-        double ICamera::width() const {
+        double ICameraNode::width() const {
             return _width;
         }
 
-        double ICamera::height() const {
+        double ICameraNode::height() const {
             return _height;
         }
 
-        double ICamera::zMin() const {
+        double ICameraNode::zMin() const {
             return _zMin;
         }
 
-        double ICamera::zMax() const {
+        double ICameraNode::zMax() const {
             return _zMax;
         }
 
-        void ICamera::updateProjectionMatrix() {
+        void ICameraNode::updateProjectionMatrix() {
             double w = _width;
             double h = _height;
-            // ICamera is facing at -z
+            // ICameraNode is facing at -z
             double n = -_zMin;
             double f = -_zMax;
 
@@ -50,27 +50,27 @@ namespace UltRenderer {
             projectionMatrix = scaling * translation * press;
         }
 
-        void ICamera::setWidth(double width) {
+        void ICameraNode::setWidth(double width) {
             _width = width;
             updateProjectionMatrix();
         }
 
-        void ICamera::setHeight(double height) {
+        void ICameraNode::setHeight(double height) {
             _height = height;
             updateProjectionMatrix();
         }
 
-        void ICamera::setZMin(double zMin) {
+        void ICameraNode::setZMin(double zMin) {
             _zMin = zMin;
             updateProjectionMatrix();
         }
 
-        void ICamera::setZMax(double zMax) {
+        void ICameraNode::setZMax(double zMax) {
             _zMax = zMax;
             updateProjectionMatrix();
         }
 
-        void ICamera::setProjectionType(ProjectionType projectionType) {
+        void ICameraNode::setProjectionType(ProjectionType projectionType) {
             _projectionType = projectionType;
             updateProjectionMatrix();
         }

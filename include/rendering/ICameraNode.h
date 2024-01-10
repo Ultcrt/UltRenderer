@@ -2,8 +2,8 @@
 // Created by ultcrt on 24-1-8.
 //
 
-#ifndef ULTRENDERER_ICAMERA_H
-#define ULTRENDERER_ICAMERA_H
+#ifndef ULTRENDERER_ICAMERANODE_H
+#define ULTRENDERER_ICAMERANODE_H
 
 #include "hierarchy/TransformNode.h"
 #include "data/Image.h"
@@ -14,7 +14,7 @@ namespace UltRenderer {
             ORTHOGONAL, PERSPECTIVE
         };
 
-        class ICamera: public Hierarchy::TransformNode {
+        class ICameraNode: public Hierarchy::TransformNode {
         protected:
             double _width;
             double _height;
@@ -27,7 +27,7 @@ namespace UltRenderer {
         public:
             Math::Transform3D projectionMatrix;
 
-            ICamera(double width, double height, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
+            ICameraNode(double width, double height, double zMin=0.1, double zMax=10, ProjectionType projectionType=ProjectionType::PERSPECTIVE);
 
             [[nodiscard]] double width() const;
             [[nodiscard]] double height() const;
@@ -48,4 +48,4 @@ namespace UltRenderer {
     } // Rendering
 } // UltRenderer
 
-#endif //ULTRENDERER_ICAMERA_H
+#endif //ULTRENDERER_ICAMERANODE_H

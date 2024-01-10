@@ -8,7 +8,7 @@
 #include <vector>
 #include "data/TriangleMesh.h"
 #include "rendering/Light.h"
-#include "rendering/ICamera.h"
+#include "rendering/ICameraNode.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -17,16 +17,16 @@ namespace UltRenderer {
         private:
             std::vector<std::shared_ptr<Data::TriangleMesh>> _meshes;
             std::vector<std::shared_ptr<Rendering::Light>>   _lights;
-            std::vector<std::shared_ptr<Rendering::ICamera>>  _cameras;
+            std::vector<std::shared_ptr<Rendering::ICameraNode>>  _cameras;
 
         public:
             void addMesh(const std::shared_ptr<Data::TriangleMesh>& target);
             void addLight(const std::shared_ptr<Rendering::Light>& target);
-            void addCamera(const std::shared_ptr<Rendering::ICamera>& target);
+            void addCamera(const std::shared_ptr<Rendering::ICameraNode>& target);
 
             [[nodiscard]] std::vector<std::shared_ptr<Data::TriangleMesh>> meshes();
             [[nodiscard]] std::vector<std::shared_ptr<Rendering::Light>>   lights();
-            [[nodiscard]] std::vector<std::shared_ptr<Rendering::ICamera>>  cameras();
+            [[nodiscard]] std::vector<std::shared_ptr<Rendering::ICameraNode>>  cameras();
         };
     } // Rendering
 } // UltRenderer

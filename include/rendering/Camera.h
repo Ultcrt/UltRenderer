@@ -12,13 +12,13 @@
 #include "rendering/Rasterize.h"
 #include "rendering/Pipeline.h"
 #include "shaders/IMeshShader.h"
-#include "rendering/ICamera.h"
+#include "rendering/ICameraNode.h"
 #include "shaders/PhongMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
-        template<std::derived_from<Shaders::IVarying> V = Shaders::PhongMeshVarying>
-        class Camera : public ICamera {
+        template<std::derived_from<Shaders::IVarying> V>
+        class Camera : public ICameraNode {
         private:
             Shaders::IMeshVertexShader<V> &_vertexShader;
             Shaders::IMeshFragmentShader<V> &_fragmentShader;
@@ -82,7 +82,7 @@ namespace UltRenderer {
                           Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
                           const Shaders::IInterpolator<V> &interpolator,
                           double zMin, double zMax, ProjectionType projectionType) :
-                ICamera(width, height, zMin, zMax, projectionType),
+                ICameraNode(width, height, zMin, zMax, projectionType),
                 _vertexShader(vertexShader), _fragmentShader(fragmentShader), _interpolator(interpolator) {}
     } // Rendering
 } // UltRenderer
