@@ -20,6 +20,10 @@ namespace UltRenderer {
             HORIZONTAL = 1, VERTICAL = 2
         };
 
+        enum class NormalMapType: std::size_t {
+            CARTESIAN = 0, DARBOUX = 0
+        };
+
         template<ImageFormat FORMAT>
         using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
 

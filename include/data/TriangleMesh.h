@@ -18,6 +18,8 @@ namespace UltRenderer {
         class TriangleMesh: public Hierarchy::TransformNode {
         public:
             std::shared_ptr<Image> pTexture;
+            std::shared_ptr<Image> pNormalMap;
+            Data::NormalMapType normalMapType;
 
             std::vector<Math::Vector3D> vertices;
             std::vector<Math::Vector3D> vertexNormals;
