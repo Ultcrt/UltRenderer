@@ -16,15 +16,18 @@ namespace UltRenderer {
     namespace Rendering {
         namespace Rasterize {
             /*----------Declaration----------*/
-            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
-            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings, const IT& interpolator, const FS& fragmentShader);
+            template<std::derived_from<Shaders::IVarying> V>
+            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings,
+                      const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator = {});
 
-            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
-            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings, const FS& fragmentShader, const IT& interpolator = {});
+            template<std::derived_from<Shaders::IVarying> V>
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings,
+                          const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator = {});
 
             /*----------Definition----------*/
-            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
-            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings, const IT& interpolator, const FS& fragmentShader) {
+            template<std::derived_from<Shaders::IVarying> V>
+            void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings,
+                      const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator) {
                 const Math::Vector2S p0 = {varyings[0].position.x(), varyings[0].position.y()};
                 const Math::Vector2S p1 = {varyings[1].position.x(), varyings[1].position.y()};
 
@@ -107,8 +110,9 @@ namespace UltRenderer {
                 }
             }
 
-            template<std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IFragmentShader<V>> FS>
-            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings, const FS& fragmentShader, const IT& interpolator) {
+            template<std::derived_from<Shaders::IVarying> V>
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings,
+                          const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator) {
                 std::array<Math::Vector2S, 3> points = {
                         Math::Vector2S{static_cast<std::size_t>(varyings[0].position.x()), static_cast<std::size_t>(varyings[0].position.y())},
                         Math::Vector2S{static_cast<std::size_t>(varyings[1].position.x()), static_cast<std::size_t>(varyings[1].position.y())},

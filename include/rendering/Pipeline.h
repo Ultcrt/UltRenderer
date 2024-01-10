@@ -17,13 +17,21 @@ namespace UltRenderer {
     namespace Rendering {
         class Pipeline {
         public:
-            template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
-            static void Execute(Data::Image& fBuffer, Data::Image& zBuffer, const Math::Transform3D& viewport, std::size_t vertexNum, const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points, const VS& vertexShader, const FS& fragmentShader, const IT& interpolator = {});
+            template <std::derived_from<Shaders::IVarying> V>
+            static void Execute(Data::Image& fBuffer, Data::Image& zBuffer, const Math::Transform3D& viewport, std::size_t vertexNum,
+                                const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points,
+                                const Shaders::IVertexShader<V>& vertexShader,
+                                const Shaders::IFragmentShader<V>& fragmentShader,
+                                const Shaders::IInterpolator<V>& interpolator = {});
         };
 
         // TODO: Only support triangle primitives for now
-        template <std::derived_from<Shaders::IVarying> V, std::derived_from<Shaders::IInterpolator<V>> IT, std::derived_from<Shaders::IVertexShader<V>> VS, std::derived_from<Shaders::IFragmentShader<V>> FS>
-        void Pipeline::Execute(Data::Image& fBuffer, Data::Image& zBuffer, const Math::Transform3D& viewport, std::size_t vertexNum, const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points, const VS& vertexShader, const FS& fragmentShader, const IT& interpolator) {
+        template <std::derived_from<Shaders::IVarying> V>
+        void Pipeline::Execute(Data::Image& fBuffer, Data::Image& zBuffer, const Math::Transform3D& viewport, std::size_t vertexNum,
+                               const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points,
+                               const Shaders::IVertexShader<V>& vertexShader,
+                               const Shaders::IFragmentShader<V>& fragmentShader,
+                               const Shaders::IInterpolator<V>& interpolator) {
             // Process vertex
             std::vector<V> varyings;
             std::vector<bool> clipFlags;
@@ -55,7 +63,7 @@ namespace UltRenderer {
 
                 // Rasterize the primitive (fragment shader is also called)
                 if (!clipped) {
-                    Rendering::Rasterize::Triangle<V, IT, FS>(fBuffer, zBuffer, varyingGroup, fragmentShader, interpolator);
+                    Rendering::Rasterize::Triangle<V>(fBuffer, zBuffer, varyingGroup, fragmentShader, interpolator);
                 }
             }
         }
