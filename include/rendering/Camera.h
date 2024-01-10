@@ -78,6 +78,7 @@ namespace UltRenderer {
                 // TODO: Compute only the first light here for simplicity, which is wrong
                 Math::Vector3D light = _pScene->lights()[0]->position;
 
+                // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms
                 vertexShader.pModel = &pMesh->transformMatrix;
                 vertexShader.pView = &view;
