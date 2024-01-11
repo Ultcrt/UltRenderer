@@ -6,17 +6,25 @@
 #include "rendering/Light.h"
 #include "rendering/Scene.h"
 #include "shaders/FlatMeshShader.h"
-#include "shaders/NormalMappingMeshShader.h"
+#include "shaders/BlinnPhongReflectionMeshShader.h"
 
 using namespace UltRenderer;
 
 int main() {
-    Shaders::NormalMappingMeshInterpolator it;
-    Shaders::NormalMappingMeshVertexShader vs;
-    Shaders::NormalMappingMeshFragmentShader fs;
+    Shaders::BlinnPhongReflectionMeshInterpolator it;
+    Shaders::BlinnPhongReflectionMeshVertexShader vs;
+    Shaders::BlinnPhongReflectionMeshFragmentShader fs;
+
+    fs.diffuseCoefficient = 0.75;
+    fs.specularCoefficient = 0.05;
+    fs.ambientCoefficient = 0.2;
+
+    fs.specularColor = {1, 1, 1};
+    fs.ambientColor = {0.2, 0.1, 0};
     
     auto pTexture = std::make_shared<Data::Image>("../data/african_head_diffuse.tga");
     auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm.tga");
+    auto pSpecular = std::make_shared<Data::Image>("../data/african_head_spec.tga");
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/african_head.obj");
     auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
     auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1});
@@ -26,6 +34,7 @@ int main() {
 
     pMesh->pTexture = pTexture;
     pMesh->pNormalMap = pNormalMap;
+    pMesh->pSpecular = pSpecular;
     pMesh->normalMapType = Data::NormalMapType::CARTESIAN;
 
     Rendering::Scene scene;
