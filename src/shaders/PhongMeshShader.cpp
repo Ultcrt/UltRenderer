@@ -43,21 +43,7 @@ namespace UltRenderer {
 
         bool PhongMeshFragmentShader::operator()(const UltRenderer::Shaders::PhongMeshVarying &varying, Math::Vector4D &color,
                                                  double &depth) const {
-            std::size_t width = (*pTexture).width();
-            std::size_t height = (*pTexture).height();
-
-            Math::Vector3D rgb;
-            switch ((*pTexture).type()) {
-                case Data::ImageFormat::RGBA:
-                    rgb = (*pTexture).at<Data::ImageFormat::RGBA>(std::lround(static_cast<double>(width) * varying.uv[0]), std::lround(static_cast<double>(height) * varying.uv[1])).convertTo<Data::ImageFormat::RGB>();
-                    break;
-                case Data::ImageFormat::RGB:
-                    rgb = (*pTexture).at<Data::ImageFormat::RGB>(std::lround(static_cast<double>(width) * varying.uv[0]), std::lround(static_cast<double>(height) * varying.uv[1])).convertTo<Data::ImageFormat::RGB>();
-                    break;
-                case Data::ImageFormat::GRAY:
-                    rgb = (*pTexture).at<Data::ImageFormat::GRAY>(std::lround(static_cast<double>(width) * varying.uv[0]), std::lround(static_cast<double>(height) * varying.uv[1])).convertTo<Data::ImageFormat::RGB>();
-                    break;
-            }
+            Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
 
             color = (varying.normal.dot(-(*pLight)) * rgb).toHomogeneousCoordinates(1);
 
