@@ -67,6 +67,12 @@ namespace UltRenderer {
             template<ImageFormat FORMAT>
             Pixel<FORMAT> at(std::size_t w, std::size_t h) const;
 
+            template<ImageFormat FORMAT>
+            PixelProxy<FORMAT> at(double wRatio, double hRatio);
+
+            template<ImageFormat FORMAT>
+            Pixel<FORMAT> at(double wRatio, double hRatio) const;
+
             void save(const std::string& filename);
             [[nodiscard]] Math::Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
@@ -135,6 +141,16 @@ namespace UltRenderer {
             }
 
             return PixelProxy<FORMAT>(componentPtrs);
+        }
+
+        template<ImageFormat FORMAT>
+        Pixel<FORMAT> Image::at(double wRatio, double hRatio) const {
+            return at<FORMAT>(std::lround(wRatio * static_cast<double>(_width)), std::lround(hRatio * static_cast<double>(_height)));
+        }
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT> Image::at(double wRatio, double hRatio) {
+            return at<FORMAT>(std::lround(wRatio * static_cast<double>(_width)), std::lround(hRatio * static_cast<double>(_height)));
         }
 
         template<ImageFormat FORMAT>
