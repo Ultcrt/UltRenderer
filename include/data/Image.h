@@ -145,12 +145,18 @@ namespace UltRenderer {
 
         template<ImageFormat FORMAT>
         Pixel<FORMAT> Image::at(double wRatio, double hRatio) const {
-            return at<FORMAT>(std::lround(wRatio * static_cast<double>(_width)), std::lround(hRatio * static_cast<double>(_height)));
+            auto width = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_width)));
+            auto height = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_height)));
+
+            return at<FORMAT>(width, height);
         }
 
         template<ImageFormat FORMAT>
         PixelProxy<FORMAT> Image::at(double wRatio, double hRatio) {
-            return at<FORMAT>(std::lround(wRatio * static_cast<double>(_width)), std::lround(hRatio * static_cast<double>(_height)));
+            auto width = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_width)));
+            auto height = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_height)));
+
+            return at<FORMAT>(width, height);
         }
 
         template<ImageFormat FORMAT>
