@@ -194,9 +194,6 @@ namespace UltRenderer {
                     else {
                         std::vector<std::uint8_t> rawColors(count * _format);
                         tga.read(reinterpret_cast<char *>(rawColors.data()), static_cast<long>(rawColors.size()));
-                        if (tga.good()) {
-
-                        }
                         imageData.insert(imageData.end(), rawColors.begin(), rawColors.end());
                     }
                 }
