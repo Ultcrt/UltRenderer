@@ -205,6 +205,9 @@ namespace UltRenderer {
             for (const auto& f: fList) {
                 triangles.emplace_back(fMap[f[0]], fMap[f[1]], fMap[f[2]]);
             }
+
+            // Update triangle infos
+            updateTriangleInfo();
         }
 
         void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
@@ -228,8 +231,25 @@ namespace UltRenderer {
                 const auto vertex0 = vertices[triangle[0]];
                 const auto vertex1 = vertices[triangle[1]];
                 const auto vertex2 = vertices[triangle[2]];
+                const auto u0 = vertexTextures[triangle[0]].x();
+                const auto u1 = vertexTextures[triangle[1]].x();
+                const auto u2 = vertexTextures[triangle[2]].x();
 
-                const auto normal = (vertex0 - vertex1).cross(vertex1 - vertex2);
+                const auto vec01 = vertex1 - vertex0;
+                const auto vec02 = vertex2 - vertex0;
+
+                const auto normal = -vec01.cross(vec02);
+
+                const Math::Matrix3D tbn = {
+                        vec01.x(), vec01.y(), vec01.z(),
+                        vec02.x(), vec02.y(), vec02.z(),
+                        normal.x(), normal.y(), normal.z()
+                };
+
+                const auto tangent = tbn.inverse() * Math::Vector3D{u1 - u0, u2 - u0, 0};
+
+                triangleNormals.emplace_back(normal);
+                triangleTangents.emplace_back(tangent);
             }
         }
     } // UltRenderer
