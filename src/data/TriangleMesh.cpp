@@ -220,5 +220,17 @@ namespace UltRenderer {
 
             return res;
         }
+
+        void TriangleMesh::updateTriangleInfo() {
+            triangleNormals = {};
+            triangleTangents = {};
+            for (const auto triangle: triangles) {
+                const auto vertex0 = vertices[triangle[0]];
+                const auto vertex1 = vertices[triangle[1]];
+                const auto vertex2 = vertices[triangle[2]];
+
+                const auto normal = (vertex0 - vertex1).cross(vertex1 - vertex2);
+            }
+        }
     } // UltRenderer
 } // Data
