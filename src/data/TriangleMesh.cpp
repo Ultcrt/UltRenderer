@@ -206,8 +206,13 @@ namespace UltRenderer {
                 triangles.emplace_back(fMap[f[0]], fMap[f[1]], fMap[f[2]]);
             }
 
-            // Update triangle infos
-            updateTriangleInfo();
+            // Update computed attributes
+            if (vnList.empty()) {
+                updateVertexNormals();
+            }
+            updateTriangleAttributes();
+            updateAdjacentList();
+            updateVertexTangents();
         }
 
         void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
@@ -224,7 +229,47 @@ namespace UltRenderer {
             return res;
         }
 
-        void TriangleMesh::updateTriangleInfo() {
+        void TriangleMesh::updateVertexTangents() {
+            vertexTangents = {};
+            for (std::size_t idx = 0; idx < vertices.size(); idx++) {
+                const auto adjacency = adjacentTriangles[idx];
+
+                Math::Vector3D tangent = {0., 0., 0.};
+                for (const auto tIdx: adjacency) {
+                    const auto v0 = vertices[triangles[tIdx][0]];
+                    const auto v1 = vertices[triangles[tIdx][1]];
+                    const auto v2 = vertices[triangles[tIdx][2]];
+
+                    const double area = (v1 - v0).cross(v2 - v0).norm();
+
+                    tangent += area * triangleTangents[tIdx];
+                }
+
+                vertexTangents.emplace_back(tangent.normalized());
+            }
+        }
+
+        void TriangleMesh::updateVertexNormals() {
+            vertexNormals = {};
+            for (std::size_t idx = 0; idx < vertices.size(); idx++) {
+                const auto adjacency = adjacentTriangles[idx];
+
+                Math::Vector3D normal = {0., 0., 0.};
+                for (const auto tIdx: adjacency) {
+                    const auto v0 = vertices[triangles[tIdx][0]];
+                    const auto v1 = vertices[triangles[tIdx][1]];
+                    const auto v2 = vertices[triangles[tIdx][2]];
+
+                    const double area = (v1 - v0).cross(v2 - v0).norm();
+
+                    normal += area * triangleNormals[tIdx];
+                }
+
+                vertexNormals.emplace_back(normal.normalized());
+            }
+        }
+
+        void TriangleMesh::updateTriangleAttributes() {
             triangleNormals = {};
             triangleTangents = {};
             for (const auto triangle: triangles) {
@@ -238,18 +283,31 @@ namespace UltRenderer {
                 const auto vec01 = vertex1 - vertex0;
                 const auto vec02 = vertex2 - vertex0;
 
-                const auto normal = -vec01.cross(vec02);
+                const auto normal = -vec01.cross(vec02).normalized();
 
-                const Math::Matrix3D tbn = {
+                const Math::Matrix3D transform = {
                         vec01.x(), vec01.y(), vec01.z(),
                         vec02.x(), vec02.y(), vec02.z(),
                         normal.x(), normal.y(), normal.z()
                 };
 
-                const auto tangent = tbn.inverse() * Math::Vector3D{u1 - u0, u2 - u0, 0};
+                const auto tangent = (transform.inverse() * Math::Vector3D{u1 - u0, u2 - u0, 0}).normalized();
 
                 triangleNormals.emplace_back(normal);
                 triangleTangents.emplace_back(tangent);
+            }
+        }
+
+        void TriangleMesh::updateAdjacentList() {
+            adjacentVertices = std::vector<std::set<std::size_t>>{vertices.size()};
+            adjacentTriangles = std::vector<std::set<std::size_t>>{vertices.size()};
+            for (std::size_t tIdx = 0; tIdx < triangles.size(); tIdx++) {
+                const auto triangle = triangles[tIdx];
+                for (std::size_t idx = 0; idx < 3; idx++) {
+                    adjacentVertices[triangle[idx]].insert(triangle[(idx + 1) % 3]);
+                    adjacentVertices[triangle[idx]].insert(triangle[(idx + 2) % 3]);
+                    adjacentTriangles[triangle[idx]].insert(tIdx);
+                }
             }
         }
     } // UltRenderer

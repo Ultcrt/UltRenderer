@@ -12,6 +12,7 @@
 #include "data/Image.h"
 #include "math/Transform.h"
 #include "hierarchy/TransformNode.h"
+#include "set"
 
 namespace UltRenderer {
     namespace Data {
@@ -26,9 +27,12 @@ namespace UltRenderer {
             std::vector<Math::Vector3S> triangles;
             std::vector<Math::Vector3D> vertexColors;
             std::vector<Math::Vector3D> vertexNormals;
+            std::vector<Math::Vector3D> vertexTangents;
             std::vector<Math::Vector3D> vertexTextures;
             std::vector<Math::Vector3D> triangleNormals;
             std::vector<Math::Vector3D> triangleTangents;
+            std::vector<std::set<std::size_t>> adjacentVertices;
+            std::vector<std::set<std::size_t>> adjacentTriangles;
 
             TriangleMesh(const std::vector<Math::Vector3D>& vertices, const std::vector<Math::Vector3S>& indices, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
@@ -36,7 +40,13 @@ namespace UltRenderer {
 
             [[nodiscard]] std::vector<Math::Vector3D> transform() const;
 
-            void updateTriangleInfo();
+            void updateAdjacentList();
+
+            void updateVertexTangents();
+
+            void updateVertexNormals();
+
+            void updateTriangleAttributes();
         };
 
     } // UltRenderer
