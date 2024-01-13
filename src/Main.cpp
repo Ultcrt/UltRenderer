@@ -16,8 +16,8 @@ int main() {
     Shaders::BlinnPhongReflectionMeshFragmentShader fs;
 
     fs.diffuseCoefficient = 0.75;
-    fs.specularCoefficient = 0.05;
-    fs.ambientCoefficient = 0.2;
+    fs.specularCoefficient = 0.2;
+    fs.ambientCoefficient = 0.05;
 
     fs.specularColor = {1, 1, 1};
     fs.ambientColor = {0.2, 0.1, 0};

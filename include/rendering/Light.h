@@ -12,9 +12,10 @@ namespace UltRenderer {
     namespace Rendering {
         class Light: public Hierarchy::Node {
         public:
-            Light(const Math::Vector3D& pos);
+            Light(const Math::Vector3D& pos, double intensity = 1);
 
             Math::Vector3D position;
+            double intensity;
         };
     } // Rendering
 } // UltRenderer

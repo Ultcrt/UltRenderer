@@ -76,14 +76,14 @@ namespace UltRenderer {
                 const Math::Transform3D view = transformMatrix.inverse();
 
                 // TODO: Compute only the first light here for simplicity, which is wrong
-                Math::Vector3D light = _pScene->lights()[0]->position;
+                const Rendering::Light& light = *_pScene->lights()[0];
 
                 // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms
                 vertexShader.pModel = &pMesh->transformMatrix;
                 vertexShader.pView = &view;
                 vertexShader.pProjection = &projectionMatrix;
-                vertexShader.pLight = &light;
+                vertexShader.pLight = &light.position;
 
                 // Set IMeshVertexShader general attributes
                 vertexShader.pVertices = &pMesh->vertices;
@@ -98,8 +98,9 @@ namespace UltRenderer {
                 fragmentShader.pTexture = pMesh->pTexture.get();
                 fragmentShader.pNormalMap = pMesh->pNormalMap.get();
                 fragmentShader.pSpecular = pMesh->pSpecular.get();
-                fragmentShader.pNormalMapType = &pMesh->normalMapType;
-                fragmentShader.pLight = &light;
+                fragmentShader.normalMapType = pMesh->normalMapType;
+                fragmentShader.pLight = &light.position;
+                fragmentShader.lightIntensity = light.intensity;
 
                 Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
                                      vertexShader, fragmentShader, interpolator);

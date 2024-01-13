@@ -36,9 +36,10 @@ namespace UltRenderer {
             const Math::Transform3D* pProjection;
             const Data::Image* pTexture;
             const Data::Image* pNormalMap;
-            const Data::NormalMapType* pNormalMapType;
             const Data::Image* pSpecular;
             const Math::Vector3D* pLight;
+            Data::NormalMapType normalMapType;
+            double lightIntensity;
 
             bool operator()(const V& varying, Math::Vector4D& color, double& depth) const override = 0;
         };
