@@ -140,6 +140,17 @@ namespace UltRenderer {
 
             Matrix<T, M, N> operator-() const;
 
+            Matrix<T, M, N>& operator+=(const Matrix<T, M, N>& target);
+
+            template<std::size_t K>
+            Matrix<T, M, K>& operator*=(const Matrix<T, N, K>& target);
+
+            Matrix<T, M, N>& operator*=(T target);
+
+            Matrix<T, M, N>& operator/=(T target);
+
+            Matrix<T, M, N>& operator-=(const Matrix<T, M, N>& target);
+
             [[nodiscard]] Matrix<T, N, M> transpose() const;
 
             [[nodiscard]] T determinant() const;
@@ -603,6 +614,37 @@ namespace UltRenderer {
                 res._data[idx] = _data[idx] + target._data[idx];
             }
             return res;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>& Matrix<T, M, N>::operator+=(const Matrix<T, M, N> &target) {
+            *this = *this + target;
+            return *this;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        template<std::size_t K>
+        Matrix<T, M, K>& Matrix<T, M, N>::operator*=(const Matrix<T, N, K> &target) {
+            *this = *this * target;
+            return *this;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>& Matrix<T, M, N>::operator*=(T target) {
+            *this = *this * target;
+            return *this;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>& Matrix<T, M, N>::operator/=(T target) {
+            *this = *this / target;
+            return *this;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Matrix<T, M, N>& Matrix<T, M, N>::operator-=(const Matrix<T, M, N> &target) {
+            *this = *this - target;
+            return *this;
         }
 
         template<typename T, std::size_t M, std::size_t N>
