@@ -23,7 +23,7 @@ int main() {
     fs.ambientColor = {0.2, 0.1, 0};
     
     auto pTexture = std::make_shared<Data::Image>("../data/african_head_diffuse.tga");
-    auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm.tga");
+    auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm_tangent.tga");
     auto pSpecular = std::make_shared<Data::Image>("../data/african_head_spec.tga");
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/african_head.obj");
     auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
@@ -35,7 +35,7 @@ int main() {
     pMesh->pTexture = pTexture;
     pMesh->pNormalMap = pNormalMap;
     pMesh->pSpecular = pSpecular;
-    pMesh->normalMapType = Data::NormalMapType::CARTESIAN;
+    pMesh->normalMapType = Data::NormalMapType::DARBOUX;
 
     Rendering::Scene scene;
 

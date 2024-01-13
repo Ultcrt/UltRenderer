@@ -51,7 +51,30 @@ namespace UltRenderer {
             Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
             double shininess = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
 
-            normal = (mvp.transpose().inverse() * normal.toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+            // TODO: Non-normal mapping should be checked here
+            if (normalMapType == Data::NormalMapType::DARBOUX) {
+                // Make sure TBN are orthogonal
+                auto t = varying.tangent;
+                auto n = varying.normal;
+                auto b = n.cross(t);
+                t = b.cross(n);
+
+                t.normalize();
+                b.normalize();
+                n.normalize();
+
+                // Just a rotation matrix of TBN basis
+                Math::Matrix3D tbn = {
+                        t.x(), b.x(), n.x(),
+                        t.y(), b.y(), n.y(),
+                        t.z(), b.z(), n.z(),
+                };
+
+                normal = (mvp.transpose().inverse() * (tbn * normal).toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+            }
+            else {
+                normal = (mvp.transpose().inverse() * normal.toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+            }
 
             // TODO: Too slow
 
