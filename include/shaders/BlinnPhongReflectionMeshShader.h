@@ -12,6 +12,8 @@ namespace UltRenderer {
         struct BlinnPhongReflectionMeshVarying: public IVarying {
             // TODO: Not support 3D texture for now
             Math::Vector3D uv;
+            Math::Vector3D normal;
+            Math::Vector3D tangent;
         };
 
         class BlinnPhongReflectionMeshInterpolator: public IInterpolator<BlinnPhongReflectionMeshVarying> {
