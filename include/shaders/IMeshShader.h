@@ -9,6 +9,15 @@
 
 namespace UltRenderer {
     namespace Shaders {
+        struct IMeshVarying: public IVarying {
+            // TODO: Not support 3D texture for now
+            Math::Vector3D uv;
+            Math::Vector3D normal;
+            Math::Vector3D tangent;
+            Math::Vector3D light;
+            double intensity;
+        };
+
         template <std::derived_from<IVarying> V>
         class IMeshVertexShader: public IVertexShader<V> {
         public:
@@ -17,6 +26,9 @@ namespace UltRenderer {
             const Math::Transform3D* pView;
             const Math::Transform3D* pProjection;
             const Math::Vector3D* pLight;
+            double intensity;
+            Math::Transform3D modelViewMatrix;
+            Math::Transform3D modelViewProjectionMatrix;
 
             // Attributes
             const std::vector<Math::Vector3D>* pVertices;
@@ -31,15 +43,15 @@ namespace UltRenderer {
         class IMeshFragmentShader: public IFragmentShader<V> {
         public:
             // Uniforms
-            const Math::Transform3D* pModel;
-            const Math::Transform3D* pView;
-            const Math::Transform3D* pProjection;
             const Data::Image* pTexture;
             const Data::Image* pNormalMap;
             const Data::Image* pSpecular;
-            const Math::Vector3D* pLight;
             Data::NormalMapType normalMapType;
-            double lightIntensity;
+            const Math::Transform3D* pModel;
+            const Math::Transform3D* pView;
+            const Math::Transform3D* pProjection;
+            Math::Transform3D modelViewMatrix;
+            Math::Transform3D modelViewProjectionMatrix;
 
             bool operator()(const V& varying, Math::Vector4D& color, double& depth) const override = 0;
         };
