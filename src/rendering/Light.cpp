@@ -6,6 +6,6 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        Light::Light(const Math::Vector3D &pos, double intensity): position(pos), intensity(intensity) {}
+        Light::Light(const Math::Vector3D &dir, double i): direction(dir), intensity(i) {}
     } // Rendering
 } // UltRenderer

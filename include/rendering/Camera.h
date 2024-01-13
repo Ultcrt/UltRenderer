@@ -83,7 +83,7 @@ namespace UltRenderer {
                 vertexShader.pModel = &pMesh->transformMatrix;
                 vertexShader.pView = &view;
                 vertexShader.pProjection = &projectionMatrix;
-                vertexShader.pLight = &light.position;
+                vertexShader.pLight = &light.direction;
 
                 // Set IMeshVertexShader general attributes
                 vertexShader.pVertices = &pMesh->vertices;
@@ -99,7 +99,7 @@ namespace UltRenderer {
                 fragmentShader.pNormalMap = pMesh->pNormalMap.get();
                 fragmentShader.pSpecular = pMesh->pSpecular.get();
                 fragmentShader.normalMapType = pMesh->normalMapType;
-                fragmentShader.pLight = &light.position;
+                fragmentShader.pLight = &light.direction;
                 fragmentShader.lightIntensity = light.intensity;
 
                 Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
