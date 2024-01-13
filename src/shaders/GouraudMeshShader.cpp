@@ -7,40 +7,49 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        GouraudMeshVarying
-        GouraudMeshInterpolator::operator()(const std::array<GouraudMeshVarying, 2> &varyings, const Math::Vector2D &weights) const {
-            GouraudMeshVarying res;
+        IMeshVarying
+        GouraudMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings, const Math::Vector2D &weights) const {
+            IMeshVarying res;
 
             res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1];
 
+            res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1];
+            res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1];
+
             return res;
         }
 
-        GouraudMeshVarying
-        GouraudMeshInterpolator::operator()(const std::array<GouraudMeshVarying, 3> &varyings, const Math::Vector3D &weights) const {
-            GouraudMeshVarying res;
+        IMeshVarying
+        GouraudMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings, const Math::Vector3D &weights) const {
+            IMeshVarying res;
 
             res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
             res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1] + varyings[2].intensity * weights[2];
 
+            res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1] + varyings[2].light * weights[2];
+            res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1] + varyings[2].intensity * weights[2];
+
             return res;
         }
 
-        GouraudMeshVarying GouraudMeshVertexShader::operator()(std::size_t vIdx) const {
-            GouraudMeshVarying res;
+        IMeshVarying GouraudMeshVertexShader::operator()(std::size_t vIdx) const {
+            IMeshVarying res;
 
-            res.intensity = (-*pLight).dot((*pNormals)[vIdx]);
+            res.normal = (modelViewMatrix * (*pNormals)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+            res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+
+            res.intensity = (-res.light).dot(res.normal) * intensity;
             res.uv = (*pUvs)[vIdx];
 
-            res.position = (*pProjection) * (*pView) * (*pModel) * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
 
             return res;
         }
 
-        bool GouraudMeshFragmentShader::operator()(const UltRenderer::Shaders::GouraudMeshVarying &varying, Math::Vector4D &color,
+        bool GouraudMeshFragmentShader::operator()(const UltRenderer::Shaders::IMeshVarying &varying, Math::Vector4D &color,
                                                    double &depth) const {
             Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
 

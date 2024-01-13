@@ -9,26 +9,20 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        struct PhongMeshVarying: public IVarying {
-            // TODO: Not support 3D texture for now
-            Math::Vector3D uv;
-            Math::Vector3D normal;
+        class PhongMeshInterpolator: public IInterpolator<IMeshVarying> {
+        public:
+            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class PhongMeshInterpolator: public IInterpolator<PhongMeshVarying> {
+        class PhongMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
         public:
-            PhongMeshVarying operator()(const std::array<PhongMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
-            PhongMeshVarying operator()(const std::array<PhongMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+            IMeshVarying operator()(std::size_t vIdx) const override;
         };
 
-        class PhongMeshVertexShader: public IMeshVertexShader<PhongMeshVarying> {
+        class PhongMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
         public:
-            PhongMeshVarying operator()(std::size_t vIdx) const override;
-        };
-
-        class PhongMeshFragmentShader: public IMeshFragmentShader<PhongMeshVarying> {
-        public:
-            bool operator()(const PhongMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer

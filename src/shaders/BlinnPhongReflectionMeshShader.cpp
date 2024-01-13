@@ -7,46 +7,53 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        BlinnPhongReflectionMeshVarying
-        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<BlinnPhongReflectionMeshVarying, 3> &varyings,
+        IMeshVarying
+        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings,
                                                   const Math::Vector3D &weights) const {
-            BlinnPhongReflectionMeshVarying res;
+            IMeshVarying res;
             res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1] + varyings[2].normal * weights[2];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1] + varyings[2].tangent * weights[2];
+            res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1] + varyings[2].light * weights[2];
+            res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1] + varyings[2].intensity * weights[2];
 
             return res;
         }
 
-        BlinnPhongReflectionMeshVarying
-        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<BlinnPhongReflectionMeshVarying, 2> &varyings,
+        IMeshVarying
+        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings,
                                                   const Math::Vector2D &weights) const {
-            BlinnPhongReflectionMeshVarying res;
+            IMeshVarying res;
             res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] ;
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1];
+            res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1];
+            res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1];
 
             return res;
         }
 
-        BlinnPhongReflectionMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx) const {
-            BlinnPhongReflectionMeshVarying res;
+        IMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx) const {
+            IMeshVarying res;
 
             res.uv = (*pUvs)[vIdx];
-            res.position = (*pProjection) * (*pView) * (*pModel) * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
-            res.normal = (*pNormals)[vIdx];
-            res.tangent = (*pTangents)[vIdx];
+            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+            // Transform the vector (the w of 3D vector is zero)
+            res.normal = (modelViewMatrix * (*pNormals)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+            res.tangent = (modelViewMatrix * (*pTangents)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+            // Light is in world space
+            res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+            res.intensity = intensity;
 
             return res;
         }
 
-        bool BlinnPhongReflectionMeshFragmentShader::operator()(const BlinnPhongReflectionMeshVarying &varying, Math::Vector4D &color,
+        bool BlinnPhongReflectionMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
                                                          double &depth) const {
-            auto mvp = (*pProjection) * (*pView) * (*pModel);
             // Apply intensity here
-            Math::Vector3D light = (mvp * (*pLight).toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized() * lightIntensity;
+            Math::Vector3D light = varying.light * varying.intensity;
             Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
             double shininess = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
@@ -70,13 +77,11 @@ namespace UltRenderer {
                         t.z(), b.z(), n.z(),
                 };
 
-                normal = (mvp.transpose().inverse() * (tbn * normal).toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+                normal = (tbn * normal).normalized();
             }
             else {
-                normal = (mvp.transpose().inverse() * normal.toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+                normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             }
-
-            // TODO: Too slow
 
             // Diffuse
             double diffuse = normal.dot(-light);

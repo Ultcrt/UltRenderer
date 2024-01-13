@@ -9,26 +9,20 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        struct GouraudMeshVarying: public IVarying {
-            // TODO: Not support 3D texture for now
-            Math::Vector3D uv;
-            double intensity;
+        class GouraudMeshInterpolator: public IInterpolator<IMeshVarying> {
+        public:
+            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class GouraudMeshInterpolator: public IInterpolator<GouraudMeshVarying> {
+        class GouraudMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
         public:
-            GouraudMeshVarying operator()(const std::array<GouraudMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
-            GouraudMeshVarying operator()(const std::array<GouraudMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+            IMeshVarying operator()(std::size_t vIdx) const override;
         };
 
-        class GouraudMeshVertexShader: public IMeshVertexShader<GouraudMeshVarying> {
+        class GouraudMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
         public:
-            GouraudMeshVarying operator()(std::size_t vIdx) const override;
-        };
-
-        class GouraudMeshFragmentShader: public IMeshFragmentShader<GouraudMeshVarying> {
-        public:
-            bool operator()(const GouraudMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer

@@ -9,26 +9,20 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        struct FlatMeshVarying: public IVarying {
-            // TODO: Not support 3D texture for now
-            Math::Vector3D uv;
-            Math::Vector3D normal;
+        class FlatMeshInterpolator: public IInterpolator<IMeshVarying> {
+        public:
+            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class FlatMeshInterpolator: public IInterpolator<FlatMeshVarying> {
+        class FlatMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
         public:
-            FlatMeshVarying operator()(const std::array<FlatMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
-            FlatMeshVarying operator()(const std::array<FlatMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+            IMeshVarying operator()(std::size_t vIdx) const override;
         };
 
-        class FlatMeshVertexShader: public IMeshVertexShader<FlatMeshVarying> {
+        class FlatMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
         public:
-            FlatMeshVarying operator()(std::size_t vIdx) const override;
-        };
-
-        class FlatMeshFragmentShader: public IMeshFragmentShader<FlatMeshVarying> {
-        public:
-            bool operator()(const FlatMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer

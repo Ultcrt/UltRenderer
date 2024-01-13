@@ -9,23 +9,18 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        struct NormalMappingMeshVarying: public IVarying {
-            // TODO: Not support 3D texture for now
-            Math::Vector3D uv;
+        class NormalMappingMeshInterpolator: public IInterpolator<IMeshVarying> {
+            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class NormalMappingMeshInterpolator: public IInterpolator<NormalMappingMeshVarying> {
-            NormalMappingMeshVarying operator()(const std::array<NormalMappingMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
-            NormalMappingMeshVarying operator()(const std::array<NormalMappingMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+        class NormalMappingMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
+            IMeshVarying operator()(std::size_t vIdx) const override;
         };
 
-        class NormalMappingMeshVertexShader: public IMeshVertexShader<NormalMappingMeshVarying> {
-            NormalMappingMeshVarying operator()(std::size_t vIdx) const override;
-        };
-
-        class NormalMappingMeshFragmentShader: public IMeshFragmentShader<NormalMappingMeshVarying> {
+        class NormalMappingMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
         public:
-            bool operator()(const NormalMappingMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer
