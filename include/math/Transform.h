@@ -11,6 +11,8 @@ namespace UltRenderer {
     namespace Math {
         class Transform3D: public Matrix4D {
         public:
+            using Matrix4D::Matrix;
+
             Transform3D();
 
             Transform3D(const Matrix4D& target);
