@@ -21,7 +21,7 @@ namespace UltRenderer {
         };
 
         enum class NormalMapType: std::size_t {
-            CARTESIAN = 0, DARBOUX = 0
+            CARTESIAN = 0, DARBOUX = 1
         };
 
         template<ImageFormat FORMAT>
