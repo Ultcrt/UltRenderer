@@ -27,7 +27,7 @@ int main() {
     auto pSpecular = std::make_shared<Data::Image>("../data/african_head_spec.tga");
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/african_head.obj");
     auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
-    auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1});
+    auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);
 
     // Use 3.14 and a large z, will cause head not at center
     pCamera->transformMatrix = Math::Transform3D({1, 1, 1}, {0, M_PI / 8, -M_PI / 10}, {2.1, 1.8, 5});

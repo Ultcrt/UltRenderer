@@ -45,7 +45,8 @@ namespace UltRenderer {
         bool BlinnPhongReflectionMeshFragmentShader::operator()(const BlinnPhongReflectionMeshVarying &varying, Math::Vector4D &color,
                                                          double &depth) const {
             auto mvp = (*pProjection) * (*pView) * (*pModel);
-            Math::Vector3D light = (mvp * (*pLight).toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized();
+            // Apply intensity here
+            Math::Vector3D light = (mvp * (*pLight).toHomogeneousCoordinates(1)).toCartesianCoordinates().normalized() * lightIntensity;
             Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
             double shininess = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
