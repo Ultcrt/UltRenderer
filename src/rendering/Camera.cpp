@@ -3,15 +3,15 @@
 //
 
 #include "rendering/Camera.h"
-#include "shaders/PhongMeshShader.h"
+#include "shaders/BlinnPhongReflectionMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
         Data::Image Camera::render(std::size_t width, std::size_t height) const {
-            Shaders::PhongMeshVertexShader vertexShader;
-            Shaders::PhongMeshFragmentShader fragmentShader;
-            Shaders::PhongMeshInterpolator interpolator;
-            return Camera::render<Shaders::PhongMeshVarying>(width, height, vertexShader, fragmentShader, interpolator);
+            Shaders::BlinnPhongReflectionMeshVertexShader vertexShader;
+            Shaders::BlinnPhongReflectionMeshFragmentShader fragmentShader;
+            Shaders::BlinnPhongReflectionMeshInterpolator interpolator;
+            return Camera::render<Shaders::IMeshVarying>(width, height, vertexShader, fragmentShader, interpolator);
         }
 
         Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):
