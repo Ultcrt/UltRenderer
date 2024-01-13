@@ -21,6 +21,7 @@ namespace UltRenderer {
             // Attributes
             const std::vector<Math::Vector3D>* pVertices;
             const std::vector<Math::Vector3D>* pNormals;
+            const std::vector<Math::Vector3D>* pTangents;
             const std::vector<Math::Vector3D>* pUvs;
 
             V operator()(std::size_t vIdx) const override = 0;

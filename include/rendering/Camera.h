@@ -88,6 +88,7 @@ namespace UltRenderer {
                 // Set IMeshVertexShader general attributes
                 vertexShader.pVertices = &pMesh->vertices;
                 vertexShader.pNormals = &pMesh->vertexNormals;
+                vertexShader.pTangents = &pMesh->vertexTangents;
                 vertexShader.pUvs = &pMesh->vertexTextures;
 
                 // Set IMeshFragmentShader general uniforms
