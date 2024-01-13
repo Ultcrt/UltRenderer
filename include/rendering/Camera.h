@@ -84,6 +84,9 @@ namespace UltRenderer {
                 vertexShader.pView = &view;
                 vertexShader.pProjection = &projectionMatrix;
                 vertexShader.pLight = &light.direction;
+                vertexShader.intensity = light.intensity;
+                vertexShader.modelViewMatrix = view * pMesh->transformMatrix;
+                vertexShader.modelViewProjectionMatrix = projectionMatrix * vertexShader.modelViewMatrix;
 
                 // Set IMeshVertexShader general attributes
                 vertexShader.pVertices = &pMesh->vertices;
@@ -92,15 +95,15 @@ namespace UltRenderer {
                 vertexShader.pUvs = &pMesh->vertexTextures;
 
                 // Set IMeshFragmentShader general uniforms
-                fragmentShader.pModel = &pMesh->transformMatrix;
-                fragmentShader.pView = &view;
-                fragmentShader.pProjection = &projectionMatrix;
                 fragmentShader.pTexture = pMesh->pTexture.get();
                 fragmentShader.pNormalMap = pMesh->pNormalMap.get();
                 fragmentShader.pSpecular = pMesh->pSpecular.get();
                 fragmentShader.normalMapType = pMesh->normalMapType;
-                fragmentShader.pLight = &light.direction;
-                fragmentShader.lightIntensity = light.intensity;
+                fragmentShader.pModel = vertexShader.pModel;
+                fragmentShader.pView = vertexShader.pView;
+                fragmentShader.pProjection = vertexShader.pProjection;
+                fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
+                fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
 
                 Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
                                      vertexShader, fragmentShader, interpolator);
