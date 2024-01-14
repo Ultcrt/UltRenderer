@@ -46,12 +46,16 @@ namespace UltRenderer {
             const Data::Image* pTexture;
             const Data::Image* pNormalMap;
             const Data::Image* pSpecular;
+            const Data::Image* pShadowMap;
             Data::NormalMapType normalMapType;
             const Math::Transform3D* pModel;
             const Math::Transform3D* pView;
             const Math::Transform3D* pProjection;
+            // Transformation from camera viewport to light viewport
+            Math::Transform3D lightMatrix;
             Math::Transform3D modelViewMatrix;
             Math::Transform3D modelViewProjectionMatrix;
+            double shadowIntensity;
 
             bool operator()(const V& varying, Math::Vector4D& color, double& depth) const override = 0;
         };

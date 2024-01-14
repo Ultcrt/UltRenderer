@@ -13,6 +13,7 @@
 #include "shaders/IMeshShader.h"
 #include "hierarchy/TransformNode.h"
 #include "rendering/Scene.h"
+#include "shaders/DepthMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -69,8 +70,15 @@ namespace UltRenderer {
             viewport(1, 3) = static_cast<double>(height) / 2.;
             viewport(2, 3) = 1. / 2.;
 
-            UltRenderer::Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
-            UltRenderer::Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+            Shaders::DepthMeshVertexShader depthVS;
+            Shaders::DepthMeshFragmentShader depthFS;
+            Shaders::DepthMeshInterpolator depthIT;
+
+            Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
+            Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+
+            Data::Image fBufferShadow(width, height, Data::ImageFormat::RGBA);
+            Data::Image zBufferShadow(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
             // viewport * projection * view
             for (const auto &pMesh: _pScene->meshes()) {
@@ -78,6 +86,20 @@ namespace UltRenderer {
 
                 // TODO: Compute only the first light here for simplicity, which is wrong
                 const Rendering::Light& light = *_pScene->lights()[0];
+
+                const Math::Transform3D lightView = Math::Transform3D::FromLookAt({0, 0, 5}, {0, 0, 0}, {0, 1, 0}).inverse();
+
+                // Shadow mapping
+                depthVS.pModel = &pMesh->transformMatrix;
+                depthVS.pView = &lightView;
+                // TODO: Shadow mapping's projection matrix may not be identical to camera's.
+                depthVS.pProjection = &projectionMatrix;
+                depthVS.modelViewMatrix = lightView * pMesh->transformMatrix;
+                depthVS.modelViewProjectionMatrix = projectionMatrix * depthVS.modelViewMatrix;
+                depthVS.pVertices = &pMesh->vertices;
+
+                Pipeline::Execute<Shaders::IMeshVarying>(fBufferShadow, zBufferShadow, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
+                                                         depthVS, depthFS, depthIT);
 
                 // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms
@@ -103,6 +125,8 @@ namespace UltRenderer {
                 fragmentShader.pModel = vertexShader.pModel;
                 fragmentShader.pView = vertexShader.pView;
                 fragmentShader.pProjection = vertexShader.pProjection;
+                fragmentShader.pShadowMap = &zBufferShadow;
+                fragmentShader.lightMatrix = (viewport * depthVS.modelViewProjectionMatrix) * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
                 fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
                 fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
 

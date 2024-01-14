@@ -56,7 +56,17 @@ namespace UltRenderer {
             Math::Vector3D light = varying.light * varying.intensity;
             Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-            double shininess = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
+            auto shadowPosition = (lightMatrix * varying.position).toCartesianCoordinates();
+            // 0.01 is a coefficient to fix z-fighting
+            bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
+
+            // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
+            double brightness = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+            Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = specularColor;
+            if (pSpecular->type() == Data::ImageFormat::RGB) {
+                finalSpecularColor = (*pSpecular).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                brightness = finalSpecularColor.convertTo<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+            }
 
             // TODO: Non-normal mapping should be checked here
             if (normalMapType == Data::NormalMapType::DARBOUX) {
@@ -89,13 +99,19 @@ namespace UltRenderer {
             // Specular
             Math::Vector3D viewDir = (-varying.position.toCartesianCoordinates()).normalized();     // Camera is always at origin, so the view direction can be represented by the position
             Math::Vector3D halfVec = ((viewDir + -light) / 2).normalized();
-            double specular = std::pow(halfVec.dot(normal), shininess * static_cast<double>(std::numeric_limits<uint8_t>::max()));         // uint8_t is the correct form of data, need convert
+            double specular = std::pow(halfVec.dot(normal), brightness);         // uint8_t is the correct form of data, need convert
 
             color = (
                     ambientCoefficient * ambientColor +
                     diffuseCoefficient * diffuse * rgb +
-                    specularCoefficient * specular * specularColor
+                    specularCoefficient * specular * finalSpecularColor
             ).toHomogeneousCoordinates(1);
+
+            if (inShadow) {
+                color = shadowIntensity * color;
+                color.w() = 1;
+            }
+
             return true;
         }
     } // Shaders
