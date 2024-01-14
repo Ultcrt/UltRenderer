@@ -51,6 +51,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/NormalMappingMeshShader.cpp
         include/shaders/NormalMappingMeshShader.h
         src/shaders/BlinnPhongReflectionMeshShader.cpp
-        include/shaders/BlinnPhongReflectionMeshShader.h)
+        include/shaders/BlinnPhongReflectionMeshShader.h
+        include/shaders/DepthMeshShader.h
+        src/shaders/DepthMeshShader.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
