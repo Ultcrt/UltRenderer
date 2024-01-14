@@ -35,10 +35,7 @@ namespace UltRenderer {
 
         bool DepthMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
                                                          double &depth) const {
-            // Apply intensity here
-            color.x() = depth;
-            color.w() = 1;
-
+            // Fragment shader do not need to do anything, only need depth buffer
             return true;
         }
     } // Shaders
