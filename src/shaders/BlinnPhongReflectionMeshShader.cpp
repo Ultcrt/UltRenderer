@@ -65,7 +65,7 @@ namespace UltRenderer {
             Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = specularColor;
             if (pSpecular->type() == Data::ImageFormat::RGB) {
                 finalSpecularColor = (*pSpecular).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
-                brightness = finalSpecularColor.convertTo<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+                brightness = finalSpecularColor.to<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
             }
 
             // TODO: Non-normal mapping should be checked here

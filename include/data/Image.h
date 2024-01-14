@@ -38,7 +38,7 @@ namespace UltRenderer {
             Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target);
 
             template<ImageFormat TARGET>
-            Pixel<TARGET> convertTo() const;
+            Pixel<TARGET> to() const;
         };
 
         class Image {
@@ -84,7 +84,7 @@ namespace UltRenderer {
         /*----------Definition----------*/
         template<ImageFormat FORMAT>
         template<ImageFormat TARGET>
-        Pixel<TARGET> Pixel<FORMAT>::convertTo() const {
+        Pixel<TARGET> Pixel<FORMAT>::to() const {
             if constexpr (FORMAT == TARGET) {
                 return *this;
             }
@@ -101,8 +101,8 @@ namespace UltRenderer {
                 return Pixel<TARGET>{this->x(), this->y(), this->z(), 1};
             }
             else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::GRAY) {
-                Pixel<ImageFormat::RGB> rgb = convertTo<ImageFormat::RGB>();
-                return rgb.convertTo<TARGET>();
+                Pixel<ImageFormat::RGB> rgb = to<ImageFormat::RGB>();
+                return rgb.to<TARGET>();
             }
             else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::RGB) {
                 return Pixel<TARGET>{this->x(), this->y(), this->z()};
