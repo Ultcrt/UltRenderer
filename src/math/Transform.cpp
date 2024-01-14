@@ -44,5 +44,19 @@ namespace UltRenderer {
         Transform3D::Transform3D(): Matrix4D(Matrix4D::Identity()) {}
 
         Transform3D::Transform3D(const Matrix4D &target) : Matrix(target) {}
+
+        Transform3D Transform3D::FromLookAt(const Math::Vector3D& position, const Math::Vector3D& lookAt, const Math::Vector3D& up) {
+            const auto zAxis = (position - lookAt).normalized();
+            const auto xAxis = up.cross(zAxis).normalized();
+            // Should not use up vector directly as y-axis, to make more flexibility for users
+            const auto yAxis = zAxis.cross(xAxis).normalized();
+
+            return {
+                    xAxis.x(), yAxis.x(), zAxis.x(), position.x(),
+                    xAxis.y(), yAxis.y(), zAxis.y(), position.y(),
+                    xAxis.z(), yAxis.z(), zAxis.z(), position.z(),
+                    0, 0, 0, 1
+            };
+        }
     } // Math
 } // UltRenderer

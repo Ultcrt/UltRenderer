@@ -13,6 +13,8 @@ namespace UltRenderer {
         public:
             using Matrix4D::Matrix;
 
+            static Transform3D FromLookAt(const Math::Vector3D& position, const Math::Vector3D& lookAt, const Math::Vector3D& up);
+
             Transform3D();
 
             Transform3D(const Matrix4D& target);
