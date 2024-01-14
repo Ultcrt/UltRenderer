@@ -140,7 +140,7 @@ namespace UltRenderer {
 
                             // Only update when not discard
                             if (fragmentShader(interpolatedVarying, color, depth)) {
-                                if (depth > zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
+                                if (depth < zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
                                     zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
                                     fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx) = color;
                                 }

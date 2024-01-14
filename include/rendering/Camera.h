@@ -63,13 +63,14 @@ namespace UltRenderer {
             Math::Transform3D viewport;
             viewport(0, 0) = static_cast<double>(width) / 2.;
             viewport(1, 1) = static_cast<double>(height) / 2.;
-            viewport(2, 2) = 1. / 2.;
+            // z scaling factor is negative, to make 0~1 represent near~far
+            viewport(2, 2) = -1. / 2.;
             viewport(0, 3) = static_cast<double>(width) / 2.;
             viewport(1, 3) = static_cast<double>(height) / 2.;
             viewport(2, 3) = 1. / 2.;
 
             UltRenderer::Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
-            UltRenderer::Data::Image zBuffer(width, height, Data::ImageFormat::GRAY);
+            UltRenderer::Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
             // viewport * projection * view
             for (const auto &pMesh: _pScene->meshes()) {
