@@ -44,7 +44,7 @@ int main() {
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    auto img = pCamera->render(1920, 1920, vs, fs, it);
+    auto img = pCamera->render(1920, 1920, vs, fs, it, ssao);
 
     img.save("test.tga");
 
