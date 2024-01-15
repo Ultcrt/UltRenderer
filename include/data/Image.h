@@ -73,6 +73,18 @@ namespace UltRenderer {
             template<ImageFormat FORMAT>
             Pixel<FORMAT> at(double wRatio, double hRatio) const;
 
+            template<ImageFormat FORMAT>
+            PixelProxy<FORMAT> at(const Math::Vector2S& pos);
+
+            template<ImageFormat FORMAT>
+            Pixel<FORMAT> at(const Math::Vector2S& pos) const;
+
+            template<ImageFormat FORMAT>
+            PixelProxy<FORMAT> at(const Math::Vector2D& pos);
+
+            template<ImageFormat FORMAT>
+            Pixel<FORMAT> at(const Math::Vector2D& pos) const;
+
             void save(const std::string& filename);
             [[nodiscard]] Math::Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
@@ -191,6 +203,26 @@ namespace UltRenderer {
         template<ImageFormat FORMAT>
         Image::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel): _format(static_cast<std::size_t>(FORMAT)), _data(h * w * _format), _width(w), _height(h) {
             fill<FORMAT>(filledPixel);
+        }
+
+        template<ImageFormat FORMAT>
+        Pixel<FORMAT> Image::at(const Math::Vector2D &pos) const {
+            return at<FORMAT>(pos.x(), pos.y());
+        }
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT> Image::at(const Math::Vector2D &pos) {
+            return at<FORMAT>(pos.x(), pos.y());
+        }
+
+        template<ImageFormat FORMAT>
+        Pixel<FORMAT> Image::at(const Math::Vector2S &pos) const {
+            return at<FORMAT>(pos.x(), pos.y());
+        }
+
+        template<ImageFormat FORMAT>
+        PixelProxy<FORMAT> Image::at(const Math::Vector2S &pos) {
+            return at<FORMAT>(pos.x(), pos.y());
         }
     } // UltRenderer
 } // Data
