@@ -2,6 +2,7 @@
 // Created by ultcrt on 24-1-15.
 //
 
+#include <iostream>
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 
 namespace UltRenderer {
@@ -28,8 +29,8 @@ namespace UltRenderer {
                         approxSolidAngle = std::pow(approxSolidAngle, 100.);
 
                         // Update image
-                        Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(x, y);
-                        fBuffer.at<Data::ImageFormat::RGBA>(x, y) = color * approxSolidAngle;
+                        Math::Vector3D color = fBuffer.at<Data::ImageFormat::RGB>(x, y);
+                        fBuffer.at<Data::ImageFormat::RGB>(x, y) = color * approxSolidAngle;
                     }
                 }
             }
