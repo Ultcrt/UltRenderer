@@ -53,6 +53,12 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/BlinnPhongReflectionMeshShader.cpp
         include/shaders/BlinnPhongReflectionMeshShader.h
         include/shaders/DepthMeshShader.h
-        src/shaders/DepthMeshShader.cpp)
+        src/shaders/DepthMeshShader.cpp
+        src/postprocessors/IPostprocessor.cpp
+        include/postprocessors/IPostprocessor.h
+        src/postprocessors/ScreenSpaceAmbientOcclusion.cpp
+        include/postprocessors/ScreenSpaceAmbientOcclusion.h
+        src/postprocessors/EmptyPostprocessor.cpp
+        include/postprocessors/EmptyPostprocessor.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

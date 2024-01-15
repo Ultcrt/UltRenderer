@@ -14,6 +14,7 @@
 #include "hierarchy/TransformNode.h"
 #include "rendering/Scene.h"
 #include "shaders/DepthMeshShader.h"
+#include "postprocessors/EmptyPostprocessor.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -49,17 +50,17 @@ namespace UltRenderer {
             void setZMin(double zMin);
             void setZMax(double zMax);
 
-            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const;
+            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
             template<std::derived_from<Shaders::IVarying> V>
             [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                             const Shaders::IInterpolator<V> &interpolator) const;
+                                             const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
         };
 
         template<std::derived_from<Shaders::IVarying> V>
         Data::Image Camera::render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                      const Shaders::IInterpolator<V> &interpolator) const {
+                                   const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
             Math::Transform3D viewport;
             viewport(0, 0) = static_cast<double>(width) / 2.;
@@ -131,8 +132,7 @@ namespace UltRenderer {
                 fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
 
                 Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
-                                     vertexShader, fragmentShader, interpolator);
-
+                                     vertexShader, fragmentShader, interpolator, postprocessor);
             }
 
             return fBuffer;

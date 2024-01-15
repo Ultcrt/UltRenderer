@@ -5,6 +5,7 @@
 #ifndef ULTRENDERER_GEOMETRY_H
 #define ULTRENDERER_GEOMETRY_H
 
+#include <random>
 #include <utility>
 #include <vector>
 #include <array>
@@ -19,6 +20,8 @@ namespace UltRenderer {
 
             template<typename T>
             Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point, const std::array<Math::Vector2<T>, 3>& trianglePoints);
+
+            std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
 
             /*----------Definition----------*/
             template<typename T, std::size_t N>
@@ -48,7 +51,7 @@ namespace UltRenderer {
 
             template<typename T>
             Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point,
-                                                      const std::array<Math::Vector2<T>, 3>& trianglePoints) {
+                                                        const std::array<Math::Vector2<T>, 3>& trianglePoints) {
                 Math::Vector2<T> vecAB = trianglePoints[1] - trianglePoints[0];
                 Math::Vector2<T> vecAC = trianglePoints[2] - trianglePoints[0];
                 Math::Vector2<T> vecAP = point - trianglePoints[0];

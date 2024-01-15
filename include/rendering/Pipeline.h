@@ -12,6 +12,7 @@
 #include "shaders/IShader.h"
 #include "rendering/Rasterize.h"
 #include "math/Transform.h"
+#include "postprocessors/EmptyPostprocessor.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -22,7 +23,8 @@ namespace UltRenderer {
                                 const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points,
                                 const Shaders::IVertexShader<V>& vertexShader,
                                 const Shaders::IFragmentShader<V>& fragmentShader,
-                                const Shaders::IInterpolator<V>& interpolator = {});
+                                const Shaders::IInterpolator<V>& interpolator = {},
+                                const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor());
         };
 
         // TODO: Only support triangle primitives for now
@@ -31,7 +33,8 @@ namespace UltRenderer {
                                const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points,
                                const Shaders::IVertexShader<V>& vertexShader,
                                const Shaders::IFragmentShader<V>& fragmentShader,
-                               const Shaders::IInterpolator<V>& interpolator) {
+                               const Shaders::IInterpolator<V>& interpolator,
+                               const Postprocessors::IPostprocessor& postprocessor) {
             // Process vertex
             std::vector<V> fragCoords;
             std::vector<bool> clipFlags;
@@ -73,6 +76,9 @@ namespace UltRenderer {
                     Rendering::Rasterize::Triangle<V>(fBuffer, zBuffer, varyingGroup, fragmentShader, interpolator);
                 }
             }
+
+            // Postprocessing
+            postprocessor(fBuffer, zBuffer);
         }
     } // Rendering
 } // UltRenderer

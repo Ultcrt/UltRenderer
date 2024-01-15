@@ -7,11 +7,11 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        Data::Image Camera::render(std::size_t width, std::size_t height) const {
+        Data::Image Camera::render(std::size_t width, std::size_t height, const Postprocessors::IPostprocessor& postprocessor) const {
             Shaders::BlinnPhongReflectionMeshVertexShader vertexShader;
             Shaders::BlinnPhongReflectionMeshFragmentShader fragmentShader;
             Shaders::BlinnPhongReflectionMeshInterpolator interpolator;
-            return Camera::render<Shaders::IMeshVarying>(width, height, vertexShader, fragmentShader, interpolator);
+            return Camera::render<Shaders::IMeshVarying>(width, height, vertexShader, fragmentShader, interpolator, postprocessor);
         }
 
         Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):

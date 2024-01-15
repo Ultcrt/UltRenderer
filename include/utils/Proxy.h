@@ -19,6 +19,7 @@ namespace UltRenderer {
         public:
             explicit MatrixProxy(const std::array<T*, M * N>& componentPtrs);
 
+            // TODO: Should override more operator like +=
             MatrixProxy<T, M, N>& operator=(const Math::Matrix<T, M, N>& target);
 
             operator Math::Matrix<T, M, N>() const;
