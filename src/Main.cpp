@@ -24,6 +24,7 @@ int main() {
 
     fs.specularColor = {1, 1, 1};
     fs.ambientColor = {0.2, 0.1, 0};
+    fs.shadowIntensity = 0.3;
 
     auto pTexture = std::make_shared<Data::Image>("../data/african_head_diffuse.tga");
     auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm_tangent.tga");
