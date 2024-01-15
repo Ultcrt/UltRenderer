@@ -10,7 +10,7 @@
 namespace UltRenderer {
     namespace Postprocessors {
         class EmptyPostprocessor: public IPostprocessor{
-            void operator()(Data::Image& fBuffer, Data::Image& zBuffer) override;
+            void operator()(Data::Image& fBuffer, Data::Image& zBuffer) const override;
         };
 
     } // Postprocessors

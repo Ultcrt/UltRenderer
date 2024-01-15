@@ -6,7 +6,7 @@
 
 namespace UltRenderer {
     namespace Postprocessors {
-        void ScreenSpaceAmbientOcclusion::operator()(Data::Image &fBuffer, Data::Image &zBuffer) {
+        void ScreenSpaceAmbientOcclusion::operator()(Data::Image &fBuffer, Data::Image &zBuffer) const {
             const std::size_t width = fBuffer.width();
             const std::size_t height = fBuffer.height();
 

@@ -12,7 +12,7 @@ namespace UltRenderer {
 
         class ScreenSpaceAmbientOcclusion: public IPostprocessor {
         public:
-            void operator()(Data::Image& fBuffer, Data::Image& zBuffer) override;
+            void operator()(Data::Image& fBuffer, Data::Image& zBuffer) const override;
 
         private:
             static double ComputeMaxSlopeAngle(

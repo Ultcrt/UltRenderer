@@ -6,7 +6,7 @@
 
 namespace UltRenderer {
     namespace Postprocessors {
-        void EmptyPostprocessor::operator()(Data::Image &fBuffer, Data::Image &zBuffer) {
+        void EmptyPostprocessor::operator()(Data::Image &fBuffer, Data::Image &zBuffer) const {
         }
     } // Postprocessors
 } // UltRenderer
