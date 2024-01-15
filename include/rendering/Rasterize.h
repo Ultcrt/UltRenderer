@@ -129,13 +129,23 @@ namespace UltRenderer {
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
-                        auto barycentricCoords = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
+                        // Get barycentric coordinate in screen space
+                        auto fragBarycentricCoord = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
+
+                        // Perform perspective correction
+                        auto barycentricCoord = Math::Vector3D{
+                                fragBarycentricCoord.x() * varyings[0].position.w(),
+                                fragBarycentricCoord.y() * varyings[1].position.w(),
+                                fragBarycentricCoord.z() * varyings[2].position.w()
+                        } / (fragBarycentricCoord.x() * varyings[0].position.w() + fragBarycentricCoord.y() * varyings[1].position.w() + fragBarycentricCoord.z() * varyings[2].position.w());
 
                         // Check the point is inside triangle or not
-                        if (barycentricCoords.x() >= 0 && barycentricCoords.y() >= 0 && barycentricCoords.z() >= 0) {
-                            const V& interpolatedVarying = interpolator(varyings, barycentricCoords);
+                        if (barycentricCoord.x() >= 0 && barycentricCoord.y() >= 0 && barycentricCoord.z() >= 0) {
+                            V interpolatedVarying = interpolator(varyings, barycentricCoord);
+                            // TODO: 1/w is set to 1, because varying.position.w is assumed equals to 1 in shaders, which may not be appropriate
+                            interpolatedVarying.position.w() = 1;
+
                             Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx);
-                            // TODO: Barycentric coordinates is not the same before and after perspective projection (perspective correct)
                             double depth = interpolatedVarying.position.z();
 
                             // Only update when not discard

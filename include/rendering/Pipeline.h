@@ -33,28 +33,35 @@ namespace UltRenderer {
                                const Shaders::IFragmentShader<V>& fragmentShader,
                                const Shaders::IInterpolator<V>& interpolator) {
             // Process vertex
-            std::vector<V> varyings;
+            std::vector<V> fragCoords;
             std::vector<bool> clipFlags;
             for (std::size_t vIdx = 0; vIdx < vertexNum; vIdx++) {
                 // Call vertex shader for each vertex
                 V varying = vertexShader(vIdx);
 
+                // TODO: Clipping is not ideal (discard triangle when one vertex is outside)
                 // Record vertex clip flag here
-                const double w = std::abs(varying.position.w());
-                clipFlags.emplace_back(std::abs(varying.position.x()) > w || std::abs(varying.position.y()) > w || std::abs(varying.position.z()) > w);
+                const double absW = std::abs(varying.position.w());
+                clipFlags.emplace_back(std::abs(varying.position.x()) > absW || std::abs(varying.position.y()) > absW || std::abs(varying.position.z()) > absW);
 
-                // Apply viewport here
-                varying.position = viewport * varying.position / varying.position.w();
-                varyings.emplace_back(varying);
+                // Perspective division
+                const double wR = 1 / varying.position.w();
+                varying.position *= wR;
+
+                // Apply viewport
+                varying.position = viewport * varying.position;
+
+                // Form fragment coordinates as (x, y, z, 1/w)
+                varying.position.w() = wR;
+                fragCoords.emplace_back(varying);
             }
 
             // Primitive assembly: triangle primitives
             for (const auto& triangle: triangles) {
                 bool clipped = false;
                 std::array<V, 3> varyingGroup;
-                // TODO: Perspective correcting is not done, and clipping is not ideal (discard triangle when one vertex is outside)
                 for (std::size_t idx = 0; idx < 3; idx++) {
-                    varyingGroup[idx] = varyings[triangle[idx]];
+                    varyingGroup[idx] = fragCoords[triangle[idx]];
                     if (clipFlags[triangle[idx]]) {
                         clipped = true;
                         break;
