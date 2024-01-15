@@ -55,6 +55,8 @@ add_executable(UltRenderer src/Main.cpp
         src/postprocessors/IPostprocessor.cpp
         include/postprocessors/IPostprocessor.h
         src/postprocessors/ScreenSpaceAmbientOcclusion.cpp
-        include/postprocessors/ScreenSpaceAmbientOcclusion.h)
+        include/postprocessors/ScreenSpaceAmbientOcclusion.h
+        src/postprocessors/EmptyPostprocessor.cpp
+        include/postprocessors/EmptyPostprocessor.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
