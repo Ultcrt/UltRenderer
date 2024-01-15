@@ -7,6 +7,7 @@
 #include "rendering/Scene.h"
 #include "shaders/FlatMeshShader.h"
 #include "shaders/BlinnPhongReflectionMeshShader.h"
+#include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 
 using namespace UltRenderer;
 
@@ -14,6 +15,8 @@ int main() {
     Shaders::BlinnPhongReflectionMeshInterpolator it;
     Shaders::BlinnPhongReflectionMeshVertexShader vs;
     Shaders::BlinnPhongReflectionMeshFragmentShader fs;
+    Postprocessors::ScreenSpaceAmbientOcclusion ssao;
+
 
     fs.diffuseCoefficient = 0.5;
     fs.specularCoefficient = 0.4;
