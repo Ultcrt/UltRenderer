@@ -10,6 +10,7 @@
 namespace UltRenderer {
     namespace Postprocessors {
         class IPostprocessor {
+        public:
             virtual void operator()(Data::Image& fBuffer, Data::Image& zBuffer) = 0;
         };
     } // Rendering
