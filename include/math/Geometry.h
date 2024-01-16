@@ -23,6 +23,8 @@ namespace UltRenderer {
 
             std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
 
+            std::pair<Math::Vector3D, double> ComputeApproximateBoundingSphere(const std::vector<Math::Vector3D>& vertices);
+
             /*----------Definition----------*/
             template<typename T, std::size_t N>
             std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>>

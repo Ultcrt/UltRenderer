@@ -29,6 +29,15 @@ namespace UltRenderer {
 
                 return res;
             }
+
+            std::pair<Math::Vector3D, double> ComputeApproximateBoundingSphere(const std::vector<Math::Vector3D>& vertices) {
+                auto [min, max] = GetAABB(vertices);
+
+                auto origin = (min + max) / 2;
+                auto radius = (max - min).norm() / 2;
+
+                return {origin, radius};
+            }
         }
     } // Utils
 } // UltRender
