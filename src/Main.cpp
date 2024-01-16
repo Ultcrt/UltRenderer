@@ -17,7 +17,6 @@ int main() {
     Shaders::BlinnPhongReflectionMeshFragmentShader fs;
     Postprocessors::ScreenSpaceAmbientOcclusion ssao;
 
-
     fs.diffuseCoefficient = 0.5;
     fs.specularCoefficient = 0.4;
     fs.ambientCoefficient = 0.1;
@@ -47,7 +46,7 @@ int main() {
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    auto img = pCamera->render(1920, 1920, vs, fs, it);
+    auto img = pCamera->render(1920, 1920, vs, fs, it, ssao);
 
     img.save("test.tga");
 
