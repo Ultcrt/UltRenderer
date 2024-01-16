@@ -125,12 +125,12 @@ namespace UltRenderer {
                         Math::Vector2D{varyings[2].position.x(), varyings[2].position.y()},
                 };
 
-                auto [minVec, maxVec] = Utils::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
+                auto [minVec, maxVec] = Math::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
                         // Get barycentric coordinate in screen space
-                        auto fragBarycentricCoord = Utils::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
+                        auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
 
                         // Perform perspective correction
                         auto barycentricCoord = Math::Vector3D{

@@ -5,7 +5,7 @@
 #include "math/Geometry.h"
 
 namespace UltRenderer {
-    namespace Utils {
+    namespace Math {
         namespace Geometry {
             std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed) {
                 std::mt19937 mt(seed);

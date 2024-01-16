@@ -12,7 +12,7 @@
 #include "Matrix.h"
 
 namespace UltRenderer {
-    namespace Utils {
+    namespace Math {
         namespace Geometry {
             /*----------Declaration----------*/
             template<typename T, std::size_t N>
