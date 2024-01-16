@@ -59,6 +59,10 @@ add_executable(UltRenderer src/Main.cpp
         src/postprocessors/ScreenSpaceAmbientOcclusion.cpp
         include/postprocessors/ScreenSpaceAmbientOcclusion.h
         src/postprocessors/EmptyPostprocessor.cpp
-        include/postprocessors/EmptyPostprocessor.h)
+        include/postprocessors/EmptyPostprocessor.h
+        src/bakers/PreBakedAmbientOcclusion.cpp
+        include/bakers/PreBakedAmbientOcclusion.h
+        src/shaders/PreBakedAmbientOcclusionMeshShader.cpp
+        include/shaders/PreBakedAmbientOcclusionMeshShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
