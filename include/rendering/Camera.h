@@ -83,7 +83,10 @@ namespace UltRenderer {
 
                 // Shadow mapping
                 // TODO: Shadow mapping's projection matrix may not be identical to camera's, e.g. directional light should use orthogonal projection.
-                const auto lightMatrix = Rendering::RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap);
+                Math::Transform3D lightModelView;
+                Math::Transform3D lightProjection;
+                Math::Transform3D lightViewport;
+                Rendering::RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap, &lightModelView, &lightProjection, &lightViewport);
 
                 // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms
@@ -110,7 +113,7 @@ namespace UltRenderer {
                 fragmentShader.pView = vertexShader.pView;
                 fragmentShader.pProjection = vertexShader.pProjection;
                 fragmentShader.pShadowMap = &shadowMap;
-                fragmentShader.lightMatrix = lightMatrix * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
+                fragmentShader.lightMatrix = (lightViewport * lightProjection * lightModelView) * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
                 fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
                 fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
 
