@@ -9,6 +9,15 @@
 
 namespace UltRenderer {
     namespace Shaders {
+        class PreBakedAmbientOcclusionMeshInterpolator: public IInterpolator<IMeshVarying> {
+            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+        };
+
+        class PreBakedAmbientOcclusionMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
+            IMeshVarying operator()(std::size_t vIdx) const override;
+        };
+
         class PreBakedAmbientOcclusionMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
         private:
             Data::Image& _bakedTexture;
