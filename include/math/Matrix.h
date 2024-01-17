@@ -109,6 +109,10 @@ namespace UltRenderer {
 
             static Matrix<T, M, N> Identity();
 
+            static Vector3D X();
+            static Vector3D Y();
+            static Vector3D Z();
+
             T& operator()(std::size_t rowIdx, std::size_t colIdx);
 
             T operator()(std::size_t rowIdx, std::size_t colIdx) const;
@@ -249,6 +253,21 @@ namespace UltRenderer {
             }
 
             return res;
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Vector3D Matrix<T, M, N>::X() {
+            return {1, 0, 0};
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Vector3D Matrix<T, M, N>::Y() {
+            return {0, 1, 0};
+        }
+
+        template<typename T, std::size_t M, std::size_t N>
+        Vector3D Matrix<T, M, N>::Z() {
+            return {0, 0, 1};
         }
 
         template<typename T, std::size_t M, std::size_t N>
