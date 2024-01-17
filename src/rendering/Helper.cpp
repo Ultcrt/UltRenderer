@@ -9,7 +9,8 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        Math::Transform3D RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage) {
+        void RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage,
+                                    Math::Transform3D* outModelView, Math::Transform3D* outProjection, Math::Transform3D* outViewport) {
             const auto nDir = dir.normalized();
 
             auto [origin, radius] = Math::Geometry::ComputeApproximateBoundingSphere(mesh.vertices);
@@ -19,8 +20,8 @@ namespace UltRenderer {
             const auto zMin = -1.05 * radius;
             const auto zMax = 1.05 * radius;
 
-            // User only pass direction here, so only orthogonal projection is needed
-            const Math::Transform3D& model = mesh.transformMatrix;
+            // dir is in mesh local coordinate, so model matrix is identity matrix
+            const Math::Transform3D& model = Math::Matrix4D::Identity();
             // dir.dot(Math::Vector3D::Y()): make sure z axis is not parallel to up vector
             const Math::Transform3D& view = Math::Transform3D::FromLookAt(
                 origin,
@@ -28,6 +29,7 @@ namespace UltRenderer {
                 nDir.dot(Math::Vector3D::Y()) == 1 ? Math::Vector3D::X() : Math::Vector3D::Y()
             ).inverse();
 
+            // User only pass direction here, so only orthogonal projection is needed
             const auto projection = Rendering::Camera::ComputeProjectionMatrix(w, h, zMin, zMax, ProjectionType::ORTHOGONAL);
             const auto viewport = Rendering::Camera::ComputeViewportMatrix(depthImage.width(), depthImage.height());
 
@@ -51,7 +53,18 @@ namespace UltRenderer {
                 mesh.triangles, {}, {}, vertexShader, fragmentShader, interpolator
             );
 
-            return viewport * vertexShader.modelViewProjectionMatrix;
+            if (outModelView != nullptr) {
+                // Model matrix is identical
+                *outModelView = view;
+            }
+
+            if (outProjection != nullptr) {
+                *outProjection = projection;
+            }
+
+            if (outViewport != nullptr) {
+                *outViewport = viewport;
+            }
         }
     } // Rendering
 } // UltRenderer

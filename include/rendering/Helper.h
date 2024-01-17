@@ -11,7 +11,10 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        Math::Transform3D RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage);
+        void RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage,
+                                                 Math::Transform3D* outModelView = nullptr,
+                                                 Math::Transform3D* outProjection = nullptr,
+                                                 Math::Transform3D* outViewport = nullptr);
     } // Rendering
 } // UltRenderer
 
