@@ -8,11 +8,10 @@
 #include "data/Image.h"
 #include "data/TriangleMesh.h"
 #include "math/Matrix.h"
-#include "rendering/Camera.h"
 
 namespace UltRenderer {
     namespace Rendering {
-        Data::Image RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir);
+        Math::Transform3D RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage);
     } // Rendering
 } // UltRenderer
 
