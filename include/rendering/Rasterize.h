@@ -84,7 +84,7 @@ namespace UltRenderer {
                         error -= static_cast<long long>(samples);
                     }
 
-                    // TODO: Need to update zBuffer
+                    // TODO: Need to update pZBuffer
                     double depth = 0;
                     if (xIsLonger) {
                         const Math::Vector2D doubleP = {static_cast<double>(longPos), static_cast<double>(shortPos)};

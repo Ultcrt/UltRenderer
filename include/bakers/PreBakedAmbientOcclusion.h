@@ -14,6 +14,8 @@ namespace UltRenderer {
         class PreBakedAmbientOcclusion {
         public:
             std::size_t samplingNum;
+            std::size_t width;
+            std::size_t height;
 
             Data::Image operator()(const Data::TriangleMesh& mesh) const;
         };

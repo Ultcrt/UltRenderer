@@ -63,6 +63,8 @@ add_executable(UltRenderer src/Main.cpp
         src/bakers/PreBakedAmbientOcclusion.cpp
         include/bakers/PreBakedAmbientOcclusion.h
         src/shaders/PreBakedAmbientOcclusionMeshShader.cpp
-        include/shaders/PreBakedAmbientOcclusionMeshShader.h)
+        include/shaders/PreBakedAmbientOcclusionMeshShader.h
+        include/rendering/Helper.cpp
+        include/rendering/Helper.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

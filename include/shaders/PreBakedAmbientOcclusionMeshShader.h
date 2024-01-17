@@ -5,11 +5,18 @@
 #ifndef ULTRENDERER_PREBAKEDAMBIENTOCCLUSIONMESHSHADER_H
 #define ULTRENDERER_PREBAKEDAMBIENTOCCLUSIONMESHSHADER_H
 
+#include "shaders/IMeshShader.h"
+
 namespace UltRenderer {
     namespace Shaders {
+        class PreBakedAmbientOcclusionMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
+        private:
+            Data::Image& _bakedTexture;
 
-        class PreBakedAmbientOcclusionMeshShader {
+        public:
+            explicit PreBakedAmbientOcclusionMeshFragmentShader(Data::Image& bakedTexture);
 
+            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
         };
 
     } // Shaders
