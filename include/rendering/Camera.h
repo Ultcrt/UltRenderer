@@ -15,6 +15,7 @@
 #include "rendering/Scene.h"
 #include "shaders/DepthMeshShader.h"
 #include "postprocessors/EmptyPostprocessor.h"
+#include "rendering/Helper.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -56,30 +57,22 @@ namespace UltRenderer {
             [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
                                              const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
+
+            static Math::Transform3D ComputeProjectionMatrix(double width, double height, double zMin, double zMax, ProjectionType projectionType);
+
+            static Math::Transform3D ComputeViewportMatrix(std::size_t width, std::size_t height);
         };
 
         template<std::derived_from<Shaders::IVarying> V>
         Data::Image Camera::render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
                                    const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
-            Math::Transform3D viewport;
-            viewport(0, 0) = static_cast<double>(width) / 2.;
-            viewport(1, 1) = static_cast<double>(height) / 2.;
-            // z scaling factor is negative, to make 0~1 represent near~far
-            viewport(2, 2) = -1. / 2.;
-            viewport(0, 3) = static_cast<double>(width) / 2.;
-            viewport(1, 3) = static_cast<double>(height) / 2.;
-            viewport(2, 3) = 1. / 2.;
-
-            Shaders::DepthMeshVertexShader depthVS;
-            Shaders::DepthMeshFragmentShader depthFS;
-            Shaders::DepthMeshInterpolator depthIT;
+            Math::Transform3D viewport = ComputeViewportMatrix(width, height);
 
             Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
             Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
-            Data::Image fBufferShadow(width, height, Data::ImageFormat::RGBA);
-            Data::Image zBufferShadow(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+            Data::Image shadowMap(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
             // viewport * projection * view
             for (const auto &pMesh: _pScene->meshes()) {
@@ -88,19 +81,9 @@ namespace UltRenderer {
                 // TODO: Compute only the first light here for simplicity, which is wrong
                 const Rendering::Light& light = *_pScene->lights()[0];
 
-                const Math::Transform3D lightView = Math::Transform3D::FromLookAt({0, 0, 5}, {0, 0, 0}, {0, 1, 0}).inverse();
-
                 // Shadow mapping
-                depthVS.pModel = &pMesh->transformMatrix;
-                depthVS.pView = &lightView;
-                // TODO: Shadow mapping's projection matrix may not be identical to camera's.
-                depthVS.pProjection = &projectionMatrix;
-                depthVS.modelViewMatrix = lightView * pMesh->transformMatrix;
-                depthVS.modelViewProjectionMatrix = projectionMatrix * depthVS.modelViewMatrix;
-                depthVS.pVertices = &pMesh->vertices;
-
-                Pipeline::Execute<Shaders::IMeshVarying>(fBufferShadow, zBufferShadow, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
-                                                         depthVS, depthFS, depthIT);
+                // TODO: Shadow mapping's projection matrix may not be identical to camera's, e.g. directional light should use orthogonal projection.
+                const auto lightMatrix = Rendering::RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap);
 
                 // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms
@@ -126,8 +109,8 @@ namespace UltRenderer {
                 fragmentShader.pModel = vertexShader.pModel;
                 fragmentShader.pView = vertexShader.pView;
                 fragmentShader.pProjection = vertexShader.pProjection;
-                fragmentShader.pShadowMap = &zBufferShadow;
-                fragmentShader.lightMatrix = (viewport * depthVS.modelViewProjectionMatrix) * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
+                fragmentShader.pShadowMap = &shadowMap;
+                fragmentShader.lightMatrix = lightMatrix * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
                 fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
                 fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
 
