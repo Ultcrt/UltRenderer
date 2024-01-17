@@ -23,7 +23,7 @@ namespace UltRenderer {
                                 const std::vector<Math::Vector3S>& triangles, const std::vector<Math::Vector2S>& lines, const std::vector<std::size_t>& points,
                                 const Shaders::IVertexShader<V>& vertexShader,
                                 const Shaders::IFragmentShader<V>& fragmentShader,
-                                const Shaders::IInterpolator<V>& interpolator = {},
+                                const Shaders::IInterpolator<V>& interpolator,
                                 const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor());
         };
 
