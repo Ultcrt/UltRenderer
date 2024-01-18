@@ -27,10 +27,10 @@ int main() {
     fs.shadowIntensity = 0.3;
     fs.glowIntensity = 3.0;
 
-    auto pTexture = std::make_shared<Data::Image>("../data/diablo3_pose_diffuse.tga");
-    auto pNormalMap = std::make_shared<Data::Image>("../data/diablo3_pose_nm_tangent.tga");
-    auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga");
-    auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga");
+    auto pTexture = std::make_shared<Data::Image>("../data/diablo3_pose_diffuse.tga", Data::FilterType::LINEAR);
+    auto pNormalMap = std::make_shared<Data::Image>("../data/diablo3_pose_nm_tangent.tga", Data::FilterType::LINEAR);
+    auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga", Data::FilterType::LINEAR);
+    auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga", Data::FilterType::LINEAR);
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
     auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
     auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);

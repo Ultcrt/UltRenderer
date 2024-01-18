@@ -42,7 +42,7 @@ namespace UltRenderer {
         bool PreBakedAmbientOcclusionMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
                                                                     double &depth) const {
             if ((*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(varying.position.x()),  static_cast<std::size_t>(varying.position.y()))[0] >= varying.position.z()) {
-                _bakedTexture.at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] = 1;
+                _bakedTexture.at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(varying.uv[0]), static_cast<std::size_t>(varying.uv[1]))[0] = 1;
             }
             return true;
         }

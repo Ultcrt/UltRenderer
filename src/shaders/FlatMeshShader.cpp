@@ -56,10 +56,10 @@ namespace UltRenderer {
                                                 double &depth) const {
             Math::Vector3D rgb;
             if ((*pTexture).type() == Data::ImageFormat::GRAY) {
-                rgb = (*pTexture).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+                rgb = (*pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
             }
             else {
-                rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                rgb = (*pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             }
 
             color = (varying.normal.dot(-varying.light * varying.intensity) * rgb).toHomogeneousCoordinates(1);
