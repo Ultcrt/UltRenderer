@@ -54,11 +54,18 @@ namespace UltRenderer {
                                                          double &depth) const {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;
-            Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
             auto shadowPosition = (lightMatrix * varying.position).toCartesianCoordinates();
             // 0.01 is a coefficient to fix z-fighting
             bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
+
+            Math::Vector3D rgb;
+            if ((*pTexture).type() == Data::ImageFormat::GRAY) {
+                rgb = (*pTexture).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+            }
+            else {
+                rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+            }
 
             // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
             double brightness = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());

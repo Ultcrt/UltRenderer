@@ -54,8 +54,13 @@ namespace UltRenderer {
                                                                 double &depth) const {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;
-            Math::Vector3D rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
-            Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+            Math::Vector3D rgb;
+            if ((*pTexture).type() == Data::ImageFormat::GRAY) {
+                rgb = (*pTexture).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+            }
+            else {
+                rgb = (*pTexture).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+            }            Math::Vector3D normal = (*pNormalMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
             double shininess = (*pSpecular).at<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
 
             // TODO: Non-normal mapping should be checked here
