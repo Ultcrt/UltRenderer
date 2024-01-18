@@ -51,11 +51,11 @@ namespace UltRenderer {
             void setZMin(double zMin);
             void setZMax(double zMax);
 
-            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 0}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
             template<std::derived_from<Shaders::IVarying> V>
             [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                             const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+                                             const Shaders::IInterpolator<V> &interpolator, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 0}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
 
             static Math::Transform3D ComputeProjectionMatrix(double width, double height, double zMin, double zMax, ProjectionType projectionType);
@@ -65,11 +65,11 @@ namespace UltRenderer {
 
         template<std::derived_from<Shaders::IVarying> V>
         Data::Image Camera::render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                   const Shaders::IInterpolator<V> &interpolator, const Postprocessors::IPostprocessor& postprocessor) const {
+                                   const Shaders::IInterpolator<V> &interpolator, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor, const Postprocessors::IPostprocessor& postprocessor) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
             Math::Transform3D viewport = ComputeViewportMatrix(width, height);
 
-            Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
+            Data::Image fBuffer(width, height, backgroundColor);
             Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
             Data::Image shadowMap(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
