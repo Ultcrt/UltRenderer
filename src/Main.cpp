@@ -23,22 +23,26 @@ int main() {
 
     fs.specularColor = {1, 1, 1};
     fs.ambientColor = {0.2, 0.1, 0};
-    fs.shadowIntensity = 0.3;
 
-    auto pTexture = std::make_shared<Data::Image>("../data/african_head_diffuse.tga");
-    auto pNormalMap = std::make_shared<Data::Image>("../data/african_head_nm_tangent.tga");
-    auto pSpecular = std::make_shared<Data::Image>("../data/african_head_spec.tga");
-    auto pMesh = std::make_shared<Data::TriangleMesh>("../data/african_head.obj");
+    fs.shadowIntensity = 0.3;
+    fs.glowIntensity = 3.0;
+
+    auto pTexture = std::make_shared<Data::Image>("../data/diablo3_pose_diffuse.tga");
+    auto pNormalMap = std::make_shared<Data::Image>("../data/diablo3_pose_nm_tangent.tga");
+    auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga");
+    auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga");
+    auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
     auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
     auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);
 
     // Use 3.14 and a large z, will cause head not at center
-    pCamera->transformMatrix = Math::Transform3D({1, 1, 1}, {0, M_PI / 8, -M_PI / 10}, {2.1, 1.8, 5});
+    pCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
 
     pMesh->pTexture = pTexture;
     pMesh->pNormalMap = pNormalMap;
     pMesh->pSpecular = pSpecular;
     pMesh->normalMapType = Data::NormalMapType::DARBOUX;
+    pMesh->pGlowMap = pGlowMap;
 
     Rendering::Scene scene;
 
@@ -46,7 +50,7 @@ int main() {
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    auto img = pCamera->render(1920, 1920, vs, fs, it, ssao);
+    auto img = pCamera->render(1920, 1920, vs, fs, it, {0, 0, 0, 1});
 
     img.save("test.tga");
 
