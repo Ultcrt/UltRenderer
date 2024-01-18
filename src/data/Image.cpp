@@ -200,6 +200,7 @@ namespace UltRenderer {
             }
             // Uncompressed data process
             else {
+                imageData.resize(width * height * _format);
                 tga.read(reinterpret_cast<char *>(imageData.data()), static_cast<long>(width * height * _format));
             }
 
