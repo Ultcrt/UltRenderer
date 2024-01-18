@@ -58,6 +58,7 @@ namespace UltRenderer {
             auto shadowPosition = (lightMatrix * varying.position).toCartesianCoordinates();
             // 0.01 is a coefficient to fix z-fighting
             bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
+            Math::Vector3D glowColor = (*pGlowMap).at<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
 
             Math::Vector3D rgb;
             if ((*pTexture).type() == Data::ImageFormat::GRAY) {
@@ -111,8 +112,8 @@ namespace UltRenderer {
             color = (
                     ambientCoefficient * ambientColor +
                     diffuseCoefficient * diffuse * rgb +
-                    specularCoefficient * specular * finalSpecularColor
-            ).toHomogeneousCoordinates(1);
+                    specularCoefficient * specular * finalSpecularColor +
+                    glowColor * glowIntensity).toHomogeneousCoordinates(1);
 
             if (inShadow) {
                 color = shadowIntensity * color;

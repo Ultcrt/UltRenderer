@@ -22,6 +22,7 @@ namespace UltRenderer {
             std::shared_ptr<Image> pSpecular;
             std::shared_ptr<Image> pNormalMap;
             Data::NormalMapType normalMapType;
+            std::shared_ptr<Image> pGlowMap;
 
             std::vector<Math::Vector3D> vertices;
             std::vector<Math::Vector3S> triangles;

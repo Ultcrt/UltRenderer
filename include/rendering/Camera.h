@@ -109,6 +109,7 @@ namespace UltRenderer {
                 fragmentShader.pNormalMap = pMesh->pNormalMap.get();
                 fragmentShader.pSpecular = pMesh->pSpecular.get();
                 fragmentShader.normalMapType = pMesh->normalMapType;
+                fragmentShader.pGlowMap = pMesh->pGlowMap.get();
                 fragmentShader.pModel = vertexShader.pModel;
                 fragmentShader.pView = vertexShader.pView;
                 fragmentShader.pProjection = vertexShader.pProjection;
