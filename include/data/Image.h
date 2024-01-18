@@ -24,6 +24,10 @@ namespace UltRenderer {
             CARTESIAN = 0, DARBOUX = 1
         };
 
+        enum class FilterType: std::size_t {
+            NEAREST, LINEAR
+        };
+
         template<ImageFormat FORMAT>
         using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
 
@@ -49,12 +53,14 @@ namespace UltRenderer {
             std::vector<double> _data;
 
         public:
-            Image(std::size_t w, std::size_t h, ImageFormat format);
+            FilterType filterType;
 
-            explicit Image(const std::string& filename);
+            Image(std::size_t w, std::size_t h, ImageFormat format, FilterType filterType = FilterType::NEAREST);
+
+            explicit Image(const std::string& filename, FilterType filterType = FilterType::NEAREST);
 
             template<ImageFormat FORMAT>
-            Image(std::size_t w, std::size_t h, const Pixel<FORMAT>& filledPixel);
+            Image(std::size_t w, std::size_t h, const Pixel<FORMAT>& filledPixel, FilterType filterType = FilterType::NEAREST);
 
             template<ImageFormat FORMAT>
             void fill(const Pixel<FORMAT>& filledPixel);
@@ -65,25 +71,19 @@ namespace UltRenderer {
             PixelProxy<FORMAT> at(std::size_t w, std::size_t h);
 
             template<ImageFormat FORMAT>
-            Pixel<FORMAT> at(std::size_t w, std::size_t h) const;
+            const Pixel<FORMAT> at(std::size_t w, std::size_t h) const;
 
             template<ImageFormat FORMAT>
-            PixelProxy<FORMAT> at(double wRatio, double hRatio);
-
-            template<ImageFormat FORMAT>
-            Pixel<FORMAT> at(double wRatio, double hRatio) const;
+            const Pixel<FORMAT> get(double wRatio, double hRatio) const;
 
             template<ImageFormat FORMAT>
             PixelProxy<FORMAT> at(const Math::Vector2S& pos);
 
             template<ImageFormat FORMAT>
-            Pixel<FORMAT> at(const Math::Vector2S& pos) const;
+            const Pixel<FORMAT> at(const Math::Vector2S& pos) const;
 
             template<ImageFormat FORMAT>
-            PixelProxy<FORMAT> at(const Math::Vector2D& pos);
-
-            template<ImageFormat FORMAT>
-            Pixel<FORMAT> at(const Math::Vector2D& pos) const;
+            const Pixel<FORMAT> get(const Math::Vector2D& pos) const;
 
             void save(const std::string& filename);
             [[nodiscard]] Math::Vector2S shape() const;
@@ -125,7 +125,7 @@ namespace UltRenderer {
         Pixel<FORMAT>::Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target): Math::VectorXD<static_cast<std::size_t>(FORMAT)>(target) {}
 
         template<ImageFormat FORMAT>
-        Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
+        const Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
             // Only fill when given pixel has more dimension than image
             assert(static_cast<std::size_t>(FORMAT) <= _format);
             assert(w < _width);
@@ -156,19 +156,33 @@ namespace UltRenderer {
         }
 
         template<ImageFormat FORMAT>
-        Pixel<FORMAT> Image::at(double wRatio, double hRatio) const {
-            auto width = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_width)));
-            auto height = static_cast<std::size_t>(std::lround(hRatio * static_cast<double>(_height)));
+        const Pixel<FORMAT> Image::get(double wRatio, double hRatio) const {
 
-            return at<FORMAT>(width, height);
-        }
+            switch (filterType) {
+                case FilterType::NEAREST: {
+                    auto width = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_width)));
+                    auto height = static_cast<std::size_t>(std::lround(hRatio * static_cast<double>(_height)));
+                    return at<FORMAT>(width, height);
+                }
+                case FilterType::LINEAR: {
+                    // TODO: (0.5, 0.5) should be the proper pixel center
+                    auto width = wRatio * static_cast<double>(_width);
+                    auto height = hRatio * static_cast<double>(_height);
 
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> Image::at(double wRatio, double hRatio) {
-            auto width = static_cast<std::size_t>(std::lround(wRatio * static_cast<double>(_width)));
-            auto height = static_cast<std::size_t>(std::lround(hRatio * static_cast<double>(_height)));
+                    auto floorW = static_cast<std::size_t>(std::floor(width));
+                    auto floorH = static_cast<std::size_t>(std::floor(height));
+                    auto ceilW = static_cast<std::size_t>(std::ceil(width));
+                    auto ceilH = static_cast<std::size_t>(std::ceil(height));
 
-            return at<FORMAT>(width, height);
+                    auto weightW = width - static_cast<double>(floorW);
+                    auto weightH = height - static_cast<double>(floorH);
+
+                    auto color0 = at<FORMAT>(floorW, floorH) * (1 - weightW) + at<FORMAT>(ceilW, floorH) * weightW;
+                    auto color1 = at<FORMAT>(floorW, ceilH) * (1 - weightW) + at<FORMAT>(ceilW, ceilH) * weightW;
+
+                    return color0 * (1 - weightH) + color1 * weightH;
+                }
+            }
         }
 
         template<ImageFormat FORMAT>
@@ -201,22 +215,17 @@ namespace UltRenderer {
         }
 
         template<ImageFormat FORMAT>
-        Image::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel): _format(static_cast<std::size_t>(FORMAT)), _data(h * w * _format), _width(w), _height(h) {
+        Image::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel, FilterType filterType): _format(static_cast<std::size_t>(FORMAT)), _data(h * w * _format), _width(w), _height(h), filterType(filterType) {
             fill<FORMAT>(filledPixel);
         }
 
         template<ImageFormat FORMAT>
-        Pixel<FORMAT> Image::at(const Math::Vector2D &pos) const {
-            return at<FORMAT>(pos.x(), pos.y());
+        const Pixel<FORMAT> Image::get(const Math::Vector2D &pos) const {
+            return get<FORMAT>(pos.x(), pos.y());
         }
 
         template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> Image::at(const Math::Vector2D &pos) {
-            return at<FORMAT>(pos.x(), pos.y());
-        }
-
-        template<ImageFormat FORMAT>
-        Pixel<FORMAT> Image::at(const Math::Vector2S &pos) const {
+        const Pixel<FORMAT> Image::at(const Math::Vector2S &pos) const {
             return at<FORMAT>(pos.x(), pos.y());
         }
 

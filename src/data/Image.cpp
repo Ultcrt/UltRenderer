@@ -15,8 +15,8 @@
 
 namespace UltRenderer {
     namespace Data {
-        Image::Image(std::size_t w, std::size_t h, ImageFormat format):
-                _format(static_cast<std::size_t>(format)), _width(w), _height(h), _data(h * w * _format) {}
+        Image::Image(std::size_t w, std::size_t h, ImageFormat format, FilterType filterType):
+                _format(static_cast<std::size_t>(format)), _width(w), _height(h), _data(h * w * _format), filterType(filterType) {}
 
         Math::Vector2S Image::shape() const {
             return {_width, _height};
@@ -117,7 +117,7 @@ namespace UltRenderer {
             }
         }
 
-        Image::Image(const std::string &filename) {
+        Image::Image(const std::string &filename, FilterType filterType): filterType(filterType) {
             std::ifstream tga(filename, std::ios::binary);
             if (!tga.is_open()) {
                 throw std::runtime_error(std::format("Cannot open file: {}", filename));
