@@ -182,6 +182,8 @@ namespace UltRenderer {
 
                     return color0 * (1 - weightH) + color1 * weightH;
                 }
+                default:
+                    assert(false);
             }
         }
 
