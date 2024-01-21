@@ -5,6 +5,8 @@
 #ifndef ULTRENDERER_CAMERA_H
 #define ULTRENDERER_CAMERA_H
 
+#include <ranges>
+
 #include "math/Matrix.h"
 #include "math/Transform.h"
 #include "data/TriangleMesh.h"
@@ -22,6 +24,12 @@ namespace UltRenderer {
     namespace Rendering {
         enum class ProjectionType {
             ORTHOGONAL, PERSPECTIVE
+        };
+
+        struct RenderOptions {
+            // TODO: Automatically decide numDepthPeelingLayer
+            std::size_t numDepthPeelingLayer = 10;
+            Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 1};
         };
 
         class Camera: public Hierarchy::TransformNode {
@@ -52,11 +60,11 @@ namespace UltRenderer {
             void setZMin(double zMin);
             void setZMax(double zMax);
 
-            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 0}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+            [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, RenderOptions options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
             template<std::derived_from<Shaders::IVarying> V>
             [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                             const Shaders::IInterpolator<V> &interpolator, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 0}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+                                             const Shaders::IInterpolator<V> &interpolator, RenderOptions options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
 
             static Math::Transform3D ComputeProjectionMatrix(double width, double height, double zMin, double zMax, ProjectionType projectionType);
@@ -66,19 +74,15 @@ namespace UltRenderer {
 
         template<std::derived_from<Shaders::IVarying> V>
         Data::Image Camera::render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                   const Shaders::IInterpolator<V> &interpolator, Data::Pixel<Data::ImageFormat::RGBA> backgroundColor, const Postprocessors::IPostprocessor& postprocessor) const {
+                                   const Shaders::IInterpolator<V> &interpolator, RenderOptions options, const Postprocessors::IPostprocessor& postprocessor) const {
             // Origin is always (0, 0) here, depth is scaled into (0, 1)
             Math::Transform3D viewport = ComputeViewportMatrix(width, height);
 
-            Data::Image fBuffer(width, height, backgroundColor);
-            Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+            Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
+            Data::Image zBufferA(width, height, Data::Pixel<Data::ImageFormat::GRAY>(0));
+            Data::Image zBufferB(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
             Data::Image shadowMap(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
-
-            Shaders::DepthMeshInterpolator depthMeshInterpolator;
-            Shaders::DepthMeshVertexShader depthMeshVertexShader;
-            Shaders::DepthMeshFragmentShader depthMeshFragmentShader;
-            Shaders::DepthPeelingMeshFragmentShader depthPeelingMeshFragmentShader;
 
             // viewport * projection * view
             for (const auto &pMesh: _pScene->meshes()) {
@@ -95,62 +99,69 @@ namespace UltRenderer {
                 Rendering::RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap, &lightModelView, &lightProjection, &lightViewport);
 
                 // Depth peeling
-                Data::Image depthFrameBuffer(width, height, backgroundColor);
-                Data::Image firstDepthLayer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
-                depthMeshVertexShader.pModel = &pMesh->transformMatrix;
-                depthMeshVertexShader.pView = &view;
-                depthMeshVertexShader.pProjection = &projectionMatrix;
-                depthMeshVertexShader.modelViewMatrix = view * pMesh->transformMatrix;
-                depthMeshVertexShader.modelViewProjectionMatrix = projectionMatrix * depthMeshVertexShader.modelViewMatrix;
-                depthMeshVertexShader.pVertices = &pMesh->vertices;
+                Data::Image* pLastDepthLayer = &zBufferA;
+                Data::Image* pCurDepthLayer = &zBufferB;
+                std::vector<Data::Image> layers;
+                for (std::size_t layerIdx = 0; layerIdx < options.numDepthPeelingLayer; layerIdx++) {
+                    // Clean up for recording current layer
+                    fBuffer.fill(0);
+                    pCurDepthLayer->fill(1);
 
-                Pipeline::Execute<Shaders::IMeshVarying>(depthFrameBuffer, firstDepthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
-                                     depthMeshVertexShader, depthMeshFragmentShader, depthMeshInterpolator);
-                std::vector<Data::Image> depthLayers {firstDepthLayer};
-                firstDepthLayer.save(std::format("{}.tga", depthLayers.size()));
-                while(depthLayers.size() < 1) {
-                    depthPeelingMeshFragmentShader.pLastDepthLayer = &depthLayers.back();
+                    // TODO: nullptr is never checked
+                    // Set IMeshVertexShader general uniforms
+                    vertexShader.pModel = &pMesh->transformMatrix;
+                    vertexShader.pView = &view;
+                    vertexShader.pProjection = &projectionMatrix;
+                    vertexShader.pLight = &light.direction;
+                    vertexShader.intensity = light.intensity;
+                    vertexShader.modelViewMatrix = view * pMesh->transformMatrix;
+                    vertexShader.modelViewProjectionMatrix = projectionMatrix * vertexShader.modelViewMatrix;
 
-                    Data::Image depthLayer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
-                    Pipeline::Execute<Shaders::IMeshVarying>(depthFrameBuffer, depthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
-                                         depthMeshVertexShader, depthPeelingMeshFragmentShader, depthMeshInterpolator);
-                    depthLayers.emplace_back(depthLayer);
+                    // Set IMeshVertexShader general attributes
+                    vertexShader.pVertices = &pMesh->vertices;
+                    vertexShader.pNormals = &pMesh->vertexNormals;
+                    vertexShader.pTangents = &pMesh->vertexTangents;
+                    vertexShader.pUvs = &pMesh->vertexTextures;
 
-                    depthLayer.save(std::format("{}.tga", depthLayers.size()));
+                    // Set IMeshFragmentShader general uniforms
+                    fragmentShader.pTexture = pMesh->pTexture.get();
+                    fragmentShader.pNormalMap = pMesh->pNormalMap.get();
+                    fragmentShader.pSpecular = pMesh->pSpecular.get();
+                    fragmentShader.normalMapType = pMesh->normalMapType;
+                    fragmentShader.pGlowMap = pMesh->pGlowMap.get();
+                    fragmentShader.pModel = vertexShader.pModel;
+                    fragmentShader.pView = vertexShader.pView;
+                    fragmentShader.pProjection = vertexShader.pProjection;
+                    fragmentShader.pShadowMap = &shadowMap;
+                    fragmentShader.lightMatrix = (lightViewport * lightProjection * lightModelView) * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
+                    fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
+                    fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
+                    fragmentShader.pLastDepthLayer = pLastDepthLayer;
+
+                    Pipeline::Execute<V>(fBuffer, *pCurDepthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
+                                         vertexShader, fragmentShader, interpolator, postprocessor);
+
+                    // Record current layer RGBA
+                    layers.emplace_back(fBuffer);
+
+                    // Swap zBuffer
+                    std::swap(pLastDepthLayer, pCurDepthLayer);
                 }
 
-                // TODO: nullptr is never checked
-                // Set IMeshVertexShader general uniforms
-                vertexShader.pModel = &pMesh->transformMatrix;
-                vertexShader.pView = &view;
-                vertexShader.pProjection = &projectionMatrix;
-                vertexShader.pLight = &light.direction;
-                vertexShader.intensity = light.intensity;
-                vertexShader.modelViewMatrix = view * pMesh->transformMatrix;
-                vertexShader.modelViewProjectionMatrix = projectionMatrix * vertexShader.modelViewMatrix;
+                // TODO: Only works on single mesh
+                // Blend all layers
+                for (std::size_t w = 0; w < width; w++) {
+                    for (std::size_t h = 0; h < height; h++) {
+                        Math::Vector4D rgba = options.backgroundColor;
+                        for (const auto & layer : std::ranges::reverse_view(layers)) {
+                            // TODO: Should implement more blending type
+                            const auto topRGBA = Math::Vector4D(layer.at<Data::ImageFormat::RGBA>(w, h));
+                            rgba = topRGBA * topRGBA.w() + rgba * (1 - topRGBA.w());
+                        }
 
-                // Set IMeshVertexShader general attributes
-                vertexShader.pVertices = &pMesh->vertices;
-                vertexShader.pNormals = &pMesh->vertexNormals;
-                vertexShader.pTangents = &pMesh->vertexTangents;
-                vertexShader.pUvs = &pMesh->vertexTextures;
-
-                // Set IMeshFragmentShader general uniforms
-                fragmentShader.pTexture = pMesh->pTexture.get();
-                fragmentShader.pNormalMap = pMesh->pNormalMap.get();
-                fragmentShader.pSpecular = pMesh->pSpecular.get();
-                fragmentShader.normalMapType = pMesh->normalMapType;
-                fragmentShader.pGlowMap = pMesh->pGlowMap.get();
-                fragmentShader.pModel = vertexShader.pModel;
-                fragmentShader.pView = vertexShader.pView;
-                fragmentShader.pProjection = vertexShader.pProjection;
-                fragmentShader.pShadowMap = &shadowMap;
-                fragmentShader.lightMatrix = (lightViewport * lightProjection * lightModelView) * (vertexShader.modelViewProjectionMatrix.inverse() * viewport.inverse());
-                fragmentShader.modelViewMatrix = vertexShader.modelViewMatrix;
-                fragmentShader.modelViewProjectionMatrix = vertexShader.modelViewProjectionMatrix;
-
-                Pipeline::Execute<V>(fBuffer, zBuffer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
-                                     vertexShader, fragmentShader, interpolator, postprocessor);
+                        fBuffer.at<Data::ImageFormat::RGBA>(w, h) = rgba;
+                    }
+                }
             }
 
             return fBuffer;

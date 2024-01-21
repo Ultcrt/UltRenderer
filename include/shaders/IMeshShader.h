@@ -46,6 +46,7 @@ namespace UltRenderer {
             const Data::Image* pTexture;
             const Data::Image* pNormalMap;
             const Data::Image* pSpecular;
+            const Data::Image* pLastDepthLayer;
             const Data::Image* pShadowMap;
             const Data::Image* pGlowMap;
             Data::NormalMapType normalMapType;
