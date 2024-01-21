@@ -146,6 +146,8 @@ namespace UltRenderer {
                             interpolatedVarying.position.w() = 1;
 
                             Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx);
+
+                            // TODO: gl_FragDepth not work correctly, depth test should be done before or after fragment shader depending on gl_FragDepth is set or not
                             double depth = interpolatedVarying.position.z();
 
                             // Only update when not discard
