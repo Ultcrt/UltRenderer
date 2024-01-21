@@ -15,7 +15,7 @@ namespace UltRenderer {
         };
 
         class PreBakedAmbientOcclusionMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
-            IMeshVarying operator()(std::size_t vIdx) const override;
+            IMeshVarying operator()(std::size_t vIdx, Math::Vector4D& position) const override;
         };
 
         class PreBakedAmbientOcclusionMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
@@ -25,7 +25,7 @@ namespace UltRenderer {
         public:
             explicit PreBakedAmbientOcclusionMeshFragmentShader(Data::Image& bakedTexture);
 
-            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
         };
 
     } // Shaders

@@ -11,7 +11,6 @@ namespace UltRenderer {
         BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings,
                                                   const Math::Vector3D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1] + varyings[2].normal * weights[2];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1] + varyings[2].tangent * weights[2];
@@ -25,7 +24,6 @@ namespace UltRenderer {
         BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings,
                                                   const Math::Vector2D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] ;
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1];
@@ -35,11 +33,10 @@ namespace UltRenderer {
             return res;
         }
 
-        IMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx) const {
+        IMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
             IMeshVarying res;
 
             res.uv = (*pUvs)[vIdx];
-            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
             // Transform the vector (the w of 3D vector is zero)
             res.normal = (modelViewMatrix * (*pNormals)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.tangent = (modelViewMatrix * (*pTangents)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
@@ -47,15 +44,17 @@ namespace UltRenderer {
             res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.intensity = intensity;
 
+            position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+
             return res;
         }
 
-        bool BlinnPhongReflectionMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
+        bool BlinnPhongReflectionMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                          double &depth) const {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;
             Math::Vector3D normal = (*pNormalMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-            auto shadowPosition = (lightMatrix * varying.position).toCartesianCoordinates();
+            auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
             // 0.01 is a coefficient to fix z-fighting
             bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
             Math::Vector3D glowColor = (*pGlowMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
@@ -105,7 +104,8 @@ namespace UltRenderer {
             double diffuse = normal.dot(-light);
 
             // Specular
-            Math::Vector3D viewDir = (-varying.position.toCartesianCoordinates()).normalized();     // Camera is always at origin, so the view direction can be represented by the position
+            // TODO: Wrong coord
+            Math::Vector3D viewDir = (-Math::Vector3D(fragCoord[0], fragCoord[1], fragCoord[2])).normalized();     // Camera is always at origin, so the view direction can be represented by the position
             Math::Vector3D halfVec = ((viewDir + -light) / 2).normalized();
             double specular = std::pow(halfVec.dot(normal), brightness);         // uint8_t is the correct form of data, need convert
 

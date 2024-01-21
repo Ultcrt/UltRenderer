@@ -16,10 +16,9 @@
 namespace UltRenderer {
     namespace Shaders {
         /**
-         * A struct used to pass values from vertex shader to fragment shader in the same primitive, just like varying. User can derive this class to add more varying variables
+         * A struct used to pass values from vertex shader to fragment shader in the same primitive, just like varying. User should derive this class to add more varying variables
          */
         struct IVarying {
-            Math::Vector4D position;    // Works like gl_Position
         };
 
         /**
@@ -57,9 +56,10 @@ namespace UltRenderer {
              /**
               * Callback function of vertex shader
               * @param vIdx The index of current vertex, user can use it to get attribute variables (User should set vertex buffer as member of this class)
+              * @param position Works like gl_Position
               * @return A user defined struct derived from IVarying
               */
-            virtual V operator()(std::size_t vIdx) const = 0;
+            virtual V operator()(std::size_t vIdx, Math::Vector4D& position) const = 0;
         };
 
         /**
@@ -72,10 +72,11 @@ namespace UltRenderer {
             /**
              * Callback function of fragment shader
              * @param varying The interpolated variables from rasterization procedure, works like varying in GLSL.
+             * @param fragCoord The gl_FragCoord like variable
              * @param color The reference of color that need processing
              * @return Return true means color is processed, false means discarded
              */
-            virtual bool operator()(const V& varying, Math::Vector4D& color, double& depth) const = 0;
+            virtual bool operator()(const V& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const = 0;
         };
     } // Rendering
 } // UltRender

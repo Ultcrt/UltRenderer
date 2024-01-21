@@ -36,7 +36,7 @@ namespace UltRenderer {
             const std::vector<Math::Vector3D>* pTangents;
             const std::vector<Math::Vector3D>* pUvs;
 
-            V operator()(std::size_t vIdx) const override = 0;
+            V operator()(std::size_t vIdx, Math::Vector4D& position) const override = 0;
         };
 
         template <std::derived_from<IVarying> V>
@@ -59,7 +59,7 @@ namespace UltRenderer {
             double shadowIntensity;
             double glowIntensity;
 
-            bool operator()(const V& varying, Math::Vector4D& color, double& depth) const override = 0;
+            bool operator()(const V& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override = 0;
         };
     } // Shaders
 } // UltRenderer

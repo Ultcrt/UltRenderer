@@ -11,7 +11,6 @@ namespace UltRenderer {
         NormalMappingMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings,
                                                          const Math::Vector3D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1] + varyings[2].normal * weights[2];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1] + varyings[2].tangent * weights[2];
@@ -25,7 +24,6 @@ namespace UltRenderer {
         NormalMappingMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings,
                                                          const Math::Vector2D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] ;
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1];
@@ -35,11 +33,10 @@ namespace UltRenderer {
             return res;
         }
 
-        IMeshVarying NormalMappingMeshVertexShader::operator()(std::size_t vIdx) const {
+        IMeshVarying NormalMappingMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
             IMeshVarying res;
 
             res.uv = (*pUvs)[vIdx];
-            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
             // Tips: In orthogonal projection, the inverse and transpose of M is itself
             res.normal = (modelViewMatrix * (*pNormals)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.tangent = (modelViewMatrix * (*pTangents)[vIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
@@ -47,10 +44,12 @@ namespace UltRenderer {
             res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.intensity = intensity;
 
+            position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+
             return res;
         }
 
-        bool NormalMappingMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
+        bool NormalMappingMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                                 double &depth) const {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;

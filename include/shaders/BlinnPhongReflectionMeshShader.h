@@ -15,7 +15,7 @@ namespace UltRenderer {
         };
 
         class BlinnPhongReflectionMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
-            IMeshVarying operator()(std::size_t vIdx) const override;
+            IMeshVarying operator()(std::size_t vIdx, Math::Vector4D& position) const override;
         };
 
         class BlinnPhongReflectionMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
@@ -27,7 +27,7 @@ namespace UltRenderer {
             Math::Vector3D specularColor;
             Math::Vector3D ambientColor;
 
-            bool operator()(const IMeshVarying& varying, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const IMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer

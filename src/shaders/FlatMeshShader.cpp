@@ -11,7 +11,6 @@ namespace UltRenderer {
         FlatMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings, const Math::Vector2D &weights) const {
             IMeshVarying res;
 
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.normal = (varyings[0].normal + varyings[1].normal).normalized();
             res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1];
@@ -24,7 +23,6 @@ namespace UltRenderer {
         FlatMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings, const Math::Vector3D &weights) const {
             IMeshVarying res;
 
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
 
             // TODO: Use the average normal of three vertex to represent the surface normal, not ideal.
@@ -37,10 +35,8 @@ namespace UltRenderer {
         }
 
         // TODO: Should apply here?
-        IMeshVarying FlatMeshVertexShader::operator()(std::size_t vIdx) const {
+        IMeshVarying FlatMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
             IMeshVarying res;
-
-            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
 
             res.uv = (*pUvs)[vIdx];
 
@@ -49,10 +45,12 @@ namespace UltRenderer {
             res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.intensity = intensity;
 
+            position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+
             return res;
         }
 
-        bool FlatMeshFragmentShader::operator()(const UltRenderer::Shaders::IMeshVarying &varying, Math::Vector4D &color,
+        bool FlatMeshFragmentShader::operator()(const UltRenderer::Shaders::IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                 double &depth) const {
             Math::Vector3D rgb;
             if ((*pTexture).type() == Data::ImageFormat::GRAY) {

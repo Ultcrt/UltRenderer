@@ -11,7 +11,6 @@ namespace UltRenderer {
         DepthMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings,
                                                   const Math::Vector3D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] + varyings[2].position * weights[2];
 
             return res;
         }
@@ -20,20 +19,19 @@ namespace UltRenderer {
         DepthMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings,
                                                   const Math::Vector2D &weights) const {
             IMeshVarying res;
-            res.position = varyings[0].position * weights[0] + varyings[1].position * weights[1] ;
 
             return res;
         }
 
-        IMeshVarying DepthMeshVertexShader::operator()(std::size_t vIdx) const {
+        IMeshVarying DepthMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
             IMeshVarying res;
 
-            res.position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
+            position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
 
             return res;
         }
 
-        bool DepthMeshFragmentShader::operator()(const IMeshVarying &varying, Math::Vector4D &color,
+        bool DepthMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                          double &depth) const {
             // Fragment shader do not need to do anything, only need depth buffer
             return true;
