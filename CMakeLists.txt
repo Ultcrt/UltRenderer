@@ -65,6 +65,8 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/PreBakedAmbientOcclusionMeshShader.cpp
         include/shaders/PreBakedAmbientOcclusionMeshShader.h
         src/rendering/Helper.cpp
-        include/rendering/Helper.h)
+        include/rendering/Helper.h
+        src/shaders/DepthPeelingMeshShader.cpp
+        include/shaders/DepthPeelingMeshShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
