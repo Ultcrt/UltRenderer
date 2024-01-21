@@ -9,16 +9,20 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        class BlinnPhongReflectionMeshInterpolator: public IInterpolator<IMeshVarying> {
-            IMeshVarying operator()(const std::array<IMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
-            IMeshVarying operator()(const std::array<IMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
+        struct BlinnPhongReflectionMeshVarying: IMeshVarying {
+            Math::Vector3D viewPosition;
         };
 
-        class BlinnPhongReflectionMeshVertexShader: public IMeshVertexShader<IMeshVarying> {
-            IMeshVarying operator()(std::size_t vIdx, Math::Vector4D& position) const override;
+        class BlinnPhongReflectionMeshInterpolator: public IInterpolator<BlinnPhongReflectionMeshVarying> {
+            BlinnPhongReflectionMeshVarying operator()(const std::array<BlinnPhongReflectionMeshVarying, 3>& varyings, const Math::Vector3D& weights) const override;
+            BlinnPhongReflectionMeshVarying operator()(const std::array<BlinnPhongReflectionMeshVarying, 2>& varyings, const Math::Vector2D& weights) const override;
         };
 
-        class BlinnPhongReflectionMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
+        class BlinnPhongReflectionMeshVertexShader: public IMeshVertexShader<BlinnPhongReflectionMeshVarying> {
+            BlinnPhongReflectionMeshVarying operator()(std::size_t vIdx, Math::Vector4D& position) const override;
+        };
+
+        class BlinnPhongReflectionMeshFragmentShader: public IMeshFragmentShader<BlinnPhongReflectionMeshVarying> {
         public:
             double diffuseCoefficient;
             double specularCoefficient;
@@ -27,7 +31,7 @@ namespace UltRenderer {
             Math::Vector3D specularColor;
             Math::Vector3D ambientColor;
 
-            bool operator()(const IMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
+            bool operator()(const BlinnPhongReflectionMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders
 } // UltRenderer

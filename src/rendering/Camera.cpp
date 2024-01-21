@@ -11,7 +11,7 @@ namespace UltRenderer {
             Shaders::BlinnPhongReflectionMeshVertexShader vertexShader;
             Shaders::BlinnPhongReflectionMeshFragmentShader fragmentShader;
             Shaders::BlinnPhongReflectionMeshInterpolator interpolator;
-            return Camera::render<Shaders::IMeshVarying>(width, height, vertexShader, fragmentShader, interpolator, backgroundColor, postprocessor);
+            return Camera::render<Shaders::BlinnPhongReflectionMeshVarying>(width, height, vertexShader, fragmentShader, interpolator, backgroundColor, postprocessor);
         }
 
         Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):

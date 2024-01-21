@@ -16,6 +16,7 @@
 #include "shaders/DepthMeshShader.h"
 #include "postprocessors/EmptyPostprocessor.h"
 #include "rendering/Helper.h"
+#include "shaders/DepthPeelingMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -74,6 +75,11 @@ namespace UltRenderer {
 
             Data::Image shadowMap(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
 
+            Shaders::DepthMeshInterpolator depthMeshInterpolator;
+            Shaders::DepthMeshVertexShader depthMeshVertexShader;
+            Shaders::DepthMeshFragmentShader depthMeshFragmentShader;
+            Shaders::DepthPeelingMeshFragmentShader depthPeelingMeshFragmentShader;
+
             // viewport * projection * view
             for (const auto &pMesh: _pScene->meshes()) {
                 const Math::Transform3D view = transformMatrix.inverse();
@@ -87,6 +93,31 @@ namespace UltRenderer {
                 Math::Transform3D lightProjection;
                 Math::Transform3D lightViewport;
                 Rendering::RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap, &lightModelView, &lightProjection, &lightViewport);
+
+                // Depth peeling
+                Data::Image depthFrameBuffer(width, height, backgroundColor);
+                Data::Image firstDepthLayer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+                depthMeshVertexShader.pModel = &pMesh->transformMatrix;
+                depthMeshVertexShader.pView = &view;
+                depthMeshVertexShader.pProjection = &projectionMatrix;
+                depthMeshVertexShader.modelViewMatrix = view * pMesh->transformMatrix;
+                depthMeshVertexShader.modelViewProjectionMatrix = projectionMatrix * depthMeshVertexShader.modelViewMatrix;
+                depthMeshVertexShader.pVertices = &pMesh->vertices;
+
+                Pipeline::Execute<Shaders::IMeshVarying>(depthFrameBuffer, firstDepthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
+                                     depthMeshVertexShader, depthMeshFragmentShader, depthMeshInterpolator);
+                std::vector<Data::Image> depthLayers {firstDepthLayer};
+                firstDepthLayer.save(std::format("{}.tga", depthLayers.size()));
+                while(depthLayers.size() < 1) {
+                    depthPeelingMeshFragmentShader.pLastDepthLayer = &depthLayers.back();
+
+                    Data::Image depthLayer(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+                    Pipeline::Execute<Shaders::IMeshVarying>(depthFrameBuffer, depthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
+                                         depthMeshVertexShader, depthPeelingMeshFragmentShader, depthMeshInterpolator);
+                    depthLayers.emplace_back(depthLayer);
+
+                    depthLayer.save(std::format("{}.tga", depthLayers.size()));
+                }
 
                 // TODO: nullptr is never checked
                 // Set IMeshVertexShader general uniforms

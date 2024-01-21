@@ -7,34 +7,36 @@
 
 namespace UltRenderer {
     namespace Shaders {
-        IMeshVarying
-        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 3> &varyings,
+        BlinnPhongReflectionMeshVarying
+        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<BlinnPhongReflectionMeshVarying, 3> &varyings,
                                                   const Math::Vector3D &weights) const {
-            IMeshVarying res;
+            BlinnPhongReflectionMeshVarying res;
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1] + varyings[2].uv * weights[2];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1] + varyings[2].normal * weights[2];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1] + varyings[2].tangent * weights[2];
             res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1] + varyings[2].light * weights[2];
             res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1] + varyings[2].intensity * weights[2];
+            res.viewPosition = varyings[0].viewPosition * weights[0] + varyings[1].viewPosition * weights[1] + varyings[2].viewPosition * weights[2];
 
             return res;
         }
 
-        IMeshVarying
-        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<IMeshVarying, 2> &varyings,
+        BlinnPhongReflectionMeshVarying
+        BlinnPhongReflectionMeshInterpolator::operator()(const std::array<BlinnPhongReflectionMeshVarying, 2> &varyings,
                                                   const Math::Vector2D &weights) const {
-            IMeshVarying res;
+            BlinnPhongReflectionMeshVarying res;
             res.uv = varyings[0].uv * weights[0] + varyings[1].uv * weights[1];
             res.normal = varyings[0].normal * weights[0] + varyings[1].normal * weights[1];
             res.tangent = varyings[0].tangent * weights[0] + varyings[1].tangent * weights[1];
             res.light = varyings[0].light * weights[0] + varyings[1].light * weights[1];
             res.intensity = varyings[0].intensity * weights[0] + varyings[1].intensity * weights[1];
+            res.viewPosition = varyings[0].viewPosition * weights[0] + varyings[1].viewPosition * weights[1];
 
             return res;
         }
 
-        IMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
-            IMeshVarying res;
+        BlinnPhongReflectionMeshVarying BlinnPhongReflectionMeshVertexShader::operator()(std::size_t vIdx, Math::Vector4D& position) const {
+            BlinnPhongReflectionMeshVarying res;
 
             res.uv = (*pUvs)[vIdx];
             // Transform the vector (the w of 3D vector is zero)
@@ -43,13 +45,14 @@ namespace UltRenderer {
             // Light is in world space
             res.light = ((*pView) * (*pLight).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
             res.intensity = intensity;
+            res.viewPosition = (modelViewMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1)).toCartesianCoordinates();
 
             position = modelViewProjectionMatrix * (*pVertices)[vIdx].toHomogeneousCoordinates(1);
 
             return res;
         }
 
-        bool BlinnPhongReflectionMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
+        bool BlinnPhongReflectionMeshFragmentShader::operator()(const BlinnPhongReflectionMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                          double &depth) const {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;
@@ -104,8 +107,7 @@ namespace UltRenderer {
             double diffuse = normal.dot(-light);
 
             // Specular
-            // TODO: Wrong coord
-            Math::Vector3D viewDir = (-Math::Vector3D(fragCoord[0], fragCoord[1], fragCoord[2])).normalized();     // Camera is always at origin, so the view direction can be represented by the position
+            Math::Vector3D viewDir = (-varying.viewPosition).normalized();     // Camera is always at origin, so the view direction can be represented by the position
             Math::Vector3D halfVec = ((viewDir + -light) / 2).normalized();
             double specular = std::pow(halfVec.dot(normal), brightness);         // uint8_t is the correct form of data, need convert
 
