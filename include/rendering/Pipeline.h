@@ -36,35 +36,40 @@ namespace UltRenderer {
                                const Shaders::IInterpolator<V>& interpolator,
                                const Postprocessors::IPostprocessor& postprocessor) {
             // Process vertex
-            std::vector<V> fragCoords;
+            std::vector<V> varyings;
+            std::vector<Math::Vector4D> preciseFragCoords;
             std::vector<bool> clipFlags;
             for (std::size_t vIdx = 0; vIdx < vertexNum; vIdx++) {
                 // Call vertex shader for each vertex
-                V varying = vertexShader(vIdx);
+                Math::Vector4D position;
+                V varying = vertexShader(vIdx, position);
 
                 // TODO: Clipping is not ideal (discard triangle when one vertex is outside)
                 // Record vertex clip flag here
-                const double absW = std::abs(varying.position.w());
-                clipFlags.emplace_back(std::abs(varying.position.x()) > absW || std::abs(varying.position.y()) > absW || std::abs(varying.position.z()) > absW);
+                const double absW = std::abs(position.w());
+                clipFlags.emplace_back(std::abs(position.x()) > absW || std::abs(position.y()) > absW || std::abs(position.z()) > absW);
 
                 // Perspective division
-                const double wR = 1 / varying.position.w();
-                varying.position *= wR;
+                Math::Vector4D device = position / position.w();
 
                 // Apply viewport
-                varying.position = viewport * varying.position;
+                Math::Vector4D preciseFragCoord = viewport * device;
 
                 // Form fragment coordinates as (x, y, z, 1/w)
-                varying.position.w() = wR;
-                fragCoords.emplace_back(varying);
+                preciseFragCoord.w() = 1 / position.w();
+
+                preciseFragCoords.emplace_back(preciseFragCoord);
+                varyings.emplace_back(varying);
             }
 
             // Primitive assembly: triangle primitives
             for (const auto& triangle: triangles) {
                 bool clipped = false;
                 std::array<V, 3> varyingGroup;
+                std::array<Math::Vector4D , 3> preciseFragCoordGroup;
                 for (std::size_t idx = 0; idx < 3; idx++) {
-                    varyingGroup[idx] = fragCoords[triangle[idx]];
+                    varyingGroup[idx] = varyings[triangle[idx]];
+                    preciseFragCoordGroup[idx] = preciseFragCoords[triangle[idx]];
                     if (clipFlags[triangle[idx]]) {
                         clipped = true;
                         break;
@@ -73,7 +78,7 @@ namespace UltRenderer {
 
                 // Rasterize the primitive (fragment shader is also called)
                 if (!clipped) {
-                    Rendering::Rasterize::Triangle<V>(fBuffer, zBuffer, varyingGroup, fragmentShader, interpolator);
+                    Rendering::Rasterize::Triangle<V>(fBuffer, zBuffer, preciseFragCoordGroup, varyingGroup, fragmentShader, interpolator);
                 }
             }
 

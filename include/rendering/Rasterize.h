@@ -21,7 +21,7 @@ namespace UltRenderer {
                       const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator = {});
 
             template<std::derived_from<Shaders::IVarying> V>
-            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings,
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<Math::Vector4D, 3>& preciseFragCoords, const std::array<V, 3>& varyings,
                           const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator = {});
 
             /*----------Definition----------*/
@@ -111,47 +111,53 @@ namespace UltRenderer {
             }
 
             template<std::derived_from<Shaders::IVarying> V>
-            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 3>& varyings,
+            void Triangle(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<Math::Vector4D, 3>& preciseFragCoords, const std::array<V, 3>& varyings,
                           const Shaders::IFragmentShader<V>& fragmentShader, const Shaders::IInterpolator<V>& interpolator) {
-                std::array<Math::Vector2S, 3> points = {
-                        Math::Vector2S{static_cast<std::size_t>(varyings[0].position.x()), static_cast<std::size_t>(varyings[0].position.y())},
-                        Math::Vector2S{static_cast<std::size_t>(varyings[1].position.x()), static_cast<std::size_t>(varyings[1].position.y())},
-                        Math::Vector2S{static_cast<std::size_t>(varyings[2].position.x()), static_cast<std::size_t>(varyings[2].position.y())},
+                std::array<Math::Vector2D, 3> points = {
+                    Math::Vector2D{preciseFragCoords[0].x(), preciseFragCoords[0].y()},
+                    Math::Vector2D{preciseFragCoords[1].x(), preciseFragCoords[1].y()},
+                    Math::Vector2D{preciseFragCoords[2].x(), preciseFragCoords[2].y()},
                 };
 
-                std::array<Math::Vector2D, 3> doublePoints = {
-                        Math::Vector2D{varyings[0].position.x(), varyings[0].position.y()},
-                        Math::Vector2D{varyings[1].position.x(), varyings[1].position.y()},
-                        Math::Vector2D{varyings[2].position.x(), varyings[2].position.y()},
-                };
+                auto [preciseMin, preciseMax] = Math::Geometry::GetAABB<double, 2>({points.begin(), points.end()});
 
-                auto [minVec, maxVec] = Math::Geometry::GetAABB<std::size_t, 2>({points.begin(), points.end()});
+                // Extend min-max to make sure covering all pixel intersect with bounding box
+                Math::Vector2S minVec = {
+                        static_cast<std::size_t>(std::floor(preciseMin.x())),
+                        static_cast<std::size_t>(std::floor(preciseMin.y()))
+                };
+                Math::Vector2S maxVec = {
+                        static_cast<std::size_t>(std::ceil(preciseMax.x())),
+                        static_cast<std::size_t>(std::ceil(preciseMax.y()))
+                };
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
                         // Get barycentric coordinate in screen space
-                        auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx), static_cast<double>(yIdx)}, doublePoints);
-
-                        // Perform perspective correction
-                        auto barycentricCoord = Math::Vector3D{
-                                fragBarycentricCoord.x() * varyings[0].position.w(),
-                                fragBarycentricCoord.y() * varyings[1].position.w(),
-                                fragBarycentricCoord.z() * varyings[2].position.w()
-                        } / (fragBarycentricCoord.x() * varyings[0].position.w() + fragBarycentricCoord.y() * varyings[1].position.w() + fragBarycentricCoord.z() * varyings[2].position.w());
+                        auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, points);
 
                         // Check the point is inside triangle or not
-                        if (barycentricCoord.x() >= 0 && barycentricCoord.y() >= 0 && barycentricCoord.z() >= 0) {
-                            V interpolatedVarying = interpolator(varyings, barycentricCoord);
-                            // TODO: 1/w is set to 1, because varying.position.w is assumed equals to 1 in shaders, which may not be appropriate
-                            interpolatedVarying.position.w() = 1;
+                        if (fragBarycentricCoord.x() >= 0 && fragBarycentricCoord.y() >= 0 && fragBarycentricCoord.z() >= 0) {
+                            // Perform perspective correction
+                            auto clipBarycentricCoord = Math::Vector3D{
+                                    fragBarycentricCoord.x() * preciseFragCoords[0].w(),
+                                    fragBarycentricCoord.y() * preciseFragCoords[1].w(),
+                                    fragBarycentricCoord.z() * preciseFragCoords[2].w()
+                            } / (fragBarycentricCoord.x() * preciseFragCoords[0].w() + fragBarycentricCoord.y() * preciseFragCoords[1].w() + fragBarycentricCoord.z() * preciseFragCoords[2].w());
+
+                            V interpolatedVarying = interpolator(varyings, clipBarycentricCoord);
 
                             Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx);
 
                             // TODO: gl_FragDepth not work correctly, depth test should be done before or after fragment shader depending on gl_FragDepth is set or not
-                            double depth = interpolatedVarying.position.z();
+                            double depth = preciseFragCoords[0].z() * clipBarycentricCoord[0] + preciseFragCoords[1].z() * clipBarycentricCoord[1] + preciseFragCoords[2].z() * clipBarycentricCoord[2];
+                            const double w = 1 / preciseFragCoords[0].w() * clipBarycentricCoord[0] + 1 / preciseFragCoords[1].w() * clipBarycentricCoord[1] + 1 / preciseFragCoords[2].w() * clipBarycentricCoord[2];
+
+                            // Tips: Should not calculate xy using barycentric coord, because float error would make result not the same as xIdx + 0.5, yIdx + 0.5
+                            const Math::Vector4D fragCoord = {static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5, depth, 1 / w};
 
                             // Only update when not discard
-                            if (fragmentShader(interpolatedVarying, color, depth)) {
+                            if (fragmentShader(interpolatedVarying, fragCoord, color, depth)) {
                                 if (depth < zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
                                     zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
                                     fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx) = color;
