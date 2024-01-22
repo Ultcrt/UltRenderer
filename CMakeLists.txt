@@ -69,6 +69,12 @@ add_executable(UltRenderer src/Main.cpp
         src/shaders/DepthPeelingMeshShader.cpp
         include/shaders/DepthPeelingMeshShader.h
         src/data/BoundingInfo.cpp
-        include/data/BoundingInfo.h)
+        include/data/BoundingInfo.h
+        include/rendering/Raytracing.h
+        src/rendering/Raytracing.cpp
+        src/math/Ray.cpp
+        include/math/Ray.h
+        src/data/IntersectionInfo.cpp
+        include/data/IntersectionInfo.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
