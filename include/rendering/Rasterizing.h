@@ -119,7 +119,7 @@ namespace UltRenderer {
                     Math::Vector2D{preciseFragCoords[2].x(), preciseFragCoords[2].y()},
                 };
 
-                auto [preciseMin, preciseMax] = Math::Geometry::GetAABB<double, 2>({points.begin(), points.end()});
+                auto [preciseMin, preciseMax] = Math::Geometry::GetMinMax<double, 2>({points.begin(), points.end()});
 
                 // Extend min-max to make sure covering all pixel intersect with bounding box
                 Math::Vector2S minVec = {

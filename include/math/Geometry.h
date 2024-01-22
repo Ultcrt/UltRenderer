@@ -10,13 +10,16 @@
 #include <vector>
 #include <array>
 #include "Matrix.h"
+#include "data/BoundingInfo.h"
 
 namespace UltRenderer {
     namespace Math {
         namespace Geometry {
             /*----------Declaration----------*/
             template<typename T, std::size_t N>
-            std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>> GetAABB(const std::vector<Math::VectorX<T, N>>& points);
+            std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>> GetMinMax(const std::vector<Math::VectorX<T, N>>& points);
+
+            Data::BoundingInfo GetAABB(const std::vector<Math::Vector3D>& points);
 
             template<typename T>
             Math::Vector3<T> ComputeBarycentricCoords2D(const Math::Vector2<T>& point, const std::array<Math::Vector2<T>, 3>& trianglePoints);
@@ -28,7 +31,7 @@ namespace UltRenderer {
             /*----------Definition----------*/
             template<typename T, std::size_t N>
             std::pair<Math::VectorX<T, N>, Math::VectorX<T, N>>
-            GetAABB(const std::vector<Math::VectorX<T, N>> &points) {
+            GetMinMax(const std::vector<Math::VectorX<T, N>> &points) {
                 Math::VectorX<T, N> minVec;
                 Math::VectorX<T, N> maxVec;
 

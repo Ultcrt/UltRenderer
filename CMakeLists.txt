@@ -67,6 +67,8 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/Helper.cpp
         include/rendering/Helper.h
         src/shaders/DepthPeelingMeshShader.cpp
-        include/shaders/DepthPeelingMeshShader.h)
+        include/shaders/DepthPeelingMeshShader.h
+        src/data/BoundingInfo.cpp
+        include/data/BoundingInfo.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

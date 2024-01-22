@@ -31,12 +31,17 @@ namespace UltRenderer {
             }
 
             std::pair<Math::Vector3D, double> ComputeApproximateBoundingSphere(const std::vector<Math::Vector3D>& vertices) {
-                auto [min, max] = GetAABB(vertices);
+                auto [min, max] = GetMinMax(vertices);
 
                 auto origin = (min + max) / 2;
                 auto radius = (max - min).norm() / 2;
 
                 return {origin, radius};
+            }
+
+            Data::BoundingInfo GetAABB(const std::vector<Math::Vector3D>& points) {
+                auto [min, max] = GetMinMax<double, 3>(points);
+                return {min, max};
             }
         }
     } // Utils
