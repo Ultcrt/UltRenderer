@@ -13,7 +13,10 @@ namespace UltRenderer {
                                     Math::Transform3D* outModelView, Math::Transform3D* outProjection, Math::Transform3D* outViewport) {
             const auto nDir = dir.normalized();
 
-            auto [origin, radius] = Math::Geometry::ComputeApproximateBoundingSphere(mesh.vertices);
+            auto boundingInfo = Math::Geometry::GetAABB(mesh.vertices);
+
+            const auto origin = boundingInfo.origin();
+            const auto radius = boundingInfo.radius();
 
             const auto w = 2.1 * radius;
             const auto h = 2.1 * radius;
