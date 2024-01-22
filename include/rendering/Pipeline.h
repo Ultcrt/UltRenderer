@@ -10,7 +10,7 @@
 #include "math/Matrix.h"
 #include "data/Image.h"
 #include "shaders/IShader.h"
-#include "rendering/Rasterize.h"
+#include "rendering/Rasterizing.h"
 #include "math/Transform.h"
 #include "postprocessors/EmptyPostprocessor.h"
 
@@ -76,9 +76,9 @@ namespace UltRenderer {
                     }
                 }
 
-                // Rasterize the primitive (fragment shader is also called)
+                // Rasterizing the primitive (fragment shader is also called)
                 if (!clipped) {
-                    Rendering::Rasterize::Triangle<V>(fBuffer, zBuffer, preciseFragCoordGroup, varyingGroup, fragmentShader, interpolator);
+                    Rendering::Rasterizing::Triangle<V>(fBuffer, zBuffer, preciseFragCoordGroup, varyingGroup, fragmentShader, interpolator);
                 }
             }
 

@@ -2,8 +2,8 @@
 // Created by ultcrt on 23-11-21.
 //
 
-#ifndef ULTRENDERER_RASTERIZE_H
-#define ULTRENDERER_RASTERIZE_H
+#ifndef ULTRENDERER_RASTERIZING_H
+#define ULTRENDERER_RASTERIZING_H
 
 #include <cmath>
 #include <iostream>
@@ -14,7 +14,7 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        namespace Rasterize {
+        namespace Rasterizing {
             /*----------Declaration----------*/
             template<std::derived_from<Shaders::IVarying> V>
             void Line(UltRenderer::Data::Image& fBuffer, UltRenderer::Data::Image& zBuffer, const std::array<V, 2>& varyings,
@@ -171,4 +171,4 @@ namespace UltRenderer {
     } // UltRenderer
 } // Rendering
 
-#endif //ULTRENDERER_RASTERIZE_H
+#endif //ULTRENDERER_RASTERIZING_H

@@ -10,7 +10,7 @@
 #include "math/Matrix.h"
 #include "math/Transform.h"
 #include "data/TriangleMesh.h"
-#include "rendering/Rasterize.h"
+#include "rendering/Rasterizing.h"
 #include "rendering/Pipeline.h"
 #include "shaders/IMeshShader.h"
 #include "hierarchy/TransformNode.h"
@@ -153,7 +153,7 @@ namespace UltRenderer {
                 for (std::size_t w = 0; w < width; w++) {
                     for (std::size_t h = 0; h < height; h++) {
                         Math::Vector4D rgba = options.backgroundColor;
-                        for (const auto & layer : std::ranges::reverse_view(layers)) {
+                        for (const Data::Image & layer : std::ranges::reverse_view(layers)) {
                             // TODO: Should implement more blending type
                             const auto topRGBA = Math::Vector4D(layer.at<Data::ImageFormat::RGBA>(w, h));
                             rgba = topRGBA * topRGBA.w() + rgba * (1 - topRGBA.w());
