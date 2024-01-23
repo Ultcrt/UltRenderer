@@ -283,7 +283,7 @@ namespace UltRenderer {
                 const auto vec01 = vertex1 - vertex0;
                 const auto vec02 = vertex2 - vertex0;
 
-                const auto normal = -vec01.cross(vec02).normalized();
+                const auto normal = vec01.cross(vec02).normalized();
 
                 const Math::Matrix3D transform = {
                         vec01.x(), vec01.y(), vec01.z(),

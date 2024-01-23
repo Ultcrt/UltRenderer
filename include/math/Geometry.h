@@ -21,8 +21,9 @@ namespace UltRenderer {
 
             Data::BoundingInfo GetAABB(const std::vector<Vector3D>& points);
 
-            template<typename T>
-            Vector3<T> ComputeBarycentricCoords2D(const Vector2<T>& point, const std::array<Vector2<T>, 3>& trianglePoints);
+            Vector3D ComputeBarycentricCoords(const Vector2D& point, const std::array<Vector2D, 3>& trianglePoints);
+
+            Vector3D ComputeBarycentricCoords(const Vector3D& point, const std::array<Vector3D, 3>& trianglePoints);
 
             std::vector<Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
 
@@ -50,22 +51,6 @@ namespace UltRenderer {
                 }
 
                 return {minVec, maxVec};
-            }
-
-            template<typename T>
-            Vector3<T> ComputeBarycentricCoords2D(const Vector2<T>& point,
-                                                        const std::array<Vector2<T>, 3>& trianglePoints) {
-                Vector2<T> vecAB = trianglePoints[1] - trianglePoints[0];
-                Vector2<T> vecAC = trianglePoints[2] - trianglePoints[0];
-                Vector2<T> vecAP = point - trianglePoints[0];
-
-                T triangleArea2 = vecAC.x() * vecAB.y() - vecAC.y() * vecAB.x();
-
-                T v = (vecAC.x() * vecAP.y() - vecAC.y() * vecAP.x()) / triangleArea2;
-                T w = (vecAP.x() * vecAB.y() - vecAP.y() * vecAB.x()) / triangleArea2;
-                T u = 1 - v - w;
-
-                return {u, v, w};
             }
         }
     } // Utils

@@ -134,7 +134,7 @@ namespace UltRenderer {
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
                         // Get barycentric coordinate in screen space
-                        auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords2D({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, points);
+                        auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, points);
 
                         // Check the point is inside triangle or not
                         if (fragBarycentricCoord.x() >= 0 && fragBarycentricCoord.y() >= 0 && fragBarycentricCoord.z() >= 0) {
