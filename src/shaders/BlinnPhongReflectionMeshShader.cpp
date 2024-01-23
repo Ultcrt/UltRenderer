@@ -123,8 +123,6 @@ namespace UltRenderer {
                     color.w() = 1;
                 }
 
-                color.w() = 0.2;
-
                 return true;
             }
 
