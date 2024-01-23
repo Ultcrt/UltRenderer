@@ -21,15 +21,15 @@ namespace UltRenderer {
             _cameras.emplace_back(target);
         }
 
-        std::vector<std::shared_ptr<Data::TriangleMesh>> Scene::meshes() {
+        std::vector<std::shared_ptr<Data::TriangleMesh>> Scene::meshes() const {
             return _meshes;
         }
 
-        std::vector<std::shared_ptr<Light>> Scene::lights() {
+        std::vector<std::shared_ptr<Light>> Scene::lights() const {
             return _lights;
         }
 
-        std::vector<std::shared_ptr<ICamera>> Scene::cameras() {
+        std::vector<std::shared_ptr<ICamera>> Scene::cameras() const {
             return _cameras;
         }
     } // Rendering

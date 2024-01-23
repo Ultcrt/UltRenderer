@@ -24,9 +24,9 @@ namespace UltRenderer {
             void addLight(const std::shared_ptr<Light>& target);
             void addCamera(const std::shared_ptr<ICamera>& target);
 
-            [[nodiscard]] std::vector<std::shared_ptr<Data::TriangleMesh>> meshes();
-            [[nodiscard]] std::vector<std::shared_ptr<Light>>   lights();
-            [[nodiscard]] std::vector<std::shared_ptr<ICamera>>  cameras();
+            [[nodiscard]] std::vector<std::shared_ptr<Data::TriangleMesh>> meshes() const;
+            [[nodiscard]] std::vector<std::shared_ptr<Light>> lights() const;
+            [[nodiscard]] std::vector<std::shared_ptr<ICamera>> cameras() const;
         };
     } // Rendering
 } // UltRenderer

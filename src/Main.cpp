@@ -8,6 +8,8 @@
 #include "shaders/FlatMeshShader.h"
 #include "shaders/BlinnPhongReflectionMeshShader.h"
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
+#include "rendering/raytracing/Camera.h"
+#include "math/Ray.h"
 
 using namespace UltRenderer;
 
@@ -32,11 +34,13 @@ int main() {
     auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga", Data::FilterType::LINEAR);
     auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga", Data::FilterType::LINEAR);
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
-    auto pCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 4);
+    auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 4);
+    auto pRaytracingCamera = std::make_shared<Rendering::Raytracing::Camera>(2, 2, 4);
     auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);
 
     // Use 3.14 and a large z, will cause head not at center
-    pCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
+    pRasterizingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
+    pRaytracingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
 
     pMesh->pTexture = pTexture;
     pMesh->pNormalMap = pNormalMap;
@@ -46,13 +50,18 @@ int main() {
 
     Rendering::Scene scene;
 
-    scene.addCamera(pCamera);
+    scene.addCamera(pRasterizingCamera);
+    scene.addCamera(pRaytracingCamera);
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    auto img = pCamera->render(1920, 1920, vs, fs, it);
+    Math::Ray ray({0, 0, 0}, {1, 0, 0});
 
-    img.save("test.tga");
+//    auto imgRasterizing = pRasterizingCamera->render(1920, 1920, vs, fs, it);
+    auto imgRaytracing = pRaytracingCamera->render(128, 128);
+
+//    imgRasterizing.save("rasterizing.tga");
+    imgRaytracing.save("raytracing.tga");
 
     return 0;
 }

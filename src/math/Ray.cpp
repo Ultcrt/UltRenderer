@@ -12,7 +12,13 @@ namespace UltRenderer {
             Data::TriangleIntersectionInfo res;
             for (std::size_t idx = 0; idx < mesh.triangles.size(); idx++) {
                 const auto triangle = mesh.triangles[idx];
-                const auto info = intersect(mesh.vertices[triangle[0]], mesh.vertices[triangle[1]],mesh.vertices[triangle[2]]);
+
+                // To world frame
+                const auto p0 = (mesh.transformMatrix * mesh.vertices[triangle[0]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
+                const auto p1 = (mesh.transformMatrix * mesh.vertices[triangle[1]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
+                const auto p2 = (mesh.transformMatrix * mesh.vertices[triangle[2]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
+
+                const auto info = intersect(p0, p1, p2);
 
                 if (info.isIntersected) {
                     if (info.length < res.length) {
@@ -37,7 +43,7 @@ namespace UltRenderer {
             const auto factor = s1.dot(e1);
             const auto t = s2.dot(e2) / factor;
             const auto b1 = s1.dot(s) / factor;
-            const auto b2 = s2.dot(direction);
+            const auto b2 = s2.dot(direction) / factor;
 
             Data::TriangleIntersectionInfo res;
 
@@ -45,6 +51,23 @@ namespace UltRenderer {
                 res.isIntersected = true;
                 res.length = t;
                 res.barycentricCoord = {1 - b1 - b2, b1, b2};
+            }
+
+            return res;
+        }
+
+        Data::TriangleIntersectionInfo Ray::intersect(const Rendering::Scene &scene, bool fastCheck, double eps) const {
+            Data::TriangleIntersectionInfo res;
+
+            for (const auto& pMesh: scene.meshes()) {
+                const auto info = intersect(*pMesh, fastCheck, eps);
+
+                if (info.isIntersected) {
+                    if (info.length < res.length) {
+                        res = info;
+                        if (fastCheck) return res;
+                    }
+                }
             }
 
             return res;
