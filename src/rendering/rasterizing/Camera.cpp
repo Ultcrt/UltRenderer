@@ -4,6 +4,8 @@
 
 #include "rendering/rasterizing/Camera.h"
 #include "shaders/BlinnPhongReflectionMeshShader.h"
+#include "rendering/raytracing/Camera.h"
+
 
 namespace UltRenderer {
     namespace Rendering {
@@ -16,7 +18,7 @@ namespace UltRenderer {
             }
 
             Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):
-                    ICamera(), _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {
+                    ICamera(width, height, zMin, zMax, projectionType) {
                 updateProjectionMatrix();
             }
 

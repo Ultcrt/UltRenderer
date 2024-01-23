@@ -2,8 +2,8 @@
 // Created by ultcrt on 23-12-26.
 //
 
-#ifndef ULTRENDERER_CAMERA_H
-#define ULTRENDERER_CAMERA_H
+#ifndef ULTRENDERER_RASTERIZING_CAMERA_H
+#define ULTRENDERER_RASTERIZING_CAMERA_H
 
 #include <ranges>
 
@@ -23,10 +23,6 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterizing {
-            enum class ProjectionType {
-                ORTHOGONAL, PERSPECTIVE
-            };
-
             // TODO: Should inherit from base options
             struct RenderOptions {
                 // TODO: Automatically decide numDepthPeelingLayer
@@ -36,14 +32,6 @@ namespace UltRenderer {
             };
 
             class Camera: public ICamera {
-            private:
-                double _width;
-                double _height;
-
-                double _zMin = 0.1;
-                double _zMax = 10;
-
-                ProjectionType _projectionType;
             public:
                 Camera(double width, double height,
                        double zMin = 0.1, double zMax = 10, ProjectionType projectionType = ProjectionType::PERSPECTIVE);
@@ -57,13 +45,12 @@ namespace UltRenderer {
 
                 void updateProjectionMatrix();
 
-                void setProjectionType(ProjectionType projectionType);
-                void setWidth(double width);
-                void setHeight(double height);
-                void setZMin(double zMin);
-                void setZMax(double zMax);
-
-                [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const;
+                void setProjectionType(ProjectionType projectionType) override;
+                void setWidth(double width) override;
+                void setHeight(double height) override;
+                void setZMin(double zMin) override;
+                void setZMax(double zMax) override;
+                [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const override;
 
                 template<std::derived_from<Shaders::IVarying> V>
                 [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
@@ -173,4 +160,4 @@ namespace UltRenderer {
     } // Rendering
 } // UltRenderer
 
-#endif //ULTRENDERER_CAMERA_H
+#endif //ULTRENDERER_RASTERIZING_CAMERA_H
