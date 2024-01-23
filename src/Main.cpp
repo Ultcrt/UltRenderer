@@ -2,7 +2,7 @@
 #include "math/Matrix.h"
 #include "data/TriangleMesh.h"
 #include <memory>
-#include "rendering/Camera.h"
+#include "rendering/rasterizing/Camera.h"
 #include "rendering/Light.h"
 #include "rendering/Scene.h"
 #include "shaders/FlatMeshShader.h"
@@ -32,7 +32,7 @@ int main() {
     auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga", Data::FilterType::LINEAR);
     auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga", Data::FilterType::LINEAR);
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
-    auto pCamera = std::make_shared<Rendering::Camera>(2, 2, 4);
+    auto pCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 4);
     auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);
 
     // Use 3.14 and a large z, will cause head not at center

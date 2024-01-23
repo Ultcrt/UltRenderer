@@ -10,8 +10,8 @@ add_executable(UltRenderer src/Main.cpp
         include/data/Image.h
         include/data/Image.h
         src/data/Image.cpp
-        src/rendering/Rasterizing.cpp
-        include/rendering/Rasterizing.h
+        src/rendering/rasterizing/Rasterizing.cpp
+        include/rendering/rasterizing/Rasterizing.h
         src/data/TriangleMesh.cpp
         include/data/TriangleMesh.h
         src/math/Matrix.cpp
@@ -22,8 +22,8 @@ add_executable(UltRenderer src/Main.cpp
         include/utils/Hash.h
         src/math/Geometry.cpp
         include/math/Geometry.h
-        src/rendering/Camera.cpp
-        include/rendering/Camera.h
+        src/rendering/rasterizing/Camera.cpp
+        include/rendering/rasterizing/Camera.h
         src/rendering/Scene.cpp
         include/rendering/Scene.h
         src/math/Transform.cpp
@@ -38,8 +38,8 @@ add_executable(UltRenderer src/Main.cpp
         include/hierarchy/TransformNode.h
         src/shaders/IShader.cpp
         include/shaders/IShader.h
-        src/rendering/Pipeline.cpp
-        include/rendering/Pipeline.h
+        src/rendering/rasterizing/Pipeline.cpp
+        include/rendering/rasterizing/Pipeline.h
         src/shaders/FlatMeshShader.cpp
         include/shaders/FlatMeshShader.h
         src/shaders/GouraudMeshShader.cpp
@@ -60,18 +60,18 @@ add_executable(UltRenderer src/Main.cpp
         include/postprocessors/ScreenSpaceAmbientOcclusion.h
         src/postprocessors/EmptyPostprocessor.cpp
         include/postprocessors/EmptyPostprocessor.h
-        src/bakers/PreBakedAmbientOcclusion.cpp
-        include/bakers/PreBakedAmbientOcclusion.h
+        src/rendering/rasterizing/bakers/PreBakedAmbientOcclusion.cpp
+        include/rendering/rasterizing/bakers/PreBakedAmbientOcclusion.h
         src/shaders/PreBakedAmbientOcclusionMeshShader.cpp
         include/shaders/PreBakedAmbientOcclusionMeshShader.h
-        src/rendering/Helper.cpp
-        include/rendering/Helper.h
+        src/rendering/rasterizing/Helper.cpp
+        include/rendering/rasterizing/Helper.h
         src/shaders/DepthPeelingMeshShader.cpp
         include/shaders/DepthPeelingMeshShader.h
         src/data/BoundingInfo.cpp
         include/data/BoundingInfo.h
-        include/rendering/Raytracing.h
-        src/rendering/Raytracing.cpp
+        include/rendering/raytracing/Raytracing.h
+        src/rendering/raytracing/Raytracing.cpp
         src/math/Ray.cpp
         include/math/Ray.h
         src/data/IntersectionInfo.cpp
