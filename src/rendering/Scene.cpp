@@ -3,7 +3,6 @@
 //
 
 #include "rendering/Scene.h"
-#include "rendering/rasterizing/Camera.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -17,7 +16,7 @@ namespace UltRenderer {
             _lights.emplace_back(target);
         }
 
-        void Scene::addCamera(const std::shared_ptr<Rasterizing::Camera> &target) {
+        void Scene::addCamera(const std::shared_ptr<ICamera> &target) {
             target->setScene(this);
             _cameras.emplace_back(target);
         }
@@ -30,7 +29,7 @@ namespace UltRenderer {
             return _lights;
         }
 
-        std::vector<std::shared_ptr<Rasterizing::Camera>> Scene::cameras() {
+        std::vector<std::shared_ptr<ICamera>> Scene::cameras() {
             return _cameras;
         }
     } // Rendering

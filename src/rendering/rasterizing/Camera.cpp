@@ -8,15 +8,15 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterizing {
-            Data::Image Camera::render(std::size_t width, std::size_t height, RenderOptions options, const Postprocessors::IPostprocessor& postprocessor) const {
+            Data::Image Camera::render(std::size_t width, std::size_t height) const {
                 Shaders::BlinnPhongReflectionMeshVertexShader vertexShader;
                 Shaders::BlinnPhongReflectionMeshFragmentShader fragmentShader;
                 Shaders::BlinnPhongReflectionMeshInterpolator interpolator;
-                return Camera::render<Shaders::BlinnPhongReflectionMeshVarying>(width, height, vertexShader, fragmentShader, interpolator, options, postprocessor);
+                return Camera::render<Shaders::BlinnPhongReflectionMeshVarying>(width, height, vertexShader, fragmentShader, interpolator);
             }
 
             Camera::Camera(double width, double height, double zMin, double zMax, ProjectionType projectionType):
-                    _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {
+                    ICamera(), _width(width), _height(height), _zMin(zMin), _zMax(zMax), _projectionType(projectionType) {
                 updateProjectionMatrix();
             }
 

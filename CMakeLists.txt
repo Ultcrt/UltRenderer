@@ -75,6 +75,10 @@ add_executable(UltRenderer src/Main.cpp
         src/math/Ray.cpp
         include/math/Ray.h
         src/data/IntersectionInfo.cpp
-        include/data/IntersectionInfo.h)
+        include/data/IntersectionInfo.h
+        src/rendering/raytracing/Camera.cpp
+        include/rendering/raytracing/Camera.h
+        src/rendering/ICamera.cpp
+        include/rendering/ICamera.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

@@ -13,7 +13,7 @@
 #include "Rasterizing.h"
 #include "Pipeline.h"
 #include "shaders/IMeshShader.h"
-#include "hierarchy/TransformNode.h"
+#include "rendering/ICamera.h"
 #include "rendering/Scene.h"
 #include "shaders/DepthMeshShader.h"
 #include "postprocessors/EmptyPostprocessor.h"
@@ -27,13 +27,15 @@ namespace UltRenderer {
                 ORTHOGONAL, PERSPECTIVE
             };
 
+            // TODO: Should inherit from base options
             struct RenderOptions {
                 // TODO: Automatically decide numDepthPeelingLayer
                 std::size_t numDepthPeelingLayer = 10;
                 Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 1};
+                // TODO: Should put post processor here
             };
 
-            class Camera: public Hierarchy::TransformNode {
+            class Camera: public ICamera {
             private:
                 double _width;
                 double _height;
@@ -61,11 +63,11 @@ namespace UltRenderer {
                 void setZMin(double zMin);
                 void setZMax(double zMax);
 
-                [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, RenderOptions options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+                [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const;
 
                 template<std::derived_from<Shaders::IVarying> V>
                 [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                                 const Shaders::IInterpolator<V> &interpolator, RenderOptions options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
+                                                 const Shaders::IInterpolator<V> &interpolator, const RenderOptions& options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
 
                 static Math::Transform3D ComputeProjectionMatrix(double width, double height, double zMin, double zMax, ProjectionType projectionType);
@@ -75,7 +77,7 @@ namespace UltRenderer {
 
             template<std::derived_from<Shaders::IVarying> V>
             Data::Image Camera::render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
-                                       const Shaders::IInterpolator<V> &interpolator, RenderOptions options, const Postprocessors::IPostprocessor& postprocessor) const {
+                                       const Shaders::IInterpolator<V> &interpolator, const RenderOptions& options, const Postprocessors::IPostprocessor& postprocessor) const {
                 // Origin is always (0, 0) here, depth is scaled into (0, 1)
                 Math::Transform3D viewport = ComputeViewportMatrix(width, height);
 
