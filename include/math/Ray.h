@@ -19,8 +19,8 @@ namespace UltRenderer {
             Ray(const Vector3D& ori, const Vector3D& dir);
 
             // TODO: Should implement intersect more than once
-            [[nodiscard]] Data::IntersectionInfo intersect(const Data::TriangleMesh& mesh, bool fastCheck = false, double eps = 1e-5) const;
-            [[nodiscard]] Data::IntersectionInfo intersect(const Vector3D& p0, const Vector3D& p1, const Vector3D& p2, double eps = 1e-5) const;
+            [[nodiscard]] Data::TriangleIntersectionInfo intersect(const Data::TriangleMesh& mesh, bool fastCheck = false, double eps = 1e-5) const;
+            [[nodiscard]] Data::TriangleIntersectionInfo intersect(const Vector3D& p0, const Vector3D& p1, const Vector3D& p2, double eps = 1e-5) const;
         };
     } // Math
 } // UltRenderer
