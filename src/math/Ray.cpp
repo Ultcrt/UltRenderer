@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "math/Ray.h"
 
 namespace UltRenderer {
@@ -32,9 +33,6 @@ namespace UltRenderer {
                         }
                     }
                 }
-            }
-            else {
-                std::cout << "!!!" << std::endl;
             }
 
             return res;
@@ -92,17 +90,26 @@ namespace UltRenderer {
             std::array<double, 3> tMins{};
             std::array<double, 3> tMaxs{};
             for (std::size_t idx = 0; idx < 3; idx++) {
-                tMins[idx] = (info.min[idx] - origin[idx]) / direction[idx];
-                tMaxs[idx] = (info.max[idx] - origin[idx]) / direction[idx];
+                double t0 = (info.min[idx] - origin[idx]) / direction[idx];
+                double t1 = (info.max[idx] - origin[idx]) / direction[idx];
+
+                if (t0 <= t1) {
+                    tMins[idx] = t0;
+                    tMaxs[idx] = t1;
+                }
+                else {
+                    tMins[idx] = t1;
+                    tMaxs[idx] = t0;
+                }
             }
 
-            double globalTMin = *std::max(tMins.begin(), tMins.end());
-            double globalTMax = *std::min(tMaxs.begin(), tMaxs.end());
+            double enter = *std::max_element(tMins.begin(), tMins.end());
+            double exit = *std::min_element(tMaxs.begin(), tMaxs.end());
 
             Data::IntersectionInfo res;
-            if (globalTMax >= 0 && globalTMax > globalTMin) {
+            if (exit >= 0 && exit >= enter) {
                 res.isIntersected = true;
-                res.length = globalTMin;
+                res.length = enter;
             }
             return res;
         }
