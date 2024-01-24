@@ -2,6 +2,7 @@
 #include "math/Matrix.h"
 #include "data/TriangleMesh.h"
 #include <memory>
+#include <chrono>
 #include "rendering/rasterizing/Camera.h"
 #include "rendering/Light.h"
 #include "rendering/Scene.h"
@@ -71,8 +72,12 @@ int main() {
     scene.addLight(pLight);
 
     // Rendering
+    auto start = std::chrono::high_resolution_clock::now();
 //    auto imgRasterizing = pRasterizingCamera->render(128, 128, vs, fs, it);
     auto imgRaytracing = pRaytracingCamera->render(800, 800);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";
+
 
     // Saving
 //    imgRasterizing.save("rasterizing.tga");
