@@ -26,7 +26,7 @@ namespace UltRenderer {
                             ((static_cast<double>(h) + 0.5) / static_cast<double>(height)) * _height - _height / 2,
                             -_zMin,
                             1
-                        }).toCartesianCoordinates().normalized();
+                        }).toCartesianCoordinates();
 
                         const Math::Ray ray(origin, (fragCoord - origin).normalized());
 

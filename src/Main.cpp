@@ -55,12 +55,10 @@ int main() {
     scene.addMesh(pMesh);
     scene.addLight(pLight);
 
-    Math::Ray ray({0, 0, 0}, {1, 0, 0});
-
-//    auto imgRasterizing = pRasterizingCamera->render(1920, 1920, vs, fs, it);
+    auto imgRasterizing = pRasterizingCamera->render(128, 128, vs, fs, it);
     auto imgRaytracing = pRaytracingCamera->render(128, 128);
 
-//    imgRasterizing.save("rasterizing.tga");
+    imgRasterizing.save("rasterizing.tga");
     imgRaytracing.save("raytracing.tga");
 
     return 0;
