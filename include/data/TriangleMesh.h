@@ -19,7 +19,7 @@ namespace UltRenderer {
         class TriangleMesh: public Hierarchy::TransformNode {
         public:
             std::shared_ptr<Image> pTexture;
-            std::shared_ptr<Image> pSpecular;
+            std::shared_ptr<Image> pSpecularMap;
             std::shared_ptr<Image> pNormalMap;
             Data::NormalMapType normalMapType;
             std::shared_ptr<Image> pGlowMap;
