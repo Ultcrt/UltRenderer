@@ -20,7 +20,7 @@ namespace UltRenderer {
             [[nodiscard]] double depth() const;
             [[nodiscard]] Math::Vector3D origin() const;
 
-            BoundingInfo(const Math::Vector3D& min, const Math::Vector3D& max);
+            BoundingInfo(const Math::Vector3D& min = {0, 0, 0}, const Math::Vector3D& max = {0, 0, 0});
         };
     } // Data
 } // UltRenderer
