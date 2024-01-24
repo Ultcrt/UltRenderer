@@ -66,6 +66,30 @@ namespace UltRenderer {
 
                 return {u, v, w};
             }
+
+            Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target) {
+                // Make sure TBN are orthogonal
+                auto b = normal.cross(tangent);
+                auto n = normal;
+                auto t = b.cross(n);
+
+                t.normalize();
+                b.normalize();
+                n.normalize();
+
+                // Just a rotation matrix of TBN basis
+                Math::Matrix3D tbn = {
+                        t.x(), b.x(), n.x(),
+                        t.y(), b.y(), n.y(),
+                        t.z(), b.z(), n.z(),
+                };
+
+                return (tbn * target).normalized();
+            }
+
+            Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction) {
+                return -2 * direction.dot(normal) * normal + direction;
+            }
         }
     } // Utils
 } // UltRender
