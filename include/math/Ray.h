@@ -24,6 +24,7 @@ namespace UltRenderer {
             [[nodiscard]] Data::TriangleIntersectionInfo intersect(const Rendering::Scene& scene, bool fastCheck = false, double eps = 1e-5) const;
             [[nodiscard]] Data::TriangleIntersectionInfo intersect(const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes, bool fastCheck = false, double eps = 1e-5) const;
             [[nodiscard]] Data::TriangleIntersectionInfo intersect(const Vector3D& p0, const Vector3D& p1, const Vector3D& p2, double eps = 1e-5) const;
+            [[nodiscard]] Data::IntersectionInfo intersect(const Data::BoundingInfo& info, double eps = 1e-5) const;
         };
     } // Math
 } // UltRenderer

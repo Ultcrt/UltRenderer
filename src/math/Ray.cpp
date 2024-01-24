@@ -10,25 +10,29 @@ namespace UltRenderer {
 
         Data::TriangleIntersectionInfo Ray::intersect(const Data::TriangleMesh &mesh, bool fastCheck, double eps) const {
             Data::TriangleIntersectionInfo res;
-            for (std::size_t idx = 0; idx < mesh.triangles.size(); idx++) {
-                const auto triangle = mesh.triangles[idx];
 
-                // To world frame
-                const auto p0 = (mesh.transformMatrix * mesh.vertices[triangle[0]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
-                const auto p1 = (mesh.transformMatrix * mesh.vertices[triangle[1]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
-                const auto p2 = (mesh.transformMatrix * mesh.vertices[triangle[2]].toHomogeneousCoordinates(1)).toCartesianCoordinates();
+            if (intersect(mesh.boundingInfo).isIntersected) {
+                for (std::size_t idx = 0; idx < mesh.triangles.size(); idx++) {
+                    const auto triangle = mesh.triangles[idx];
 
-                const auto info = intersect(p0, p1, p2);
+                    // To world frame
+                    const auto p0 = mesh.getTransformedVertex(triangle[0]);
+                    const auto p1 = mesh.getTransformedVertex(triangle[1]);
+                    const auto p2 = mesh.getTransformedVertex(triangle[2]);
 
-                if (info.isIntersected) {
-                    if (info.length < res.length) {
-                        res = info;
-                        res.pMesh = &mesh;
-                        res.triangleIdx = idx;
-                        if (fastCheck) return res;
+                    const auto info = intersect(p0, p1, p2);
+
+                    if (info.isIntersected) {
+                        if (info.length < res.length) {
+                            res = info;
+                            res.pMesh = &mesh;
+                            res.triangleIdx = idx;
+                            if (fastCheck) return res;
+                        }
                     }
                 }
             }
+
             return res;
         }
 
@@ -77,6 +81,25 @@ namespace UltRenderer {
                 }
             }
 
+            return res;
+        }
+
+        Data::IntersectionInfo Ray::intersect(const Data::BoundingInfo &info, double eps) const {
+            std::array<double, 3> tMins{};
+            std::array<double, 3> tMaxs{};
+            for (std::size_t idx = 0; idx < 3; idx++) {
+                tMins[idx] = (info.min[idx] - origin[idx]) / direction[idx];
+                tMaxs[idx] = (info.max[idx] - origin[idx]) / direction[idx];
+            }
+
+            double globalTMin = *std::max(tMins.begin(), tMins.end());
+            double globalTMax = *std::min(tMins.begin(), tMins.end());
+
+            Data::TriangleIntersectionInfo res;
+            if (globalTMax >= 0 && globalTMax > globalTMin) {
+                res.isIntersected = true;
+                res.length = globalTMin;
+            }
             return res;
         }
     } // Math
