@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "shaders/BlinnPhongReflectionMeshShader.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Shaders {
@@ -81,24 +82,7 @@ namespace UltRenderer {
 
                 // TODO: Non-normal mapping should be checked here
                 if (normalMapType == Data::NormalMapType::DARBOUX) {
-                    // Make sure TBN are orthogonal
-                    auto t = varying.tangent;
-                    auto n = varying.normal;
-                    auto b = n.cross(t);
-                    t = b.cross(n);
-
-                    t.normalize();
-                    b.normalize();
-                    n.normalize();
-
-                    // Just a rotation matrix of TBN basis
-                    Math::Matrix3D tbn = {
-                            t.x(), b.x(), n.x(),
-                            t.y(), b.y(), n.y(),
-                            t.z(), b.z(), n.z(),
-                    };
-
-                    normal = (tbn * normal).normalized();
+                    normal = Math::Geometry::ConvertDarbouxNormalToGlobal(varying.tangent, varying.normal, normal);
                 }
                 else {
                     normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
