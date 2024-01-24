@@ -13,11 +13,16 @@
 #include "math/Transform.h"
 #include "hierarchy/TransformNode.h"
 #include "set"
+#include "data/BoundingInfo.h"
 
 namespace UltRenderer {
     namespace Data {
         class TriangleMesh: public Hierarchy::TransformNode {
+        private:
+            std::vector<Math::Vector3D> _transformedVertices;
+
         public:
+            Data::BoundingInfo boundingInfo;
             std::shared_ptr<Image> pTexture;
             std::shared_ptr<Image> pSpecularMap;
             std::shared_ptr<Image> pNormalMap;
@@ -48,6 +53,12 @@ namespace UltRenderer {
             void updateVertexNormals();
 
             void updateTriangleAttributes();
+
+            void updateBoundingInfo();
+
+            void updateTransformedVertex();
+
+            Math::Vector3D getTransformedVertex(std::size_t idx) const;
         };
 
     } // UltRenderer

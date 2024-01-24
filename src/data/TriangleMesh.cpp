@@ -12,6 +12,7 @@
 #include "data/TriangleMesh.h"
 #include "utils/String.h"
 #include "utils/Hash.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -210,9 +211,11 @@ namespace UltRenderer {
             if (vnList.empty()) {
                 updateVertexNormals();
             }
+            updateTransformedVertex();
             updateTriangleAttributes();
             updateAdjacentList();
             updateVertexTangents();
+            updateBoundingInfo();
         }
 
         void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
@@ -220,13 +223,7 @@ namespace UltRenderer {
         }
 
         std::vector<Math::Vector3D> TriangleMesh::transform() const {
-            std::vector<Math::Vector3D> res;
-
-            for (const auto& vertex: vertices) {
-                res.emplace_back((transformMatrix * vertex.toHomogeneousCoordinates(1)).toCartesianCoordinates());
-            }
-
-            return res;
+            return _transformedVertices;
         }
 
         void TriangleMesh::updateVertexTangents() {
@@ -308,6 +305,22 @@ namespace UltRenderer {
                     adjacentVertices[triangle[idx]].insert(triangle[(idx + 2) % 3]);
                     adjacentTriangles[triangle[idx]].insert(tIdx);
                 }
+            }
+        }
+
+        void TriangleMesh::updateBoundingInfo() {
+            boundingInfo = Math::Geometry::GetAABB(_transformedVertices);
+        }
+
+        Math::Vector3D TriangleMesh::getTransformedVertex(std::size_t idx) const {
+            return _transformedVertices[idx];
+        }
+
+        void TriangleMesh::updateTransformedVertex() {
+            _transformedVertices = {};
+
+            for (const auto& vertex: vertices) {
+                _transformedVertices.emplace_back((transformMatrix * vertex.toHomogeneousCoordinates(1)).toCartesianCoordinates());
             }
         }
     } // UltRenderer
