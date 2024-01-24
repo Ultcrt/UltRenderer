@@ -57,9 +57,16 @@ namespace UltRenderer {
         }
 
         Data::TriangleIntersectionInfo Ray::intersect(const Rendering::Scene &scene, bool fastCheck, double eps) const {
+            // TODO: Should add more basic geometry
+            return intersect(scene.meshes(), fastCheck, eps);
+        }
+
+        Data::TriangleIntersectionInfo
+        Ray::intersect(const std::vector<std::shared_ptr<Data::TriangleMesh>> &pMeshes, bool fastCheck,
+                       double eps) const {
             Data::TriangleIntersectionInfo res;
 
-            for (const auto& pMesh: scene.meshes()) {
+            for (const auto& pMesh: pMeshes) {
                 const auto info = intersect(*pMesh, fastCheck, eps);
 
                 if (info.isIntersected) {
