@@ -2,6 +2,7 @@
 // Created by ultcrt on 24-1-22.
 //
 
+#include <iostream>
 #include "math/Ray.h"
 
 namespace UltRenderer {
@@ -31,6 +32,9 @@ namespace UltRenderer {
                         }
                     }
                 }
+            }
+            else {
+                std::cout << "!!!" << std::endl;
             }
 
             return res;
@@ -93,9 +97,9 @@ namespace UltRenderer {
             }
 
             double globalTMin = *std::max(tMins.begin(), tMins.end());
-            double globalTMax = *std::min(tMins.begin(), tMins.end());
+            double globalTMax = *std::min(tMaxs.begin(), tMaxs.end());
 
-            Data::TriangleIntersectionInfo res;
+            Data::IntersectionInfo res;
             if (globalTMax >= 0 && globalTMax > globalTMin) {
                 res.isIntersected = true;
                 res.length = globalTMin;
