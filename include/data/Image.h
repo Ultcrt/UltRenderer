@@ -169,18 +169,66 @@ namespace UltRenderer {
                     auto width = wRatio * static_cast<double>(_width);
                     auto height = hRatio * static_cast<double>(_height);
 
-                    auto floorW = static_cast<std::size_t>(std::floor(width));
-                    auto floorH = static_cast<std::size_t>(std::floor(height));
-                    auto ceilW = static_cast<std::size_t>(std::ceil(width));
-                    auto ceilH = static_cast<std::size_t>(std::ceil(height));
+                    std::size_t w0 = 0;
+                    std::size_t w1 = 0;
+                    std::size_t h0 = 0;
+                    std::size_t h1 = 0;
+                    double ww = 0;
+                    double hw = 0;
 
-                    auto weightW = width - static_cast<double>(floorW);
-                    auto weightH = height - static_cast<double>(floorH);
+                    // Less than the first texel center, repeat nearest neighbor
+                    if (width < 0.5) {
+                        w0 = 0;
+                        w1 = 0;
+                    }
+                    // Larger than the last texel center, repeat nearest neighbor
+                    else if (width >= static_cast<double>(_width) - 0.5) {
+                        w0 = _width - 1;
+                        w1 = _width - 1;
+                    }
+                    // Sampling at texel center
+                    else {
+                        auto dw = width - std::floor(width);
+                        auto wInt = static_cast<std::size_t>(width);
+                        if (dw < 0.5) {
+                            w0 = wInt - 1;
+                            w1 = wInt;
+                            ww = dw + 0.5;
+                        }
+                        else {
+                            w0 = wInt;
+                            w1 = wInt + 1;
+                            ww = dw - 0.5;
+                        }
+                    }
 
-                    auto color0 = at<FORMAT>(floorW, floorH) * (1 - weightW) + at<FORMAT>(ceilW, floorH) * weightW;
-                    auto color1 = at<FORMAT>(floorW, ceilH) * (1 - weightW) + at<FORMAT>(ceilW, ceilH) * weightW;
+                    if (height < 0.5) {
+                        h0 = 0;
+                        h1 = 0;
+                    }
+                    else if (height >= static_cast<double>(_height) - 0.5) {
+                        h0 = _height - 1;
+                        h1 = _height - 1;
+                    }
+                    else {
+                        auto dh = height - std::floor(height);
+                        auto hInt = static_cast<std::size_t>(height);
+                        if (dh < 0.5) {
+                            h0 = hInt - 1;
+                            h1 = hInt;
+                            hw = dh + 0.5;
+                        }
+                        else {
+                            h0 = hInt;
+                            h1 = hInt + 1;
+                            hw = dh - 0.5;
+                        }
+                    }
 
-                    return color0 * (1 - weightH) + color1 * weightH;
+                    auto color0 = at<FORMAT>(w0, h0) * (1 - ww) + at<FORMAT>(w1, h0) * ww;
+                    auto color1 = at<FORMAT>(w0, h1) * (1 - ww) + at<FORMAT>(w1, h1) * ww;
+
+                    return color0 * (1 - hw) + color1 * hw;
                 }
                 default:
                     assert(false);
