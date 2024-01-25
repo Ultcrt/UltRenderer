@@ -79,6 +79,10 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/raytracing/Camera.cpp
         include/rendering/raytracing/Camera.h
         src/rendering/ICamera.cpp
-        include/rendering/ICamera.h)
+        include/rendering/ICamera.h
+        src/math/BVH.cpp
+        include/math/BVH.h
+        src/utils/Algorithm.cpp
+        include/utils/Algorithm.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
