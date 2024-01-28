@@ -11,31 +11,10 @@ namespace UltRenderer {
         Ray::Ray(const Vector3D &ori, const Vector3D &dir) : origin(ori), direction(dir.normalized()) {}
 
         Data::TriangleIntersectionInfo Ray::intersect(const Data::TriangleMesh &mesh, bool fastCheck, double eps) const {
-            Data::TriangleIntersectionInfo res;
-
-            if (intersect(mesh.boundingInfo).isIntersected) {
-                for (std::size_t idx = 0; idx < mesh.triangles.size(); idx++) {
-                    const auto triangle = mesh.triangles[idx];
-
-                    // To world frame
-                    const auto p0 = mesh.getTransformedVertex(triangle[0]);
-                    const auto p1 = mesh.getTransformedVertex(triangle[1]);
-                    const auto p2 = mesh.getTransformedVertex(triangle[2]);
-
-                    const auto info = intersect(p0, p1, p2);
-
-                    if (info.isIntersected) {
-                        if (info.length < res.length) {
-                            res = info;
-                            res.pMesh = &mesh;
-                            res.triangleIdx = idx;
-                            if (fastCheck) return res;
-                        }
-                    }
-                }
-            }
-
-            return res;
+            bool stop = false;
+            auto info = _intersectBVH(mesh, mesh.bvh.pRoot.get(), stop, fastCheck);
+            info.pMesh = &mesh;
+            return info;
         }
 
         Data::TriangleIntersectionInfo Ray::intersect(const Vector3D &p0, const Vector3D &p1, const Vector3D &p2, double eps) const {
@@ -111,6 +90,60 @@ namespace UltRenderer {
                 res.isIntersected = true;
                 res.length = enter;
             }
+            return res;
+        }
+
+        Data::TriangleIntersectionInfo
+        Ray::_intersectBVH(const Data::TriangleMesh &mesh, const BVH::Node *pNode, bool& stop, bool fastCheck) const {
+            Data::TriangleIntersectionInfo res;
+
+            // Fast stop
+            if (!stop) {
+                // Check children when intersected with bounding box
+                if (intersect(pNode->boundingInfo).isIntersected) {
+                    // Leaf node, check primitives inside
+                    if (pNode->pLeft == nullptr and pNode->pRight == nullptr) {
+                        for (const auto& tIdx: pNode->primitiveIndices) {
+                            const auto triangle = mesh.triangles[tIdx];
+
+                            // To world frame
+                            const auto p0 = mesh.getTransformedVertex(triangle[0]);
+                            const auto p1 = mesh.getTransformedVertex(triangle[1]);
+                            const auto p2 = mesh.getTransformedVertex(triangle[2]);
+
+                            const auto info = intersect(p0, p1, p2);
+
+                            if (info.isIntersected) {
+                                if (info.length < res.length) {
+                                    res = info;
+                                    res.triangleIdx = tIdx;
+                                    if (fastCheck) {
+                                        stop = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Non-leaf node, check children nodes
+                    else {
+                        for (const auto& pChild: {pNode->pLeft.get(), pNode->pRight.get()}) {
+                            if (pChild != nullptr) {
+                                const auto newInfo = _intersectBVH(mesh, pChild, stop, fastCheck);
+
+                                if (newInfo.isIntersected) {
+                                    if (newInfo.length < res.length) {
+                                        res = newInfo;
+                                        if (fastCheck) {
+                                            stop = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return res;
         }
     } // Math

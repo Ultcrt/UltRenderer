@@ -14,6 +14,7 @@
 #include "hierarchy/TransformNode.h"
 #include "set"
 #include "data/BoundingInfo.h"
+#include "math/BVH.h"
 
 namespace UltRenderer {
     namespace Data {
@@ -22,13 +23,6 @@ namespace UltRenderer {
             std::vector<Math::Vector3D> _transformedVertices;
 
         public:
-            Data::BoundingInfo boundingInfo;
-            std::shared_ptr<Image> pTexture;
-            std::shared_ptr<Image> pSpecularMap;
-            std::shared_ptr<Image> pNormalMap;
-            Data::NormalMapType normalMapType;
-            std::shared_ptr<Image> pGlowMap;
-
             std::vector<Math::Vector3D> vertices;
             std::vector<Math::Vector3S> triangles;
             std::vector<Math::Vector3D> vertexColors;
@@ -39,6 +33,15 @@ namespace UltRenderer {
             std::vector<Math::Vector3D> triangleTangents;
             std::vector<std::set<std::size_t>> adjacentVertices;
             std::vector<std::set<std::size_t>> adjacentTriangles;
+
+            Data::BoundingInfo boundingInfo;
+            std::shared_ptr<Image> pTexture;
+            std::shared_ptr<Image> pSpecularMap;
+            std::shared_ptr<Image> pNormalMap;
+            Data::NormalMapType normalMapType;
+            std::shared_ptr<Image> pGlowMap;
+
+            Math::BVH::Tree bvh;
 
             TriangleMesh(const std::vector<Math::Vector3D>& vertices, const std::vector<Math::Vector3S>& indices, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});

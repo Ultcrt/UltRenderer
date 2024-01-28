@@ -13,6 +13,9 @@
 namespace UltRenderer {
     namespace Math {
         class Ray {
+        private:
+            [[nodiscard]] Data::TriangleIntersectionInfo _intersectBVH(const Data::TriangleMesh& mesh, const BVH::Node* pNode, bool& stop, bool fastCheck) const;
+
         public:
             Vector3D origin;
             Vector3D direction;

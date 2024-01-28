@@ -16,7 +16,7 @@
 
 namespace UltRenderer {
     namespace Data {
-        TriangleMesh::TriangleMesh(const std::vector<Math::Vector3D> &vertices, const std::vector<Math::Vector3S> &indices, const Math::Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor) {}
+        TriangleMesh::TriangleMesh(const std::vector<Math::Vector3D> &vertices, const std::vector<Math::Vector3S> &indices, const Math::Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor), bvh(vertices, indices) {}
 
         TriangleMesh::TriangleMesh(const std::string &filename, const Math::Vector3D& defaultColor) {
             std::ifstream loader(filename);
@@ -216,6 +216,8 @@ namespace UltRenderer {
             updateAdjacentList();
             updateVertexTangents();
             updateBoundingInfo();
+
+            bvh = Math::BVH::Tree(_transformedVertices, triangles);
         }
 
         void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
