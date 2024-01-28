@@ -93,7 +93,7 @@ namespace UltRenderer {
             }
 
             Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction) {
-                return -2 * direction.dot(normal) * normal + direction;
+                return (-2 * direction.dot(normal) * normal + direction).normalized();
             }
         }
     } // Utils
