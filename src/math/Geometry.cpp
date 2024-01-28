@@ -36,6 +36,11 @@ namespace UltRenderer {
                 return {min, max};
             }
 
+            Data::BoundingInfo GetAABB(const std::vector<Vector3D>& points, const std::vector<std::size_t>& indices) {
+                auto [min, max] = GetMinMax<double, 3>(points, indices);
+                return {min, max};
+            }
+
             Vector3D ComputeBarycentricCoords(const Vector2D& point,
                                                   const std::array<Vector2D, 3>& trianglePoints) {
                 Vector2D vecAB = trianglePoints[1] - trianglePoints[0];

@@ -19,7 +19,12 @@ namespace UltRenderer {
             template<typename T, std::size_t N>
             std::pair<VectorX<T, N>, VectorX<T, N>> GetMinMax(const std::vector<VectorX<T, N>>& points);
 
+            template<typename T, std::size_t N>
+            std::pair<VectorX<T, N>, VectorX<T, N>> GetMinMax(const std::vector<VectorX<T, N>>& points, const std::vector<std::size_t>& indices);
+
             Data::BoundingInfo GetAABB(const std::vector<Vector3D>& points);
+
+            Data::BoundingInfo GetAABB(const std::vector<Vector3D>& points, const std::vector<std::size_t>& indices);
 
             Vector3D ComputeBarycentricCoords(const Vector2D& point, const std::array<Vector2D, 3>& trianglePoints);
 
@@ -42,13 +47,38 @@ namespace UltRenderer {
                     minVec = points[0];
                     maxVec = points[0];
 
-                    for (auto iter = points.begin() + 1; iter != points.end(); iter++) {
+                    for (const auto point: points) {
                         for (std::size_t channelIdx = 0; channelIdx < N; channelIdx++) {
-                            if (minVec[channelIdx] > (*iter)[channelIdx]) {
-                                minVec[channelIdx] = (*iter)[channelIdx];
+                            if (minVec[channelIdx] > point[channelIdx]) {
+                                minVec[channelIdx] = point[channelIdx];
                             }
-                            else if (maxVec[channelIdx] < (*iter)[channelIdx]) {
-                                maxVec[channelIdx] = (*iter)[channelIdx];
+                            else if (maxVec[channelIdx] < point[channelIdx]) {
+                                maxVec[channelIdx] = point[channelIdx];
+                            }
+                        }
+                    }
+                }
+
+                return {minVec, maxVec};
+            }
+
+            template<typename T, std::size_t N>
+            std::pair<VectorX<T, N>, VectorX<T, N>>
+            GetMinMax(const std::vector<VectorX<T, N>> &points, const std::vector<std::size_t>& indices) {
+                VectorX<T, N> minVec;
+                VectorX<T, N> maxVec;
+
+                if (!points.empty()) {
+                    minVec = points[0];
+                    maxVec = points[0];
+
+                    for (const auto index: indices) {
+                        for (std::size_t channelIdx = 0; channelIdx < N; channelIdx++) {
+                            if (minVec[channelIdx] > points[index][channelIdx]) {
+                                minVec[channelIdx] = points[index][channelIdx];
+                            }
+                            else if (maxVec[channelIdx] < points[index][channelIdx]) {
+                                maxVec[channelIdx] = points[index][channelIdx];
                             }
                         }
                     }
