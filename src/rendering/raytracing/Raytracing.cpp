@@ -2,6 +2,7 @@
 // Created by ultcrt on 24-1-22.
 //
 
+#include <iostream>
 #include "rendering/raytracing/Raytracing.h"
 #include "math/Geometry.h"
 
@@ -12,6 +13,7 @@ namespace UltRenderer {
                     const Math::Ray& ray,
                     const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes,
                     const Math::Vector4D& backgroundColor,
+                    double eps,
                     std::size_t maxRecursion) {
                 Math::Vector4D color = backgroundColor;
 
@@ -48,7 +50,7 @@ namespace UltRenderer {
                             }
                         }
                         else {
-                            const auto& intersectedPoint = ray.origin + ray.direction * info.length;
+                            const auto& intersectedPoint = ray.origin + ray.direction * (info.length - eps);
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
 
                             const auto& reflectionRay = Math::Ray(intersectedPoint, reflectionDirection);

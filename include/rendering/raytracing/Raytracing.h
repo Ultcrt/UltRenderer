@@ -18,6 +18,7 @@ namespace UltRenderer {
                     const Math::Ray& ray,
                     const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes,
                     const Math::Vector4D& backgroundColor = {1, 1, 1, 1},
+                    double eps = 1e-6,
                     std::size_t maxRecursion = 5);
         } // Raytracing
     } // Rendering
