@@ -32,7 +32,7 @@ namespace UltRenderer {
 
                         const Math::Vector3D uv = uv0 * baryCentricCoord[0] + uv1 * baryCentricCoord[1] + uv2 * baryCentricCoord[2];
 
-                        Math::Vector3D normal = mesh.pNormalMap->get<Data::ImageFormat::RGB>(uv[0], uv[1]);
+                        Math::Vector3D normal = mesh.pNormalMap->get<Data::ImageFormat::RGB>(uv[0], uv[1]) * 2 - Math::Vector3D(1, 1, 1);
                         if (mesh.normalMapType == Data::NormalMapType::DARBOUX) {
                             const auto& triangleNormal = (mesh.transformMatrix * mesh.triangleNormals[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
                             const auto& triangleTangent = (mesh.transformMatrix * mesh.triangleTangents[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
