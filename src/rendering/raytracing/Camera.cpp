@@ -35,7 +35,7 @@ namespace UltRenderer {
 
                             const Math::Ray ray(origin, (fragCoord - origin).normalized());
 
-                            const auto color = Raytracing::Cast(ray, _pScene->meshes());
+                            const auto color = Raytracing::Cast(ray, _pScene);
 
                             img.at<Data::ImageFormat::RGBA>(w, h) = color;
                         }, w, h);

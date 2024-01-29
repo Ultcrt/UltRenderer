@@ -60,7 +60,7 @@ int main() {
     pRaytracingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
 
     // Light
-    auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 0, -1}, 2);
+    auto pLight = std::make_shared<Rendering::Light>(Math::Vector3D{0, 1, -1}.normalized(), 2);
 
     // Scene
     Rendering::Scene scene;

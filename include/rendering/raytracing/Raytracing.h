@@ -16,7 +16,7 @@ namespace UltRenderer {
         namespace Raytracing {
             Math::Vector4D Cast(
                     const Math::Ray& ray,
-                    const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes,
+                    const Scene* pScene,
                     const Math::Vector4D& backgroundColor = {1, 1, 1, 1},
                     double eps = 1e-6,
                     std::size_t maxRecursion = 5);
