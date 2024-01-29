@@ -55,7 +55,7 @@ namespace UltRenderer {
 
                             const auto& reflectionRay = Math::Ray(intersectedPoint, reflectionDirection);
 
-                            color = Cast(reflectionRay, pMeshes, backgroundColor, maxRecursion - 1) * 0.6;
+                            color = Cast(reflectionRay, pMeshes, backgroundColor, eps, maxRecursion - 1) * 0.6;
                             color.w() = 1;
                         }
                     }
