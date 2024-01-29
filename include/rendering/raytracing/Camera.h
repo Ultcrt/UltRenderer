@@ -12,6 +12,8 @@ namespace UltRenderer {
         namespace Raytracing {
             class Camera: public ICamera {
             public:
+                std::size_t maxThreads = 20;
+
                 Camera(double width, double height,
                        double zMin = 0.1, double zMax = 10, ProjectionType projectionType = ProjectionType::PERSPECTIVE);
 
