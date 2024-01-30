@@ -23,6 +23,7 @@ namespace UltRenderer {
 
                     if (info.isIntersected) {
                         const auto& mesh = *info.pMesh;
+                        const auto& mat = *mesh.pMaterial;
                         const auto& baryCentricCoord = info.barycentricCoord;
                         const auto& triangle = mesh.triangles[info.triangleIdx];
 
@@ -33,8 +34,8 @@ namespace UltRenderer {
                         const Math::Vector3D uv = uv0 * baryCentricCoord[0] + uv1 * baryCentricCoord[1] + uv2 * baryCentricCoord[2];
 
                         // TODO: Should make a option to interpolate normal
-                        Math::Vector3D normal = mesh.pNormalMap->get<Data::ImageFormat::RGB>(uv[0], uv[1]) * 2 - Math::Vector3D(1, 1, 1);
-                        if (mesh.normalMapType == Data::NormalMapType::DARBOUX) {
+                        Math::Vector3D normal = mat.pNormalMap->get<Data::ImageFormat::RGB>(uv[0], uv[1]) * 2 - Math::Vector3D(1, 1, 1);
+                        if (mat.normalMapType == Data::NormalMapType::DARBOUX) {
                             const auto& triangleNormal = (mesh.transformMatrix * mesh.triangleNormals[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
                             const auto& triangleTangent = (mesh.transformMatrix * mesh.triangleTangents[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
 
@@ -49,24 +50,24 @@ namespace UltRenderer {
 
                         // Diffuse texture
                         Math::Vector3D diffuseRGB;
-                        if (mesh.pTexture->type() == Data::ImageFormat::GRAY) {
-                            diffuseRGB = mesh.pTexture->get<Data::ImageFormat::GRAY>(uv[0], uv[1]).to<Data::ImageFormat::RGB>();
+                        if (mat.pTexture->type() == Data::ImageFormat::GRAY) {
+                            diffuseRGB = mat.pTexture->get<Data::ImageFormat::GRAY>(uv[0], uv[1]).to<Data::ImageFormat::RGB>();
                         }
                         else {
-                            diffuseRGB = mesh.pTexture->get<Data::ImageFormat::RGB>(uv[0], uv[1]);
+                            diffuseRGB = mat.pTexture->get<Data::ImageFormat::RGB>(uv[0], uv[1]);
                         }
 
                         // Specular texture
                         // TODO: Code can be reused here
-                        double brightness = mesh.pSpecularMap ? (*mesh.pSpecularMap).get<Data::ImageFormat::GRAY>(uv[0], uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
+                        double brightness = mat.pSpecularMap ? (*mat.pSpecularMap).get<Data::ImageFormat::GRAY>(uv[0], uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
                         Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = {1, 1, 1};
-                        if (mesh.pSpecularMap && mesh.pSpecularMap->type() == Data::ImageFormat::RGB) {
-                            finalSpecularColor = (*mesh.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1]);
+                        if (mat.pSpecularMap && mat.pSpecularMap->type() == Data::ImageFormat::RGB) {
+                            finalSpecularColor = (*mat.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1]);
                             brightness = finalSpecularColor.to<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());         // uint8_t is the correct form of data, need convert
                         }
 
                         // Glow texture
-                        Math::Vector3D glowColor = mesh.pGlowMap ? static_cast<Math::Vector3D>((*mesh.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1])) : Math::Vector3D{0, 0, 0};
+                        Math::Vector3D glowColor = mat.pGlowMap ? static_cast<Math::Vector3D>((*mat.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1])) : Math::Vector3D{0, 0, 0};
 
                         // Iterate all light to get diffuse and specular intensity
                         double diffuseIntensity = 0;
@@ -107,7 +108,7 @@ namespace UltRenderer {
                         );
 
                         // TODO: Reflection/refraction checking here is only for testing, not ideal
-                        if (mesh.pSpecularMap) {
+                        if (mat.pSpecularMap) {
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                             const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, 1 / 1.5);
 

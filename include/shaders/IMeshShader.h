@@ -6,6 +6,7 @@
 #define ULTRENDERER_IMESHSHADER_H
 
 #include "IShader.h"
+#include "rendering/Material.h"
 
 namespace UltRenderer {
     namespace Shaders {
@@ -43,22 +44,16 @@ namespace UltRenderer {
         class IMeshFragmentShader: public IFragmentShader<V> {
         public:
             // Uniforms
-            const Data::Image* pTexture;
-            const Data::Image* pNormalMap;
-            const Data::Image* pSpecular;
-            const Data::Image* pLastDepthLayer;
             const Data::Image* pShadowMap;
-            const Data::Image* pGlowMap;
-            Data::NormalMapType normalMapType;
+            const Data::Image* pLastDepthLayer;
             const Math::Transform3D* pModel;
             const Math::Transform3D* pView;
             const Math::Transform3D* pProjection;
+            const Rendering::Material* pMaterial;
             // Transformation from camera viewport to light viewport
             Math::Transform3D lightMatrix;
             Math::Transform3D modelViewMatrix;
             Math::Transform3D modelViewProjectionMatrix;
-            double shadowIntensity;
-            double glowIntensity;
 
             bool operator()(const V& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override = 0;
         };

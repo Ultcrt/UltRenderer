@@ -24,13 +24,6 @@ namespace UltRenderer {
 
         class BlinnPhongReflectionMeshFragmentShader: public IMeshFragmentShader<BlinnPhongReflectionMeshVarying> {
         public:
-            double diffuseCoefficient;
-            double specularCoefficient;
-            double ambientCoefficient;
-
-            Math::Vector3D specularColor;
-            Math::Vector3D ambientColor;
-
             bool operator()(const BlinnPhongReflectionMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
         };
     } // Shaders

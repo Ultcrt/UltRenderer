@@ -83,6 +83,8 @@ add_executable(UltRenderer src/Main.cpp
         src/math/BVH.cpp
         include/math/BVH.h
         src/utils/Algorithm.cpp
-        include/utils/Algorithm.h)
+        include/utils/Algorithm.h
+        src/rendering/Material.cpp
+        include/rendering/Material.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

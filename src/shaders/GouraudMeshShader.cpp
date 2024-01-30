@@ -50,11 +50,11 @@ namespace UltRenderer {
         bool GouraudMeshFragmentShader::operator()(const UltRenderer::Shaders::IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                    double &depth) const {
             Math::Vector3D rgb;
-            if ((*pTexture).type() == Data::ImageFormat::GRAY) {
-                rgb = (*pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+            if ((*pMaterial->pTexture).type() == Data::ImageFormat::GRAY) {
+                rgb = (*pMaterial->pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
             }
             else {
-                rgb = (*pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                rgb = (*pMaterial->pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
             }
 
             color = (varying.intensity * rgb).toHomogeneousCoordinates(1);

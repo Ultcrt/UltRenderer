@@ -58,30 +58,30 @@ namespace UltRenderer {
             if ((*pLastDepthLayer).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
                 // Apply intensity here
                 Math::Vector3D light = varying.light * varying.intensity;
-                Math::Vector3D normal = (*pNormalMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+                Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
                 auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
                 // 0.01 is a coefficient to fix z-fighting
                 bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
-                Math::Vector3D glowColor = (*pGlowMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                Math::Vector3D glowColor = (*pMaterial->pGlowMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
 
                 Math::Vector3D rgb;
-                if ((*pTexture).type() == Data::ImageFormat::GRAY) {
-                    rgb = (*pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+                if ((*pMaterial->pTexture).type() == Data::ImageFormat::GRAY) {
+                    rgb = (*pMaterial->pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
                 }
                 else {
-                    rgb = (*pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                    rgb = (*pMaterial->pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
                 }
 
                 // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
-                double brightness = (*pSpecular).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
-                Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = specularColor;
-                if (pSpecular->type() == Data::ImageFormat::RGB) {
-                    finalSpecularColor = (*pSpecular).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                double brightness = (*pMaterial->pSpecularMap).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+                Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = pMaterial->specularColor;
+                if (pMaterial->pSpecularMap->type() == Data::ImageFormat::RGB) {
+                    finalSpecularColor = (*pMaterial->pSpecularMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
                     brightness = finalSpecularColor.to<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
                 }
 
                 // TODO: Non-normal mapping should be checked here
-                if (normalMapType == Data::NormalMapType::DARBOUX) {
+                if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
                     normal = Math::Geometry::ConvertDarbouxNormalToGlobal(varying.tangent, varying.normal, normal);
                 }
                 else {
@@ -97,13 +97,13 @@ namespace UltRenderer {
                 double specular = std::pow(std::max(halfVec.dot(normal), 0.), brightness);         // uint8_t is the correct form of data, need convert
 
                 color = (
-                        ambientCoefficient * ambientColor +
-                        diffuseCoefficient * diffuse * rgb +
-                        specularCoefficient * specular * finalSpecularColor +
-                        glowColor * glowIntensity).toHomogeneousCoordinates(1);
+                        pMaterial->ambientCoefficient * pMaterial->ambientColor +
+                        pMaterial->diffuseCoefficient * diffuse * rgb +
+                        pMaterial->specularCoefficient * specular * finalSpecularColor +
+                        glowColor * pMaterial->glowIntensity).toHomogeneousCoordinates(1);
 
                 if (inShadow) {
-                    color = shadowIntensity * color;
+                    color = pMaterial->shadowIntensity * color;
                     color.w() = 1;
                 }
 

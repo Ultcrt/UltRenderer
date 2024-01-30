@@ -220,10 +220,6 @@ namespace UltRenderer {
             bvh = Math::BVH::Tree(_transformedVertices, triangles);
         }
 
-        void TriangleMesh::setTexture(const std::shared_ptr<Image> &pTexture) {
-            this->pTexture = pTexture;
-        }
-
         std::vector<Math::Vector3D> TriangleMesh::transform() const {
             return _transformedVertices;
         }

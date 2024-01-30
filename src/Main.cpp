@@ -11,6 +11,7 @@
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 #include "rendering/raytracing/Camera.h"
 #include "math/Ray.h"
+#include "rendering/Material.h"
 
 using namespace UltRenderer;
 
@@ -20,37 +21,33 @@ int main() {
     Shaders::BlinnPhongReflectionMeshFragmentShader fs;
     Postprocessors::ScreenSpaceAmbientOcclusion ssao;
 
-    fs.diffuseCoefficient = 0.5;
-    fs.specularCoefficient = 0.4;
-    fs.ambientCoefficient = 0.1;
-
-    fs.specularColor = {1, 1, 1};
-    fs.ambientColor = {0.2, 0.1, 0};
-
-    fs.shadowIntensity = 0.3;
-    fs.glowIntensity = 3.0;
-
-    // Obj
+    // Obj material
+    auto pMat = std::make_shared<Rendering::Material>();
     auto pTexture = std::make_shared<Data::Image>("../data/diablo3_pose_diffuse.tga", Data::FilterType::LINEAR);
     auto pNormalMap = std::make_shared<Data::Image>("../data/diablo3_pose_nm_tangent.tga", Data::FilterType::LINEAR);
     auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga", Data::FilterType::LINEAR);
     auto pGlowMap = std::make_shared<Data::Image>("../data/diablo3_pose_glow.tga", Data::FilterType::LINEAR);
+    pMat->pGlowMap = pGlowMap;
+    pMat->pTexture = pTexture;
+    pMat->pSpecularMap = pSpecular;
+    pMat->pNormalMap = pNormalMap;
+    pMat->normalMapType = UltRenderer::Data::NormalMapType::DARBOUX;
+
+    // Obj
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
+    pMesh->pMaterial = pMat;
 
-    pMesh->pTexture = pTexture;
-    pMesh->pNormalMap = pNormalMap;
-    pMesh->pSpecularMap = pSpecular;
-    pMesh->normalMapType = Data::NormalMapType::DARBOUX;
-    pMesh->pGlowMap = pGlowMap;
-
-    // Floor
+    // Floor material
+    auto pFloorMat = std::make_shared<Rendering::Material>();
     auto pFloorTexture = std::make_shared<Data::Image>("../data/floor_diffuse.tga", Data::FilterType::LINEAR);
     auto pFloorNormalMap = std::make_shared<Data::Image>("../data/floor_nm_tangent.tga", Data::FilterType::LINEAR);
-    auto pFloorMesh = std::make_shared<Data::TriangleMesh>("../data/floor.obj");
+    pFloorMat->pNormalMap = pFloorNormalMap;
+    pFloorMat->pTexture = pFloorTexture;
+    pFloorMat->normalMapType = Data::NormalMapType::DARBOUX;
 
-    pFloorMesh->setTexture(pFloorTexture);
-    pFloorMesh->pNormalMap = pFloorNormalMap;
-    pFloorMesh->normalMapType = Data::NormalMapType::DARBOUX;
+    // Floor
+    auto pFloorMesh = std::make_shared<Data::TriangleMesh>("../data/floor.obj");
+    pFloorMesh->pMaterial = pFloorMat;
 
     // Camera
     auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 4);
@@ -76,7 +73,7 @@ int main() {
     // Rendering
     auto start = std::chrono::high_resolution_clock::now();
 //    auto imgRasterizing = pRasterizingCamera->render(128, 128, vs, fs, it);
-    auto imgRaytracing = pRaytracingCamera->render(1920, 1920);
+    auto imgRaytracing = pRaytracingCamera->render(800, 800);
     auto finish = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";
 

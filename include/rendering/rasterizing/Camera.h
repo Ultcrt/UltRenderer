@@ -114,11 +114,7 @@ namespace UltRenderer {
                         vertexShader.pUvs = &pMesh->vertexTextures;
 
                         // Set IMeshFragmentShader general uniforms
-                        fragmentShader.pTexture = pMesh->pTexture.get();
-                        fragmentShader.pNormalMap = pMesh->pNormalMap.get();
-                        fragmentShader.pSpecular = pMesh->pSpecularMap.get();
-                        fragmentShader.normalMapType = pMesh->normalMapType;
-                        fragmentShader.pGlowMap = pMesh->pGlowMap.get();
+                        fragmentShader.pMaterial = pMesh->pMaterial.get();
                         fragmentShader.pModel = vertexShader.pModel;
                         fragmentShader.pView = vertexShader.pView;
                         fragmentShader.pProjection = vertexShader.pProjection;
