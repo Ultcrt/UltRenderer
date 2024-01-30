@@ -118,7 +118,7 @@ namespace UltRenderer {
                             const Math::Ray refractionRay(refractionOrigin, refractionDirection);
 
                             const auto reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1);
-                            const auto refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion = 1);
+                            const auto refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1);
 
                             double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, 1, 1.5);
 
