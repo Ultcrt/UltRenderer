@@ -95,6 +95,39 @@ namespace UltRenderer {
             Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction) {
                 return (-2 * direction.dot(normal) * normal + direction).normalized();
             }
+
+            Vector3D ComputeRefractionDirection(const Vector3D& normal, const Vector3D& direction, double n12) {
+                Vector3D n = normal;
+                double cos1 = - n.dot(direction);
+
+                if (cos1 < 0) {
+                    n = -normal;
+                    cos1 = -cos1;
+                }
+
+                // From https://en.wikipedia.org/wiki/Snell%27s_law
+                return (n12 * direction + (n12 * cos1 - std::sqrt(1 - std::pow(n12, 2) * (1 - std::pow(cos1, 2)))) * n).normalized();
+            }
+
+            double ComputeFresnel(const Vector3D& normal, const Vector3D& direction, double n1, double n2) {
+                double n12 = n1 / n2;
+                Vector3D n = normal;
+                double cos1 = - n.dot(direction);
+
+                if (cos1 < 0) {
+                    n = -normal;
+                    cos1 = -cos1;
+                }
+
+                double sin1 = std::sqrt(1 - std::pow(cos1, 2));
+                double sin2 = n12 * sin1;
+                double cos2 = std::sqrt(1 - std::pow(cos2, 2));
+
+                double rs = std::pow((n1 * cos1 - n2 * cos2) / (n1 * cos1 + n2 * cos2), 2);
+                double rp = std::pow((n1 * cos2 - n2 * cos1) / (n1 * cos2 + n2 * cos1), 2);
+
+                return (rs + rp) / 2;
+            }
         }
     } // Utils
 } // UltRender

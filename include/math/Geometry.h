@@ -36,6 +36,10 @@ namespace UltRenderer {
 
             Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction);
 
+            Vector3D ComputeRefractionDirection(const Vector3D& normal, const Vector3D& direction, double n12);
+
+            double ComputeFresnel(const Vector3D& normal, const Vector3D& direction, double n1, double n2);
+
             /*----------Definition----------*/
             template<typename T, std::size_t N>
             std::pair<VectorX<T, N>, VectorX<T, N>>
