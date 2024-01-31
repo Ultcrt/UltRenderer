@@ -10,7 +10,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
-            Data::Pixel<Data::ImageFormat::RGBA> Cast(
+            Data::Color<Data::ColorFormat::RGBA> Cast(
                     const Math::Ray& ray,
                     const Scene* pScene,
                     const Math::Vector4D& backgroundColor,
@@ -35,7 +35,7 @@ namespace UltRenderer {
                         const Math::Vector3D uv = uv0 * baryCentricCoord[0] + uv1 * baryCentricCoord[1] + uv2 * baryCentricCoord[2];
 
                         // TODO: Should make a option to interpolate normal
-                        Math::Vector3D normal = mat.pNormalMap->get<Data::ImageFormat::RGB>(uv[0], uv[1]) * 2 - Math::Vector3D(1, 1, 1);
+                        Math::Vector3D normal = mat.pNormalMap->get<Data::ColorFormat::RGB>(uv[0], uv[1]) * 2 - Math::Vector3D(1, 1, 1);
                         if (mat.normalMapType == Data::NormalMapType::DARBOUX) {
                             const auto& triangleNormal = (mesh.transformMatrix * mesh.triangleNormals[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
                             const auto& triangleTangent = (mesh.transformMatrix * mesh.triangleTangents[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
@@ -51,24 +51,24 @@ namespace UltRenderer {
 
                         // Diffuse texture
                         Math::Vector3D diffuseRGB;
-                        if (mat.pTexture->type() == Data::ImageFormat::GRAY) {
-                            diffuseRGB = mat.pTexture->get<Data::ImageFormat::GRAY>(uv[0], uv[1]).to<Data::ImageFormat::RGB>();
+                        if (mat.pTexture->type() == Data::ColorFormat::GRAY) {
+                            diffuseRGB = mat.pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
                         }
                         else {
-                            diffuseRGB = mat.pTexture->get<Data::ImageFormat::RGB>(uv[0], uv[1]);
+                            diffuseRGB = mat.pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
                         }
 
                         // Specular texture
                         // TODO: Code can be reused here
-                        double brightness = mat.pSpecularMap ? (*mat.pSpecularMap).get<Data::ImageFormat::GRAY>(uv[0], uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
-                        Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = {1, 1, 1};
-                        if (mat.pSpecularMap && mat.pSpecularMap->type() == Data::ImageFormat::RGB) {
-                            finalSpecularColor = (*mat.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1]);
-                            brightness = finalSpecularColor.to<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());         // uint8_t is the correct form of data, need convert
+                        double brightness = mat.pSpecularMap ? (*mat.pSpecularMap).get<Data::ColorFormat::GRAY>(uv[0], uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
+                        Data::Color<Data::ColorFormat::RGB> finalSpecularColor = {1, 1, 1};
+                        if (mat.pSpecularMap && mat.pSpecularMap->type() == Data::ColorFormat::RGB) {
+                            finalSpecularColor = (*mat.pSpecularMap).get<Data::ColorFormat::RGB>(uv[0], uv[1]);
+                            brightness = finalSpecularColor.to<Data::ColorFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());         // uint8_t is the correct form of data, need convert
                         }
 
                         // Glow texture
-                        Math::Vector3D glowColor = mat.pGlowMap ? static_cast<Math::Vector3D>((*mat.pSpecularMap).get<Data::ImageFormat::RGB>(uv[0], uv[1])) : Math::Vector3D{0, 0, 0};
+                        Math::Vector3D glowColor = mat.pGlowMap ? static_cast<Math::Vector3D>((*mat.pSpecularMap).get<Data::ColorFormat::RGB>(uv[0], uv[1])) : Math::Vector3D{0, 0, 0};
 
                         // Iterate all light to get diffuse and specular intensity
                         double diffuseIntensity = 0;
@@ -104,14 +104,14 @@ namespace UltRenderer {
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                             const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray reflectionRay(reflectionOrigin, reflectionDirection);
-                            reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ImageFormat::RGB>();
+                            reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ColorFormat::RGB>();
                         }
 
                         if (mat.refractionCoefficient > 0) {
                             const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, Rendering::Constants::AirRefractiveIndex / mat.refractiveIndex);
                             const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray refractionRay(refractionOrigin, refractionDirection);
-                            refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ImageFormat::RGB>();
+                            refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ColorFormat::RGB>();
                         }
 
                         double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, Rendering::Constants::AirRefractiveIndex, mat.refractiveIndex);

@@ -54,13 +54,13 @@ namespace UltRenderer {
             // Apply intensity here
             Math::Vector3D light = varying.light * varying.intensity;
             Math::Vector3D rgb;
-            if ((*pMaterial->pTexture).type() == Data::ImageFormat::GRAY) {
-                rgb = (*pMaterial->pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+            if ((*pMaterial->pTexture).type() == Data::ColorFormat::GRAY) {
+                rgb = (*pMaterial->pTexture).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
             }
             else {
-                rgb = (*pMaterial->pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
-            }            Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-            double shininess = (*pMaterial->pSpecularMap).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
+                rgb = (*pMaterial->pTexture).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
+            }            Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+            double shininess = (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
 
             // TODO: Non-normal mapping should be checked here
             if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {

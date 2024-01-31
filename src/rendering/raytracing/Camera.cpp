@@ -16,7 +16,7 @@ namespace UltRenderer {
             }
 
             Data::Image Rendering::Raytracing::Camera::render(std::size_t width, std::size_t height) const {
-                Data::Image img(width, height, Data::ImageFormat::RGBA);
+                Data::Image img(width, height, Data::ColorFormat::RGBA);
 
                 // Raytracing is done under world frame
                 const Math::Vector3D origin = (transformMatrix * Math::Vector4D{0, 0, 0, 1}).toCartesianCoordinates();
@@ -37,7 +37,7 @@ namespace UltRenderer {
 
                             const auto color = Raytracing::Cast(ray, _pScene);
 
-                            img.at<Data::ImageFormat::RGBA>(w, h) = color;
+                            img.at<Data::ColorFormat::RGBA>(w, h) = color;
                         }, w, h);
 
                         if (threads.size() == maxThreads) {

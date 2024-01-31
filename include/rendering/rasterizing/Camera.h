@@ -27,7 +27,7 @@ namespace UltRenderer {
             struct RenderOptions {
                 // TODO: Automatically decide numDepthPeelingLayer
                 std::size_t numDepthPeelingLayer = 10;
-                Data::Pixel<Data::ImageFormat::RGBA> backgroundColor = {0, 0, 0, 1};
+                Data::Color<Data::ColorFormat::RGBA> backgroundColor = {0, 0, 0, 1};
                 // TODO: Should put post processor here
             };
 
@@ -68,11 +68,11 @@ namespace UltRenderer {
                 // Origin is always (0, 0) here, depth is scaled into (0, 1)
                 Math::Transform3D viewport = ComputeViewportMatrix(width, height);
 
-                Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
-                Data::Image zBufferA(width, height, Data::Pixel<Data::ImageFormat::GRAY>(0));
-                Data::Image zBufferB(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+                Data::Image fBuffer(width, height, Data::ColorFormat::RGBA);
+                Data::Image zBufferA(width, height, Data::Color<Data::ColorFormat::GRAY>(0));
+                Data::Image zBufferB(width, height, Data::Color<Data::ColorFormat::GRAY>(1));
 
-                Data::Image shadowMap(width, height, Data::Pixel<Data::ImageFormat::GRAY>(1));
+                Data::Image shadowMap(width, height, Data::Color<Data::ColorFormat::GRAY>(1));
 
                 // viewport * projection * view
                 for (const auto &pMesh: _pScene->meshes()) {
@@ -141,11 +141,11 @@ namespace UltRenderer {
                             Math::Vector4D rgba = options.backgroundColor;
                             for (const Data::Image & layer : std::ranges::reverse_view(layers)) {
                                 // TODO: Should implement more blending type
-                                const auto topRGBA = Math::Vector4D(layer.at<Data::ImageFormat::RGBA>(w, h));
+                                const auto topRGBA = Math::Vector4D(layer.at<Data::ColorFormat::RGBA>(w, h));
                                 rgba = topRGBA * topRGBA.w() + rgba * (1 - topRGBA.w());
                             }
 
-                            fBuffer.at<Data::ImageFormat::RGBA>(w, h) = rgba;
+                            fBuffer.at<Data::ColorFormat::RGBA>(w, h) = rgba;
                         }
                     }
                 }

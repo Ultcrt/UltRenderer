@@ -15,7 +15,7 @@ namespace UltRenderer {
         namespace Rasterizing {
             namespace Bakers {
                 Data::Image PreBakedAmbientOcclusion::operator()(const Data::TriangleMesh &mesh) const {
-                    Data::Image bakedTexture(width, height, Data::ImageFormat::GRAY);
+                    Data::Image bakedTexture(width, height, Data::ColorFormat::GRAY);
 
                     std::vector<Math::Vector3D> sampledPoints = Math::Geometry::SampleFromUnitSphere(samplingNum);
 
@@ -23,7 +23,7 @@ namespace UltRenderer {
                     Shaders::PreBakedAmbientOcclusionMeshVertexShader vertexShader;
 
                     for (const auto samplePoint: sampledPoints) {
-                        Data::Image localBakedTexture(width, height, Data::ImageFormat::GRAY);
+                        Data::Image localBakedTexture(width, height, Data::ColorFormat::GRAY);
                         Shaders::PreBakedAmbientOcclusionMeshFragmentShader fragmentShader(localBakedTexture);
 
                         // Baking is done under mesh local coordinate, so model matrix is identity matrix
@@ -31,7 +31,7 @@ namespace UltRenderer {
                         Math::Transform3D view;
                         Math::Transform3D projection;
                         Math::Transform3D viewport;
-                        Data::Image depthImage(width, height, Data::Pixel<Data::ImageFormat::GRAY>{1});
+                        Data::Image depthImage(width, height, Data::Color<Data::ColorFormat::GRAY>{1});
                         RenderDepthImageOfMesh(mesh, -samplePoint, depthImage, &view, &projection, &viewport);
 
                         vertexShader.pModel = &model;
@@ -44,15 +44,15 @@ namespace UltRenderer {
 
                         fragmentShader.pShadowMap = &depthImage;
 
-                        Data::Image fBuffer(width, height, Data::ImageFormat::RGBA);
-                        Data::Image zBuffer(width, height, Data::Pixel<Data::ImageFormat::GRAY>{1});
+                        Data::Image fBuffer(width, height, Data::ColorFormat::RGBA);
+                        Data::Image zBuffer(width, height, Data::Color<Data::ColorFormat::GRAY>{1});
                         Pipeline::Execute<Shaders::IMeshVarying>(fBuffer, zBuffer, viewport, mesh.vertices.size(), mesh.triangles, {}, {}, vertexShader, fragmentShader, interpolator);
 
                         // TODO: Should support some operation in Image
                         for (std::size_t x = 0; x < width; x++) {
                             for (std::size_t y = 0; y < width; y++) {
-                                double val = bakedTexture.at<Data::ImageFormat::GRAY>(x, y)[0];
-                                bakedTexture.at<Data::ImageFormat::GRAY>(x, y)[0] = val + localBakedTexture.at<Data::ImageFormat::GRAY>(x, y)[0] / samplingNum;
+                                double val = bakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0];
+                                bakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] = val + localBakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] / samplingNum;
                             }
                         }
                     }

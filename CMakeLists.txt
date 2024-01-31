@@ -87,6 +87,8 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/Material.cpp
         include/rendering/Material.h
         src/rendering/Constants.cpp
-        include/rendering/Constants.h)
+        include/rendering/Constants.h
+        src/data/Color.cpp
+        include/data/Color.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

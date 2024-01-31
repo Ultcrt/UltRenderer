@@ -37,7 +37,7 @@ namespace UltRenderer {
                 const auto projection = Camera::ComputeProjectionMatrix(w, h, zMin, zMax, ProjectionType::ORTHOGONAL);
                 const auto viewport = Camera::ComputeViewportMatrix(depthImage.width(), depthImage.height());
 
-                Data::Image fBuffer(depthImage.width(), depthImage.height(), Data::ImageFormat::RGBA);
+                Data::Image fBuffer(depthImage.width(), depthImage.height(), Data::ColorFormat::RGBA);
 
                 Shaders::DepthMeshInterpolator interpolator;
                 Shaders::DepthMeshVertexShader vertexShader;

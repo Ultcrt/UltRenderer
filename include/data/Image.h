@@ -8,14 +8,11 @@
 #include <vector>
 #include "math/Matrix.h"
 #include "utils/Proxy.h"
+#include "data/Color.h"
 
 namespace UltRenderer {
     namespace Data {
         /*----------Declaration----------*/
-        enum class ImageFormat: std::size_t {
-            GRAY = 1, RGB = 3, RGBA = 4
-        };
-
         enum class ImageDirection: std::size_t {
             HORIZONTAL = 1, VERTICAL = 2
         };
@@ -28,24 +25,6 @@ namespace UltRenderer {
             NEAREST, LINEAR
         };
 
-        template<ImageFormat FORMAT>
-        using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
-
-
-        // Why not "using Pixel = Math::VectorXD<static_cast<std::size_t>(FORMAT)>;" ?
-        // Because compiler cannot infer template parameter from above line. Also, there are more functionality
-        template<ImageFormat FORMAT>
-        class Pixel: public Math::VectorXD<static_cast<std::size_t>(FORMAT)> {
-        public:
-            // Tips: Inherit all constructor of base class
-            using Math::VectorXD<static_cast<std::size_t>(FORMAT)>::VectorXD;
-
-            Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target);
-
-            template<ImageFormat TARGET>
-            Pixel<TARGET> to() const;
-        };
-
         class Image {
         private:
             std::size_t         _format;
@@ -56,83 +35,53 @@ namespace UltRenderer {
         public:
             FilterType filterType;
 
-            Image(std::size_t w, std::size_t h, ImageFormat format, FilterType filterType = FilterType::NEAREST);
+            Image(std::size_t w, std::size_t h, ColorFormat format, FilterType filterType = FilterType::NEAREST);
 
             explicit Image(const std::string& filename, FilterType filterType = FilterType::NEAREST);
 
-            template<ImageFormat FORMAT>
-            Image(std::size_t w, std::size_t h, const Pixel<FORMAT>& filledPixel, FilterType filterType = FilterType::NEAREST);
+            template<ColorFormat FORMAT>
+            Image(std::size_t w, std::size_t h, const Color<FORMAT>& filledPixel, FilterType filterType = FilterType::NEAREST);
 
-            template<ImageFormat FORMAT>
-            void fill(const Pixel<FORMAT>& filledPixel);
+            template<ColorFormat FORMAT>
+            void fill(const Color<FORMAT>& filledPixel);
 
             void fill(double val);
 
-            template<ImageFormat FORMAT>
-            PixelProxy<FORMAT> at(std::size_t w, std::size_t h);
+            template<ColorFormat FORMAT>
+            ColorProxy<FORMAT> at(std::size_t w, std::size_t h);
 
-            template<ImageFormat FORMAT>
-            const Pixel<FORMAT> at(std::size_t w, std::size_t h) const;
+            template<ColorFormat FORMAT>
+            const Color<FORMAT> at(std::size_t w, std::size_t h) const;
 
-            template<ImageFormat FORMAT>
-            const Pixel<FORMAT> get(double wRatio, double hRatio) const;
+            template<ColorFormat FORMAT>
+            const Color<FORMAT> get(double wRatio, double hRatio) const;
 
-            template<ImageFormat FORMAT>
-            PixelProxy<FORMAT> at(const Math::Vector2S& pos);
+            template<ColorFormat FORMAT>
+            ColorProxy<FORMAT> at(const Math::Vector2S& pos);
 
-            template<ImageFormat FORMAT>
-            const Pixel<FORMAT> at(const Math::Vector2S& pos) const;
+            template<ColorFormat FORMAT>
+            const Color<FORMAT> at(const Math::Vector2S& pos) const;
 
-            template<ImageFormat FORMAT>
-            const Pixel<FORMAT> get(const Math::Vector2D& pos) const;
+            template<ColorFormat FORMAT>
+            const Color<FORMAT> get(const Math::Vector2D& pos) const;
 
             void save(const std::string& filename);
             [[nodiscard]] Math::Vector2S shape() const;
             [[nodiscard]] std::size_t width() const;
             [[nodiscard]] std::size_t height() const;
-            [[nodiscard]] ImageFormat type() const;
+            [[nodiscard]] ColorFormat type() const;
             void flip(ImageDirection direction);
         };
 
         /*----------Definition----------*/
-        template<ImageFormat FORMAT>
-        template<ImageFormat TARGET>
-        Pixel<TARGET> Pixel<FORMAT>::to() const {
-            if constexpr (FORMAT == TARGET) {
-                return *this;
-            }
-            else if constexpr (FORMAT == ImageFormat::GRAY && TARGET == ImageFormat::RGB) {
-                return Pixel<TARGET>{1, 1, 1} * this->x();
-            }
-            else if constexpr (FORMAT == ImageFormat::GRAY && TARGET == ImageFormat::RGBA) {
-                return Pixel<TARGET>{this->x(), this->x(), this->x(), 1};
-            }
-            else if constexpr (FORMAT == ImageFormat::RGB && TARGET == ImageFormat::GRAY) {
-                return Pixel<TARGET>{0.299 * this->x() + 0.587 * this->y() + 0.114 * this->z()};
-            }
-            else if constexpr (FORMAT == ImageFormat::RGB && TARGET == ImageFormat::RGBA) {
-                return Pixel<TARGET>{this->x(), this->y(), this->z(), 1};
-            }
-            else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::GRAY) {
-                Pixel<ImageFormat::RGB> rgb = to<ImageFormat::RGB>();
-                return rgb.to<TARGET>();
-            }
-            else if constexpr (FORMAT == ImageFormat::RGBA && TARGET == ImageFormat::RGB) {
-                return Pixel<TARGET>{this->x(), this->y(), this->z()};
-            }
-        }
-
-        template<ImageFormat FORMAT>
-        Pixel<FORMAT>::Pixel(const Math::VectorXD<static_cast<std::size_t>(FORMAT)>& target): Math::VectorXD<static_cast<std::size_t>(FORMAT)>(target) {}
-
-        template<ImageFormat FORMAT>
-        const Pixel<FORMAT> Image::at(std::size_t w, std::size_t h) const {
+        template<ColorFormat FORMAT>
+        const Color<FORMAT> Image::at(std::size_t w, std::size_t h) const {
             // Only fill when given pixel has more dimension than image
             assert(static_cast<std::size_t>(FORMAT) <= _format);
             assert(w < _width);
             assert(h < _height);
 
-            Pixel<FORMAT> pixel;
+            Color<FORMAT> pixel;
 
             for (std::size_t idx = 0; idx < static_cast<std::size_t>(FORMAT); idx++) {
                 pixel[idx] = _data[(h * _width + w) * _format + idx];
@@ -141,8 +90,8 @@ namespace UltRenderer {
             return pixel;
         }
 
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> Image::at(std::size_t w, std::size_t h) {
+        template<ColorFormat FORMAT>
+        ColorProxy<FORMAT> Image::at(std::size_t w, std::size_t h) {
             assert(static_cast<std::size_t>(FORMAT) <= _format);
             assert(w < _width);
             assert(h < _height);
@@ -153,11 +102,11 @@ namespace UltRenderer {
                 componentPtrs[idx] = &(_data[(h * _width + w) * _format + idx]);
             }
 
-            return PixelProxy<FORMAT>(componentPtrs);
+            return ColorProxy<FORMAT>(componentPtrs);
         }
 
-        template<ImageFormat FORMAT>
-        const Pixel<FORMAT> Image::get(double wRatio, double hRatio) const {
+        template<ColorFormat FORMAT>
+        const Color<FORMAT> Image::get(double wRatio, double hRatio) const {
 
             switch (filterType) {
                 case FilterType::NEAREST: {
@@ -236,8 +185,8 @@ namespace UltRenderer {
             }
         }
 
-        template<ImageFormat FORMAT>
-        void Image::fill(const Pixel<FORMAT> &filledPixel) {
+        template<ColorFormat FORMAT>
+        void Image::fill(const Color<FORMAT> &filledPixel) {
             assert(static_cast<std::size_t>(FORMAT) <= _format);
 
             // Check all channels of filledPixel is the same or not.
@@ -265,23 +214,23 @@ namespace UltRenderer {
             }
         }
 
-        template<ImageFormat FORMAT>
-        Image::Image(std::size_t w, std::size_t h, const Pixel<FORMAT> &filledPixel, FilterType filterType): _format(static_cast<std::size_t>(FORMAT)), _data(h * w * _format), _width(w), _height(h), filterType(filterType) {
+        template<ColorFormat FORMAT>
+        Image::Image(std::size_t w, std::size_t h, const Color<FORMAT> &filledPixel, FilterType filterType): _format(static_cast<std::size_t>(FORMAT)), _data(h * w * _format), _width(w), _height(h), filterType(filterType) {
             fill<FORMAT>(filledPixel);
         }
 
-        template<ImageFormat FORMAT>
-        const Pixel<FORMAT> Image::get(const Math::Vector2D &pos) const {
+        template<ColorFormat FORMAT>
+        const Color<FORMAT> Image::get(const Math::Vector2D &pos) const {
             return get<FORMAT>(pos.x(), pos.y());
         }
 
-        template<ImageFormat FORMAT>
-        const Pixel<FORMAT> Image::at(const Math::Vector2S &pos) const {
+        template<ColorFormat FORMAT>
+        const Color<FORMAT> Image::at(const Math::Vector2S &pos) const {
             return at<FORMAT>(pos.x(), pos.y());
         }
 
-        template<ImageFormat FORMAT>
-        PixelProxy<FORMAT> Image::at(const Math::Vector2S &pos) {
+        template<ColorFormat FORMAT>
+        ColorProxy<FORMAT> Image::at(const Math::Vector2S &pos) {
             return at<FORMAT>(pos.x(), pos.y());
         }
     } // UltRenderer

@@ -55,29 +55,29 @@ namespace UltRenderer {
 
         bool BlinnPhongReflectionMeshFragmentShader::operator()(const BlinnPhongReflectionMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                          double &depth) const {
-            if ((*pLastDepthLayer).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
+            if ((*pLastDepthLayer).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
                 // Apply intensity here
                 Math::Vector3D light = varying.light * varying.intensity;
-                Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+                Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
                 auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
                 // 0.01 is a coefficient to fix z-fighting
-                bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()),  static_cast<std::size_t>(shadowPosition.y()))[0];
-                Math::Vector3D glowColor = (*pMaterial->pGlowMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()), static_cast<std::size_t>(shadowPosition.y()))[0];
+                Math::Vector3D glowColor = (*pMaterial->pGlowMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
 
                 Math::Vector3D rgb;
-                if ((*pMaterial->pTexture).type() == Data::ImageFormat::GRAY) {
-                    rgb = (*pMaterial->pTexture).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
+                if ((*pMaterial->pTexture).type() == Data::ColorFormat::GRAY) {
+                    rgb = (*pMaterial->pTexture).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
                 }
                 else {
-                    rgb = (*pMaterial->pTexture).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
+                    rgb = (*pMaterial->pTexture).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
                 }
 
                 // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
-                double brightness = (*pMaterial->pSpecularMap).get<Data::ImageFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
-                Data::Pixel<Data::ImageFormat::RGB> finalSpecularColor = pMaterial->specularColor;
-                if (pMaterial->pSpecularMap->type() == Data::ImageFormat::RGB) {
-                    finalSpecularColor = (*pMaterial->pSpecularMap).get<Data::ImageFormat::RGB>(varying.uv[0], varying.uv[1]);
-                    brightness = finalSpecularColor.to<Data::ImageFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+                double brightness = (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+                Data::Color<Data::ColorFormat::RGB> finalSpecularColor = pMaterial->specularColor;
+                if (pMaterial->pSpecularMap->type() == Data::ColorFormat::RGB) {
+                    finalSpecularColor = (*pMaterial->pSpecularMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
+                    brightness = finalSpecularColor.to<Data::ColorFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
                 }
 
                 // TODO: Non-normal mapping should be checked here

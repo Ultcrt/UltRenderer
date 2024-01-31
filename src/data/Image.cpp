@@ -15,7 +15,7 @@
 
 namespace UltRenderer {
     namespace Data {
-        Image::Image(std::size_t w, std::size_t h, ImageFormat format, FilterType filterType):
+        Image::Image(std::size_t w, std::size_t h, ColorFormat format, FilterType filterType):
                 _format(static_cast<std::size_t>(format)), _width(w), _height(h), _data(h * w * _format), filterType(filterType) {}
 
         Math::Vector2S Image::shape() const {
@@ -60,7 +60,7 @@ namespace UltRenderer {
             // Has no color map
             std::uint8_t colorMapType = 0;
             // Gray or not
-            std::uint8_t imageType    = static_cast<ImageFormat>(_format) == ImageFormat::GRAY ? 3 : 2;
+            std::uint8_t imageType    = static_cast<ColorFormat>(_format) == ColorFormat::GRAY ? 3 : 2;
 
             // Has no color map, set related headers to 0
             std::uint16_t firstColorMapEntryIdx = 0;
@@ -76,7 +76,7 @@ namespace UltRenderer {
             // Bytes number * 8
             std::uint8_t  pixelDepth      = _format << 3;
             // Top-left order
-            std::uint8_t  imageDescriptor = static_cast<ImageFormat>(_format) == ImageFormat::RGBA ? 0b00001000 : 0b00000000;
+            std::uint8_t  imageDescriptor = static_cast<ColorFormat>(_format) == ColorFormat::RGBA ? 0b00001000 : 0b00000000;
 
             // Write headers
             tga.write(reinterpret_cast<const char *>(&idLen), sizeof(idLen));
@@ -98,7 +98,7 @@ namespace UltRenderer {
                 reorderedData.emplace_back(std::clamp(unit, 0., 1.) * std::numeric_limits<std::uint8_t>::max());
             }
             // RGB to BGR
-            if (static_cast<ImageFormat>(_format) != ImageFormat::GRAY) {
+            if (static_cast<ColorFormat>(_format) != ColorFormat::GRAY) {
                 // Alpha channel is already filled, only need to reverse RGB
                 for (std::size_t pixelIdx = 0; pixelIdx < width * height; pixelIdx++) {
                     std::swap(reorderedData[pixelIdx * _format], reorderedData[pixelIdx * _format + 2]);
@@ -142,7 +142,7 @@ namespace UltRenderer {
             std::uint16_t height;
             // Bytes number * 8
             std::uint8_t  pixelDepth;
-            // Pixel order
+            // Color order
             std::uint8_t  imageDescriptor;
 
             // Read headers
@@ -218,7 +218,7 @@ namespace UltRenderer {
             }
 
             // BGR to RGB
-            if (static_cast<ImageFormat>(_format) != ImageFormat::GRAY) {
+            if (static_cast<ColorFormat>(_format) != ColorFormat::GRAY) {
                 // Alpha channel is already filled, only need to reverse RGB
                 for (std::size_t pixelIdx = 0; pixelIdx < width * height; pixelIdx++) {
                     std::swap(imageData[pixelIdx * _format], imageData[pixelIdx * _format + 2]);
@@ -231,8 +231,8 @@ namespace UltRenderer {
             }
         }
 
-        ImageFormat Image::type() const {
-            return static_cast<ImageFormat>(_format);
+        ColorFormat Image::type() const {
+            return static_cast<ColorFormat>(_format);
         }
 
         void Image::fill(double val) {

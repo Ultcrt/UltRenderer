@@ -13,7 +13,7 @@ namespace UltRenderer {
 
             for (std::size_t x = 0; x < width; x++) {
                 for (std::size_t y = 0; y < height; y++) {
-                    const double depth = zBuffer.at<Data::ImageFormat::GRAY>(x, y)[0];
+                    const double depth = zBuffer.at<Data::ColorFormat::GRAY>(x, y)[0];
 
                     if (depth > 0) {
                         double approxSolidAngle = 0;
@@ -29,8 +29,8 @@ namespace UltRenderer {
                         approxSolidAngle = std::pow(approxSolidAngle, 100.);
 
                         // Update image
-                        Math::Vector3D color = fBuffer.at<Data::ImageFormat::RGB>(x, y);
-                        fBuffer.at<Data::ImageFormat::RGB>(x, y) = color * approxSolidAngle;
+                        Math::Vector3D color = fBuffer.at<Data::ColorFormat::RGB>(x, y);
+                        fBuffer.at<Data::ColorFormat::RGB>(x, y) = color * approxSolidAngle;
                     }
                 }
             }
@@ -57,8 +57,8 @@ namespace UltRenderer {
 
                 // Skip when end and pos are in the same pixel
                 if (dist >= 1) {
-                    const double posDepth = zBuffer.at<Data::ImageFormat::GRAY>(pos)[0];
-                    const double endDepth = zBuffer.at<Data::ImageFormat::GRAY>(static_cast<Math::Vector2S>(end))[0];
+                    const double posDepth = zBuffer.at<Data::ColorFormat::GRAY>(pos)[0];
+                    const double endDepth = zBuffer.at<Data::ColorFormat::GRAY>(static_cast<Math::Vector2S>(end))[0];
                     const double deltaDepth = endDepth - posDepth;
 
                     const double slopeAngle = deltaDepth / dist;

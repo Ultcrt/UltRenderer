@@ -40,8 +40,8 @@ namespace UltRenderer {
 
         bool PreBakedAmbientOcclusionMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                                     double &depth) const {
-            if ((*pShadowMap).at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()),  static_cast<std::size_t>(fragCoord.y()))[0] >= fragCoord.z()) {
-                _bakedTexture.at<Data::ImageFormat::GRAY>(static_cast<std::size_t>(varying.uv[0]), static_cast<std::size_t>(varying.uv[1]))[0] = 1;
+            if ((*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] >= fragCoord.z()) {
+                _bakedTexture.at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(varying.uv[0]), static_cast<std::size_t>(varying.uv[1]))[0] = 1;
             }
             return true;
         }

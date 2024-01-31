@@ -91,19 +91,19 @@ namespace UltRenderer {
                         const Math::Vector2D weights = {(doubleP - doubleP0).norm() / len, (doubleP - doubleP1).norm() / len};
                         const V& interpolatedVarying = interpolator(varyings, weights);
 
-                        Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(longPos, shortPos);
+                        Math::Vector4D color = fBuffer.at<Data::ColorFormat::RGBA>(longPos, shortPos);
                         // TODO: Need to deal with discard
                         fragmentShader(interpolatedVarying, color, depth);
-                        fBuffer.at<Data::ImageFormat::RGBA>(longPos, shortPos) = color;
+                        fBuffer.at<Data::ColorFormat::RGBA>(longPos, shortPos) = color;
                     }
                     else {
                         const Math::Vector2D doubleP = {static_cast<double>(shortPos), static_cast<double>(longPos)};
                         const Math::Vector2D weights = {(doubleP - doubleP0).norm() / len, (doubleP - doubleP1).norm() / len};
                         const V& interpolatedVarying = interpolator(varyings, weights);
 
-                        Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(shortPos, longPos);
+                        Math::Vector4D color = fBuffer.at<Data::ColorFormat::RGBA>(shortPos, longPos);
                         fragmentShader(interpolatedVarying, color, depth);
-                        fBuffer.at<Data::ImageFormat::RGBA>(shortPos, longPos) = color;
+                        fBuffer.at<Data::ColorFormat::RGBA>(shortPos, longPos) = color;
                     }
 
                     error += static_cast<long long>(step);
@@ -147,7 +147,7 @@ namespace UltRenderer {
 
                             V interpolatedVarying = interpolator(varyings, clipBarycentricCoord);
 
-                            Math::Vector4D color = fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx);
+                            Math::Vector4D color = fBuffer.at<Data::ColorFormat::RGBA>(xIdx, yIdx);
 
                             // TODO: gl_FragDepth not work correctly, depth test should be done before or after fragment shader depending on gl_FragDepth is set or not
                             double depth = preciseFragCoords[0].z() * clipBarycentricCoord[0] + preciseFragCoords[1].z() * clipBarycentricCoord[1] + preciseFragCoords[2].z() * clipBarycentricCoord[2];
@@ -158,9 +158,9 @@ namespace UltRenderer {
 
                             // Only update when not discard
                             if (fragmentShader(interpolatedVarying, fragCoord, color, depth)) {
-                                if (depth < zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0]) {
-                                    zBuffer.at<Data::ImageFormat::GRAY>(xIdx, yIdx)[0] = depth;
-                                    fBuffer.at<Data::ImageFormat::RGBA>(xIdx, yIdx) = color;
+                                if (depth < zBuffer.at<Data::ColorFormat::GRAY>(xIdx, yIdx)[0]) {
+                                    zBuffer.at<Data::ColorFormat::GRAY>(xIdx, yIdx)[0] = depth;
+                                    fBuffer.at<Data::ColorFormat::RGBA>(xIdx, yIdx) = color;
                                 }
                             }
                         }
