@@ -100,6 +100,13 @@ namespace UltRenderer {
                         Math::Vector3D reflectionColor;
                         Math::Vector3D refractionColor;
 
+                        double inRefractiveIndex = Rendering::Constants::AirRefractiveIndex;
+                        double outRefractiveIndex = mat.refractiveIndex;
+
+                        // Swap refractive index when ray is coming from the inside of mesh
+                        // TODO: Assume mesh is enclosed here
+                        if (normal.dot(ray.direction) > 0) std::swap(inRefractiveIndex, outRefractiveIndex);
+
                         if (mat.reflectionCoefficient > 0) {
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                             const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
@@ -108,13 +115,13 @@ namespace UltRenderer {
                         }
 
                         if (mat.refractionCoefficient > 0) {
-                            const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, Rendering::Constants::AirRefractiveIndex / mat.refractiveIndex);
+                            const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, inRefractiveIndex / outRefractiveIndex);
                             const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray refractionRay(refractionOrigin, refractionDirection);
                             refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ColorFormat::RGB>();
                         }
 
-                        double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, Rendering::Constants::AirRefractiveIndex, mat.refractiveIndex);
+                        double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, inRefractiveIndex, outRefractiveIndex);
 
                         color = (
                                 mat.diffuseCoefficient * diffuseIntensity * diffuseRGB +
