@@ -10,7 +10,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
-            Math::Vector4D Cast(
+            Data::Pixel<Data::ImageFormat::RGBA> Cast(
                     const Math::Ray& ray,
                     const Scene* pScene,
                     const Math::Vector4D& backgroundColor,
@@ -97,21 +97,21 @@ namespace UltRenderer {
                             }
                         }
 
-                        Math::Vector4D reflectionColor;
-                        Math::Vector4D refractionColor;
+                        Math::Vector3D reflectionColor;
+                        Math::Vector3D refractionColor;
 
                         if (mat.reflectionCoefficient > 0) {
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                             const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray reflectionRay(reflectionOrigin, reflectionDirection);
-                            reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1);
+                            reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ImageFormat::RGB>();
                         }
 
                         if (mat.refractionCoefficient > 0) {
                             const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, Rendering::Constants::AirRefractiveIndex / mat.refractiveIndex);
                             const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray refractionRay(refractionOrigin, refractionDirection);
-                            refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1);
+                            refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ImageFormat::RGB>();
                         }
 
                         double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, Rendering::Constants::AirRefractiveIndex, mat.refractiveIndex);
@@ -120,10 +120,10 @@ namespace UltRenderer {
                                 mat.diffuseCoefficient * diffuseIntensity * diffuseRGB +
                                 mat.specularCoefficient * diffuseIntensity * finalSpecularColor +
                                 mat.ambientCoefficient * mat.ambientColor +
-                                mat.glowIntensity * glowColor
-                        ).toHomogeneousCoordinates(1) +
+                                mat.glowIntensity * glowColor +
                                 mat.reflectionCoefficient * reflectionColor * kr +
-                                mat.refractionCoefficient * refractionColor * (1 - kr);
+                                mat.refractionCoefficient * refractionColor * (1 - kr)
+                        ).toHomogeneousCoordinates(1);
                     }
                 }
 

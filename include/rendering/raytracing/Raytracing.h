@@ -14,7 +14,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
-            Math::Vector4D Cast(
+            Data::Pixel<Data::ImageFormat::RGBA> Cast(
                     const Math::Ray& ray,
                     const Scene* pScene,
                     const Math::Vector4D& backgroundColor = {1, 1, 1, 1},
