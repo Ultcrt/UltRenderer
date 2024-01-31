@@ -31,8 +31,9 @@ namespace UltRenderer {
         template<ImageFormat FORMAT>
         using PixelProxy = Utils::MatrixProxy<double, static_cast<std::size_t>(FORMAT), 1>;
 
+
         // Why not "using Pixel = Math::VectorXD<static_cast<std::size_t>(FORMAT)>;" ?
-        // Because compiler cannot infer template parameter from above line
+        // Because compiler cannot infer template parameter from above line. Also, there are more functionality
         template<ImageFormat FORMAT>
         class Pixel: public Math::VectorXD<static_cast<std::size_t>(FORMAT)> {
         public:
