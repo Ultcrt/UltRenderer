@@ -29,7 +29,7 @@ namespace UltRenderer {
             double refractiveIndex = 1;
 
             double shadowIntensity = 0.3;
-            double glowIntensity = 3.0;
+            double glowIntensity = 1.0;
         };
     } // Rendering
 } // UltRenderer
