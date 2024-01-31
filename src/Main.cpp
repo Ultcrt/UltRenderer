@@ -32,6 +32,9 @@ int main() {
     pMat->pSpecularMap = pSpecular;
     pMat->pNormalMap = pNormalMap;
     pMat->normalMapType = UltRenderer::Data::NormalMapType::DARBOUX;
+    pMat->refractiveIndex = 1.7;
+    pMat->reflectionCoefficient = 0;
+    pMat->refractionCoefficient = 1;
 
     // Obj
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");

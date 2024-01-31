@@ -5,6 +5,7 @@
 #include <iostream>
 #include "rendering/raytracing/Raytracing.h"
 #include "math/Geometry.h"
+#include "rendering/Constants.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -96,38 +97,33 @@ namespace UltRenderer {
                             }
                         }
 
-                        // TODO: Test code here
-                        double diffuseCoefficient = 1;
-                        double specularCoefficient = 0.5;
-                        double glowIntensity = 0.5;
+                        Math::Vector4D reflectionColor;
+                        Math::Vector4D refractionColor;
 
-                        Math::Vector3D blinnPhongRGB = (
-                                diffuseCoefficient * diffuseIntensity * diffuseRGB +
-                                specularCoefficient * diffuseIntensity * finalSpecularColor +
-                                glowIntensity * glowColor
-                        );
-
-                        // TODO: Reflection/refraction checking here is only for testing, not ideal
-                        if (mat.pSpecularMap) {
+                        if (mat.reflectionCoefficient > 0) {
                             const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
-                            const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, 1 / 1.5);
-
                             const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
-                            const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
-
                             const Math::Ray reflectionRay(reflectionOrigin, reflectionDirection);
+                            reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1);
+                        }
+
+                        if (mat.refractionCoefficient > 0) {
+                            const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, Rendering::Constants::AirRefractiveIndex / mat.refractiveIndex);
+                            const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                             const Math::Ray refractionRay(refractionOrigin, refractionDirection);
-
-                            const auto reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1);
-                            const auto refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1);
-
-                            double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, 1, 1.5);
-
-                            color = reflectionColor * kr + refractionColor * (1 - kr);
+                            refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1);
                         }
-                        else {
-                            color = blinnPhongRGB.toHomogeneousCoordinates(1);
-                        }
+
+                        double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, Rendering::Constants::AirRefractiveIndex, mat.refractiveIndex);
+
+                        color = (
+                                mat.diffuseCoefficient * diffuseIntensity * diffuseRGB +
+                                mat.specularCoefficient * diffuseIntensity * finalSpecularColor +
+                                mat.ambientCoefficient * mat.ambientColor +
+                                mat.glowIntensity * glowColor
+                        ).toHomogeneousCoordinates(1) +
+                                mat.reflectionCoefficient * reflectionColor * kr +
+                                mat.refractionCoefficient * refractionColor * (1 - kr);
                     }
                 }
 

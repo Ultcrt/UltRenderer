@@ -23,6 +23,10 @@ namespace UltRenderer {
             double diffuseCoefficient = 0.5;
             double specularCoefficient = 0.4;
             double ambientCoefficient = 0.1;
+            double reflectionCoefficient = 0;
+            double refractionCoefficient = 0;
+
+            double refractiveIndex = 1;
 
             double shadowIntensity = 0.3;
             double glowIntensity = 3.0;
