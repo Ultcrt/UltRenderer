@@ -85,8 +85,6 @@ namespace UltRenderer {
                 RenderDepthImageOfMeshes(_pScene->meshes(), light.direction, shadowMap, &lightModelView,
                                          &lightProjection, &lightViewport);
 
-                shadowMap.save("shadow.tga");
-
                 const Math::Transform3D view = transformMatrix.inverse();
 
                 // Depth peeling
