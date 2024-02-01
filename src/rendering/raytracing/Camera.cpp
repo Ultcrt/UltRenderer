@@ -40,7 +40,7 @@ namespace UltRenderer {
                             img.at<Data::ColorFormat::RGBA>(w, h) = color;
                         }, w, h);
 
-                        if (threads.size() == maxThreads) {
+                        if (threads.size() >= maxThreads) {
                             for (auto& thread: threads) {
                                 thread.join();
                             }
