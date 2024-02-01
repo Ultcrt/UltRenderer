@@ -60,8 +60,9 @@ namespace UltRenderer {
                 Math::Vector3D light = varying.light * varying.intensity;
                 auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
                 // 0.01 is a coefficient to fix z-fighting
-                bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()), static_cast<std::size_t>(shadowPosition.y()))[0];
-                Math::Vector3D glowColor = (*pMaterial->pGlowMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
+                bool inShadow = shadowPosition.z() - 1e-3 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()), static_cast<std::size_t>(shadowPosition.y()))[0];
+
+                Math::Vector3D glowColor = pMaterial->pGlowMap ? (*pMaterial->pGlowMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) : Data::Color<Data::ColorFormat::RGB>{0, 0, 0};
 
                 Math::Vector3D rgb;
                 if ((*pMaterial->pTexture).type() == Data::ColorFormat::GRAY) {
@@ -72,11 +73,11 @@ namespace UltRenderer {
                 }
 
                 // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
-                double brightness = (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
-                Data::Color<Data::ColorFormat::RGB> finalSpecularColor = pMaterial->specularColor;
-                if (pMaterial->pSpecularMap->type() == Data::ColorFormat::RGB) {
+                double brightness = pMaterial->pSpecularMap ? (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
+                Data::Color<Data::ColorFormat::RGB> finalSpecularColor = {1, 1, 1};
+                if (pMaterial->pSpecularMap && pMaterial->pSpecularMap->type() == Data::ColorFormat::RGB) {
                     finalSpecularColor = (*pMaterial->pSpecularMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
-                    brightness = finalSpecularColor.to<Data::ColorFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
+                    brightness = finalSpecularColor.to<Data::ColorFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());         // uint8_t is the correct form of data, need convert
                 }
 
                 Math::Vector3D normal = varying.normal;
