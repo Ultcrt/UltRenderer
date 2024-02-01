@@ -58,9 +58,9 @@ namespace UltRenderer {
             if ((*pLastDepthLayer).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
                 // Apply intensity here
                 Math::Vector3D light = varying.light * varying.intensity;
-                auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
+                auto shadowFragCoord = (lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1)).toCartesianCoordinates();
                 // 0.01 is a coefficient to fix z-fighting
-                bool inShadow = shadowPosition.z() - 1e-3 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()), static_cast<std::size_t>(shadowPosition.y()))[0];
+                bool inShadow = shadowFragCoord.z() - 1e-3 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowFragCoord.x()), static_cast<std::size_t>(shadowFragCoord.y()))[0];
 
                 Math::Vector3D glowColor = pMaterial->pGlowMap ? (*pMaterial->pGlowMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) : Data::Color<Data::ColorFormat::RGB>{0, 0, 0};
 
