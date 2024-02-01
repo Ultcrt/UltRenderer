@@ -7,7 +7,7 @@
 namespace UltRenderer {
     namespace Data {
         double BoundingInfo::radius() const {
-            return (min - max).norm();
+            return (min - max).norm() / 2;
         }
 
         double BoundingInfo::width() const {
