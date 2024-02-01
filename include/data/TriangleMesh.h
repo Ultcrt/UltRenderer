@@ -57,7 +57,7 @@ namespace UltRenderer {
 
             void updateTransformedVertex();
 
-            Math::Vector3D getTransformedVertex(std::size_t idx) const;
+            [[nodiscard]] Math::Vector3D getTransformedVertex(std::size_t idx) const;
         };
 
     } // UltRenderer
