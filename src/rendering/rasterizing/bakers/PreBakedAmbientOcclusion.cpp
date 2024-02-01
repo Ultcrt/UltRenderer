@@ -52,7 +52,7 @@ namespace UltRenderer {
                         for (std::size_t x = 0; x < width; x++) {
                             for (std::size_t y = 0; y < width; y++) {
                                 double val = bakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0];
-                                bakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] = val + localBakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] / samplingNum;
+                                bakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] = val + localBakedTexture.at<Data::ColorFormat::GRAY>(x, y)[0] / static_cast<double>(samplingNum);
                             }
                         }
                     }
