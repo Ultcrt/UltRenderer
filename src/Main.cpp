@@ -53,8 +53,8 @@ int main() {
     pFloorMesh->pMaterial = pFloorMat;
 
     // Camera
-    auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 4);
-    auto pRaytracingCamera = std::make_shared<Rendering::Raytracing::Camera>(2, 2, 4);
+    auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 3);
+    auto pRaytracingCamera = std::make_shared<Rendering::Raytracing::Camera>(2, 2, 3);
 
     pRasterizingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
     pRaytracingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
