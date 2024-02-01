@@ -84,7 +84,6 @@ namespace UltRenderer {
                             // Only do shading when light is not occlude
                             if (!lightIntersectionInfo.isIntersected) {
                                 // Blinn-Phong reflection model
-                                // TODO: Only one light is considered here
                                 const auto& lightVec = pLight->direction * pLight->intensity;
 
                                 // Diffuse

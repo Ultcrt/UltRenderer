@@ -58,7 +58,6 @@ namespace UltRenderer {
             if ((*pLastDepthLayer).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
                 // Apply intensity here
                 Math::Vector3D light = varying.light * varying.intensity;
-                Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
                 auto shadowPosition = lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1);
                 // 0.01 is a coefficient to fix z-fighting
                 bool inShadow = shadowPosition.z() - 0.01 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowPosition.x()), static_cast<std::size_t>(shadowPosition.y()))[0];
@@ -80,12 +79,15 @@ namespace UltRenderer {
                     brightness = finalSpecularColor.to<Data::ColorFormat::GRAY>()[0] * static_cast<double>(std::numeric_limits<uint8_t>::max());
                 }
 
-                // TODO: Non-normal mapping should be checked here
-                if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
-                    normal = Math::Geometry::ConvertDarbouxNormalToGlobal(varying.tangent, varying.normal, normal);
-                }
-                else {
-                    normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+                Math::Vector3D normal = varying.normal;
+                if (pMaterial->pNormalMap) {
+                    normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+                    if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
+                        normal = Math::Geometry::ConvertDarbouxNormalToGlobal(varying.tangent, varying.normal, normal);
+                    }
+                    else {
+                        normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+                    }
                 }
 
                 // Diffuse

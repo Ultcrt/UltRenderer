@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "shaders/NormalMappingMeshShader.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Shaders {
@@ -59,32 +60,17 @@ namespace UltRenderer {
             }
             else {
                 rgb = (*pMaterial->pTexture).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
-            }            Math::Vector3D normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-            double shininess = (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0];
-
-            // TODO: Non-normal mapping should be checked here
-            if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
-                // Make sure TBN are orthogonal
-                auto t = varying.tangent;
-                auto n = varying.normal;
-                auto b = n.cross(t);
-                t = b.cross(n);
-
-                t.normalize();
-                b.normalize();
-                n.normalize();
-
-                // Just a rotation matrix of TBN basis
-                Math::Matrix3D tbn = {
-                        t.x(), b.x(), n.x(),
-                        t.y(), b.y(), n.y(),
-                        t.z(), b.z(), n.z(),
-                };
-
-                normal = (tbn * normal).normalized();
             }
-            else {
-                normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+
+            Math::Vector3D normal = varying.normal;
+            if (pMaterial->pNormalMap) {
+                normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+                if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
+                    normal = Math::Geometry::ConvertDarbouxNormalToGlobal(varying.tangent, varying.normal, normal);
+                }
+                else {
+                    normal = (modelViewMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+                }
             }
 
             color = (normal.dot(-light) * rgb).toHomogeneousCoordinates(1);

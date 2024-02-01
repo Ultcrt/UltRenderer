@@ -10,7 +10,8 @@
 
 namespace UltRenderer {
     namespace Rendering {
-        struct Material {
+        class Material {
+        public:
             std::shared_ptr<Data::Image> pTexture;
             std::shared_ptr<Data::Image> pSpecularMap;
             std::shared_ptr<Data::Image> pGlowMap;
