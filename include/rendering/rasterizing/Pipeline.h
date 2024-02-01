@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <concepts>
+#include <thread>
 #include "math/Matrix.h"
 #include "data/Image.h"
 #include "shaders/IShader.h"
@@ -26,7 +27,8 @@ namespace UltRenderer {
                                     const Shaders::IVertexShader<V>& vertexShader,
                                     const Shaders::IFragmentShader<V>& fragmentShader,
                                     const Shaders::IInterpolator<V>& interpolator,
-                                    const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor());
+                                    const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor(),
+                                    std::size_t maxThreads = 20);
             };
 
             /*----------Definition----------*/
@@ -37,52 +39,82 @@ namespace UltRenderer {
                                    const Shaders::IVertexShader<V>& vertexShader,
                                    const Shaders::IFragmentShader<V>& fragmentShader,
                                    const Shaders::IInterpolator<V>& interpolator,
-                                   const Postprocessors::IPostprocessor& postprocessor) {
+                                   const Postprocessors::IPostprocessor& postprocessor, std::size_t maxThreads) {
                 // Process vertex
-                std::vector<V> varyings;
-                std::vector<Math::Vector4D> preciseFragCoords;
-                std::vector<bool> clipFlags;
+                std::vector<V> varyings(vertexNum);
+                std::vector<Math::Vector4D> preciseFragCoords(vertexNum);
+                std::vector<bool> clipFlags(vertexNum);
+
+                std::vector<std::thread> threads;
                 for (std::size_t vIdx = 0; vIdx < vertexNum; vIdx++) {
-                    // Call vertex shader for each vertex
-                    Math::Vector4D position;
-                    V varying = vertexShader(vIdx, position);
+                    threads.emplace_back([&vertexShader, &varyings, &preciseFragCoords, &clipFlags, &viewport](std::size_t vIdx){
+                        // Call vertex shader for each vertex
+                        Math::Vector4D position;
+                        V varying = vertexShader(vIdx, position);
 
-                    // TODO: Clipping is not ideal (discard triangle when one vertex is outside)
-                    // Record vertex clip flag here
-                    const double absW = std::abs(position.w());
-                    clipFlags.emplace_back(std::abs(position.x()) > absW || std::abs(position.y()) > absW || std::abs(position.z()) > absW);
+                        // TODO: Clipping is not ideal (discard triangle when one vertex is outside)
+                        // Record vertex clip flag here
+                        const double absW = std::abs(position.w());
+                        clipFlags[vIdx] = std::abs(position.x()) > absW || std::abs(position.y()) > absW || std::abs(position.z()) > absW;
 
-                    // Perspective division
-                    Math::Vector4D device = position / position.w();
+                        // Perspective division
+                        Math::Vector4D device = position / position.w();
 
-                    // Apply viewport
-                    Math::Vector4D preciseFragCoord = viewport * device;
+                        // Apply viewport
+                        Math::Vector4D preciseFragCoord = viewport * device;
 
-                    // Form fragment coordinates as (x, y, z, 1/w)
-                    preciseFragCoord.w() = 1 / position.w();
+                        // Form fragment coordinates as (x, y, z, 1/w)
+                        preciseFragCoord.w() = 1 / position.w();
 
-                    preciseFragCoords.emplace_back(preciseFragCoord);
-                    varyings.emplace_back(varying);
+                        preciseFragCoords[vIdx] = preciseFragCoord;
+                        varyings[vIdx] = varying;
+                    }, vIdx);
+
+                    if (threads.size() >= maxThreads) {
+                        for (auto& thread: threads) {
+                            thread.join();
+                        }
+                        threads.clear();
+                    }
                 }
 
-                // Primitive assembly: triangle primitives
-                for (const auto& triangle: triangles) {
-                    bool clipped = false;
-                    std::array<V, 3> varyingGroup;
-                    std::array<Math::Vector4D , 3> preciseFragCoordGroup;
-                    for (std::size_t idx = 0; idx < 3; idx++) {
-                        varyingGroup[idx] = varyings[triangle[idx]];
-                        preciseFragCoordGroup[idx] = preciseFragCoords[triangle[idx]];
-                        if (clipFlags[triangle[idx]]) {
-                            clipped = true;
-                            break;
-                        }
-                    }
+                for (auto& thread: threads) {
+                    thread.join();
+                }
+                threads.clear();
 
-                    // Rasterizing the primitive (fragment shader is also called)
-                    if (!clipped) {
-                        Rendering::Rasterizing::Triangle<V>(fBuffer, zBuffer, preciseFragCoordGroup, varyingGroup, fragmentShader, interpolator);
+                // Primitive assembly: triangle primitives
+                for (std::size_t tIdx = 0; tIdx < triangles.size(); tIdx++) {
+                    threads.emplace_back([&varyings, &triangles, &preciseFragCoords, &clipFlags, &fBuffer, &zBuffer, &fragmentShader, &interpolator](std::size_t tIdx){
+                        const auto& triangle = triangles[tIdx];
+                        bool clipped = false;
+                        std::array<V, 3> varyingGroup;
+                        std::array<Math::Vector4D , 3> preciseFragCoordGroup;
+                        for (std::size_t idx = 0; idx < 3; idx++) {
+                            varyingGroup[idx] = varyings[triangle[idx]];
+                            preciseFragCoordGroup[idx] = preciseFragCoords[triangle[idx]];
+                            if (clipFlags[triangle[idx]]) {
+                                clipped = true;
+                                break;
+                            }
+                        }
+
+                        // Rasterizing the primitive (fragment shader is also called)
+                        if (!clipped) {
+                            Rendering::Rasterizing::Triangle<V>(fBuffer, zBuffer, preciseFragCoordGroup, varyingGroup, fragmentShader, interpolator);
+                        }
+                    }, tIdx);
+
+                    if (threads.size() >= maxThreads) {
+                        for (auto& thread: threads) {
+                            thread.join();
+                        }
+                        threads.clear();
                     }
+                }
+
+                for (auto& thread: threads) {
+                    thread.join();
                 }
 
                 // Postprocessing
