@@ -77,9 +77,10 @@ namespace UltRenderer {
         template<ColorFormat FORMAT>
         const Color<FORMAT> Image::at(std::size_t w, std::size_t h) const {
             // Only fill when given pixel has more dimension than image
-            assert(static_cast<std::size_t>(FORMAT) <= _format);
-            assert(w < _width);
-            assert(h < _height);
+            // Tips: A convenient way to print message in assert: using &&
+            assert(static_cast<std::size_t>(FORMAT) <= _format && "Requested color format has more channels than image color format");
+            assert(w < _width && "Requested width is larger than image width");
+            assert(h < _height && "Requested height is larger than image height");
 
             Color<FORMAT> pixel;
 
@@ -92,9 +93,9 @@ namespace UltRenderer {
 
         template<ColorFormat FORMAT>
         ColorProxy<FORMAT> Image::at(std::size_t w, std::size_t h) {
-            assert(static_cast<std::size_t>(FORMAT) <= _format);
-            assert(w < _width);
-            assert(h < _height);
+            assert(static_cast<std::size_t>(FORMAT) <= _format && "Requested color format has more channels than image color format");
+            assert(w < _width && "Requested width is larger than image width");
+            assert(h < _height && "Requested height is larger than image height");
 
             std::array<double*, static_cast<std::size_t>(FORMAT)> componentPtrs;
 
@@ -115,7 +116,6 @@ namespace UltRenderer {
                     return at<FORMAT>(width, height);
                 }
                 case FilterType::LINEAR: {
-                    // TODO: (0.5, 0.5) should be the proper pixel center
                     auto width = wRatio * static_cast<double>(_width);
                     auto height = hRatio * static_cast<double>(_height);
 
@@ -181,13 +181,13 @@ namespace UltRenderer {
                     return color0 * (1 - hw) + color1 * hw;
                 }
                 default:
-                    assert(false);
+                    assert(false && "Unexpected image filter type");
             }
         }
 
         template<ColorFormat FORMAT>
         void Image::fill(const Color<FORMAT> &filledPixel) {
-            assert(static_cast<std::size_t>(FORMAT) <= _format);
+            assert(static_cast<std::size_t>(FORMAT) <= _format && "Filled color has more channels than image color format");
 
             // Check all channels of filledPixel is the same or not.
             bool sameChannelValue = true;

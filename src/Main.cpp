@@ -32,9 +32,9 @@ int main() {
     pMat->pSpecularMap = pSpecular;
     pMat->pNormalMap = pNormalMap;
     pMat->normalMapType = UltRenderer::Data::NormalMapType::DARBOUX;
-    pMat->refractiveIndex = 1.7;
-    pMat->reflectionCoefficient = 0;
-    pMat->refractionCoefficient = 1;
+    pMat->refractiveIndex = 1.333;
+    pMat->reflectionCoefficient = 0.9;
+    pMat->refractionCoefficient = 0.9;
 
     // Obj
     auto pMesh = std::make_shared<Data::TriangleMesh>("../data/diablo3_pose.obj");
@@ -76,7 +76,7 @@ int main() {
     // Rendering
     auto start = std::chrono::high_resolution_clock::now();
 //    auto imgRasterizing = pRasterizingCamera->render(128, 128, vs, fs, it);
-    auto imgRaytracing = pRaytracingCamera->render(800, 800);
+    auto imgRaytracing = pRaytracingCamera->render(2000, 2000);
     auto finish = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";
 

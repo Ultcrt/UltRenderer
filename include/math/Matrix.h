@@ -213,7 +213,7 @@ namespace UltRenderer {
         /*----------Definition----------*/
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M + 1, N> Matrix<T, M, N>::toHomogeneousCoordinates(T lastDim) const {
-            static_assert(N == 1);
+            static_assert(N == 1, "Only column vectors can be used");
 
             Matrix<T, M + 1, N> res;
 
@@ -228,8 +228,8 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M - 1, N> Matrix<T, M, N>::toCartesianCoordinates() const {
-            static_assert(N == 1);
-            static_assert(M > 1);
+            static_assert(N == 1, "Only column vectors can be used");
+            static_assert(M > 1, "Only vectors have more than 1 component can be used");
 
             // Zero represent vector, no need to scale
             const T scaling = _data[M - 1] != 0 ? _data[M - 1] : 1;
@@ -277,11 +277,11 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N> Matrix<T, M, N>::inverse() const {
-            static_assert(M == N);
+            static_assert(M == N, "Only square matrices can be used");
 
             T det = determinant();
 
-            assert(det != 0);
+            assert(det != 0 && "Only matrices whose determinant is not equals to zero can be used");
 
             // TODO: Current cofactor matrix method may be very slow
             Matrix<T, M, N> cofMat;
@@ -306,7 +306,7 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::determinant() const {
-            static_assert(M == N);
+            static_assert(M == N, "Only square matrices can be used");
 
             // TODO: Current recursive resolution may be very slow
 
@@ -398,8 +398,7 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::dot(const Matrix<T, M, N> &target) const {
-            // TODO: Need to add assert prompt
-            static_assert(M == 1 || N == 1);
+            static_assert(M == 1 || N == 1, "Only vectors can be used");
 
             T res = 0;
             for (std::size_t rowIdx = 0; rowIdx < M; rowIdx++) {
@@ -412,7 +411,7 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Vector3<T> Matrix<T, M, N>::cross(const Vector3<T> &target) const {
-            static_assert(M * N == 3);
+            static_assert(M * N == 3, "Only matrices that have 3 components can be used");
 
             return {
                 y() * target.z() - z() * target.y(),
@@ -484,7 +483,7 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(T x, T y, T z, T w): Matrix() {
-            static_assert(M * N > 3);
+            static_assert(M * N > 3, "Only matrices that have more than 3 components can be used");
             _data[0] = x;
             _data[1] = y;
             _data[2] = z;
@@ -493,7 +492,7 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(T x, T y, T z): Matrix() {
-            static_assert(M * N > 2);
+            static_assert(M * N > 2, "Only matrices that have more than 2 components can be used");
             _data[0] = x;
             _data[1] = y;
             _data[2] = z;
@@ -501,76 +500,76 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         Matrix<T, M, N>::Matrix(T x, T y): Matrix() {
-            static_assert(M * N > 1);
+            static_assert(M * N > 1, "Only matrices that have more than 1 components can be used");
             _data[0] = x;
             _data[1] = y;
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::x() const {
-            static_assert(M * N > 0);
+            static_assert(M * N > 0, "Only matrices that have more than 0 components can be used");
             return _data[0];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::y() const {
-            static_assert(M * N > 1);
+            static_assert(M * N > 1, "Only matrices that have more than 1 components can be used");
             return _data[1];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::z() const {
-            static_assert(M * N > 2);
+            static_assert(M * N > 2, "Only matrices that have more than 2 components can be used");
             return _data[2];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::w() const {
-            static_assert(M * N > 3);
+            static_assert(M * N > 3, "Only matrices that have more than 3 components can be used");
             return _data[3];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::operator()(std::size_t rowIdx, std::size_t colIdx) const {
-            assert(rowIdx < M);
-            assert(colIdx < N);
+            assert(rowIdx < M && "Requested row is larger than matrix row numbers");
+            assert(colIdx < N && "Requested column is larger than matrix column numbers");
             return _data[N * rowIdx + colIdx];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T Matrix<T, M, N>::operator[](std::size_t idx) const {
-            assert(idx < _data.size());
+            assert(idx < _data.size() && "Requested component is larger than matrix component numbers");
             return _data[idx];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::x() {
             // Tips: Use static_assert to check errors at compile time
-            static_assert(M * N > 0);
+            static_assert(M * N > 0, "Only matrices that have more than 0 components can be used");
             return _data[0];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::y() {
-            static_assert(M * N > 1);
+            static_assert(M * N > 1, "Only matrices that have more than 1 components can be used");
             return _data[1];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::z() {
-            static_assert(M * N > 2);
+            static_assert(M * N > 2, "Only matrices that have more than 2 components can be used");
             return _data[2];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::w() {
-            static_assert(M * N > 3);
+            static_assert(M * N > 3, "Only matrices that have more than 3 components can be used");
             return _data[3];
         }
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::operator[](std::size_t idx) {
-            assert(idx < _data.size());
+            assert(idx < _data.size() && "Requested component is larger than matrix component numbers");
             return _data[idx];
         }
 
@@ -668,8 +667,8 @@ namespace UltRenderer {
 
         template<typename T, std::size_t M, std::size_t N>
         T &Matrix<T, M, N>::operator()(std::size_t rowIdx, std::size_t colIdx) {
-            assert(rowIdx < M);
-            assert(colIdx < N);
+            assert(rowIdx < M && "Requested row is larger than matrix row numbers");
+            assert(colIdx < N && "Requested column is larger than matrix column numbers");
             return _data[N * rowIdx + colIdx];
         }
 
