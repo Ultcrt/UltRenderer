@@ -74,29 +74,31 @@ namespace UltRenderer {
 
                 Data::Image shadowMap(width, height, Data::Color<Data::ColorFormat::GRAY>(1));
 
-                // viewport * projection * view
-                for (const auto &pMesh: _pScene->meshes()) {
-                    const Math::Transform3D view = transformMatrix.inverse();
+                // TODO: Compute only the first light here for simplicity, which is wrong
+                const Rendering::Light& light = *_pScene->lights()[0];
 
-                    // TODO: Compute only the first light here for simplicity, which is wrong
-                    const Rendering::Light& light = *_pScene->lights()[0];
+                // Shadow mapping
+                // TODO: Shadow mapping's projection matrix may not be identical to camera's, e.g. directional light should use orthogonal projection.
+                Math::Transform3D lightModelView;
+                Math::Transform3D lightProjection;
+                Math::Transform3D lightViewport;
+                RenderDepthImageOfMeshes(_pScene->meshes(), light.direction, shadowMap, &lightModelView,
+                                         &lightProjection, &lightViewport);
 
-                    // Shadow mapping
-                    // TODO: Shadow mapping's projection matrix may not be identical to camera's, e.g. directional light should use orthogonal projection.
-                    Math::Transform3D lightModelView;
-                    Math::Transform3D lightProjection;
-                    Math::Transform3D lightViewport;
-                    RenderDepthImageOfMesh(*pMesh, light.direction, shadowMap, &lightModelView, &lightProjection, &lightViewport);
+                shadowMap.save("shadow.tga");
 
-                    // Depth peeling
-                    Data::Image* pLastDepthLayer = &zBufferA;
-                    Data::Image* pCurDepthLayer = &zBufferB;
-                    std::vector<Data::Image> layers;
-                    for (std::size_t layerIdx = 0; layerIdx < options.numDepthPeelingLayer; layerIdx++) {
-                        // Clean up for recording current layer
-                        fBuffer.fill(0);
-                        pCurDepthLayer->fill(1);
+                const Math::Transform3D view = transformMatrix.inverse();
 
+                // Depth peeling
+                Data::Image* pLastDepthLayer = &zBufferA;
+                Data::Image* pCurDepthLayer = &zBufferB;
+                std::vector<Data::Image> layers;
+                for (std::size_t layerIdx = 0; layerIdx < options.numDepthPeelingLayer; layerIdx++) {
+                    // Clean up for recording current layer
+                    fBuffer.fill(0);
+                    pCurDepthLayer->fill(1);
+
+                    for (const auto &pMesh: _pScene->meshes()) {
                         // TODO: nullptr is never checked
                         // Set IMeshVertexShader general uniforms
                         vertexShader.pModel = &pMesh->transformMatrix;
@@ -126,27 +128,26 @@ namespace UltRenderer {
 
                         Pipeline::Execute<V>(fBuffer, *pCurDepthLayer, viewport, pMesh->vertices.size(), pMesh->triangles, {}, {},
                                              vertexShader, fragmentShader, interpolator, postprocessor);
-
-                        // Record current layer RGBA
-                        layers.emplace_back(fBuffer);
-
-                        // Swap zBuffer
-                        std::swap(pLastDepthLayer, pCurDepthLayer);
                     }
 
-                    // TODO: Only works on single mesh
-                    // Blend all layers
-                    for (std::size_t w = 0; w < width; w++) {
-                        for (std::size_t h = 0; h < height; h++) {
-                            Math::Vector4D rgba = options.backgroundColor;
-                            for (const Data::Image & layer : std::ranges::reverse_view(layers)) {
-                                // TODO: Should implement more blending type
-                                const auto topRGBA = Math::Vector4D(layer.at<Data::ColorFormat::RGBA>(w, h));
-                                rgba = topRGBA * topRGBA.w() + rgba * (1 - topRGBA.w());
-                            }
+                    // Record current layer RGBA
+                    layers.emplace_back(fBuffer);
 
-                            fBuffer.at<Data::ColorFormat::RGBA>(w, h) = rgba;
+                    // Swap zBuffer
+                    std::swap(pLastDepthLayer, pCurDepthLayer);
+                }
+
+                // Blend all layers
+                for (std::size_t w = 0; w < width; w++) {
+                    for (std::size_t h = 0; h < height; h++) {
+                        Math::Vector4D rgba = options.backgroundColor;
+                        for (const Data::Image & layer : std::ranges::reverse_view(layers)) {
+                            // TODO: Should implement more blending type
+                            const auto topRGBA = Math::Vector4D(layer.at<Data::ColorFormat::RGBA>(w, h));
+                            rgba = topRGBA * topRGBA.w() + rgba * (1 - topRGBA.w());
                         }
+
+                        fBuffer.at<Data::ColorFormat::RGBA>(w, h) = rgba;
                     }
                 }
 

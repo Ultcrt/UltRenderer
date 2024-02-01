@@ -12,10 +12,10 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterizing {
-            void RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage,
-                                        Math::Transform3D* outModelView = nullptr,
-                                        Math::Transform3D* outProjection = nullptr,
-                                        Math::Transform3D* outViewport = nullptr);
+            void RenderDepthImageOfMeshes(const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes, const Math::Vector3D& dir, Data::Image& depthImage,
+                                          Math::Transform3D* outModelView = nullptr,
+                                          Math::Transform3D* outProjection = nullptr,
+                                          Math::Transform3D* outViewport = nullptr);
         } // Rasterizing
     } // Rendering
 } // UltRenderer

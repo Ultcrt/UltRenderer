@@ -60,7 +60,7 @@ int main() {
     pRaytracingCamera->transformMatrix = Math::Transform3D::FromLookAt({2, 3, 5}, {0, 0, 0}, Math::Vector3D::Y());
 
     // Light
-    auto pLight0 = std::make_shared<Rendering::Light>(Math::Vector3D{0, -1, -1}.normalized(), 0.5);
+    auto pLight0 = std::make_shared<Rendering::Light>(Math::Vector3D{0, -1, -1}.normalized(), 2);
     auto pLight1 = std::make_shared<Rendering::Light>(Math::Vector3D{-1, -1, -1}.normalized(), 0.5);
 
     // Scene
@@ -75,14 +75,14 @@ int main() {
 
     // Rendering
     auto start = std::chrono::high_resolution_clock::now();
-//    auto imgRasterizing = pRasterizingCamera->render(128, 128, vs, fs, it);
-    auto imgRaytracing = pRaytracingCamera->render(2000, 2000);
+    auto imgRasterizing = pRasterizingCamera->render(1920, 1920, vs, fs, it);
+    auto imgRaytracing = pRaytracingCamera->render(128, 128);
     auto finish = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";
 
 
     // Saving
-//    imgRasterizing.save("rasterizing.tga");
+    imgRasterizing.save("rasterizing.tga");
     imgRaytracing.save("raytracing.tga");
 
     return 0;

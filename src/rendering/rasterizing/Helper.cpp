@@ -10,11 +10,20 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Rasterizing {
-            void RenderDepthImageOfMesh(const Data::TriangleMesh& mesh, const Math::Vector3D& dir, Data::Image& depthImage,
-                                        Math::Transform3D* outModelView, Math::Transform3D* outProjection, Math::Transform3D* outViewport) {
-                const auto nDir = dir.normalized();
+            void RenderDepthImageOfMeshes(const std::vector<std::shared_ptr<Data::TriangleMesh>>& pMeshes, const Math::Vector3D& dir, Data::Image& depthImage,
+                                          Math::Transform3D* outModelView, Math::Transform3D* outProjection, Math::Transform3D* outViewport) {
+                std::vector<Math::Vector3D> represents;
 
-                auto boundingInfo = Math::Geometry::GetAABB(mesh.vertices);
+                for (const auto& pMesh: pMeshes) {
+                    const auto& minMax = Math::Geometry::GetMinMax(pMesh->vertices);
+                    represents.emplace_back(minMax.first);
+                    represents.emplace_back(minMax.second);
+                }
+
+                const auto boundingInfo = Math::Geometry::GetAABB(represents);
+
+
+                const auto nDir = dir.normalized();
 
                 const auto origin = boundingInfo.origin();
                 const auto radius = boundingInfo.radius();
@@ -24,8 +33,6 @@ namespace UltRenderer {
                 const auto zMin = -1.05 * radius;
                 const auto zMax = 1.05 * radius;
 
-                // dir is in mesh local coordinate, so model matrix is identity matrix
-                const Math::Transform3D& model = Math::Matrix4D::Identity();
                 // dir.dot(Math::Vector3D::Y()): make sure z axis is not parallel to up vector
                 const Math::Transform3D& view = Math::Transform3D::FromLookAt(
                         origin,
@@ -38,24 +45,29 @@ namespace UltRenderer {
                 const auto viewport = Camera::ComputeViewportMatrix(depthImage.width(), depthImage.height());
 
                 Data::Image fBuffer(depthImage.width(), depthImage.height(), Data::ColorFormat::RGBA);
+                for (const auto& pMesh: pMeshes) {
+                    const auto& mesh = *pMesh;
 
-                Shaders::DepthMeshInterpolator interpolator;
-                Shaders::DepthMeshVertexShader vertexShader;
-                Shaders::DepthMeshFragmentShader fragmentShader;
+                    const Math::Transform3D& model = mesh.transformMatrix;
 
-                vertexShader.pModel = &model;
-                vertexShader.pView = &view;
-                vertexShader.pProjection = &projection;
-                vertexShader.modelViewMatrix = view * model;
-                vertexShader.modelViewProjectionMatrix = projection * vertexShader.modelViewMatrix;
-                vertexShader.pVertices = &mesh.vertices;
+                    Shaders::DepthMeshInterpolator interpolator;
+                    Shaders::DepthMeshVertexShader vertexShader;
+                    Shaders::DepthMeshFragmentShader fragmentShader;
 
-                Pipeline::Execute<Shaders::IMeshVarying>(
-                        fBuffer, depthImage,
-                        viewport,
-                        mesh.vertices.size(),
-                        mesh.triangles, {}, {}, vertexShader, fragmentShader, interpolator
-                );
+                    vertexShader.pModel = &model;
+                    vertexShader.pView = &view;
+                    vertexShader.pProjection = &projection;
+                    vertexShader.modelViewMatrix = view * model;
+                    vertexShader.modelViewProjectionMatrix = projection * vertexShader.modelViewMatrix;
+                    vertexShader.pVertices = &mesh.vertices;
+
+                    Pipeline::Execute<Shaders::IMeshVarying>(
+                            fBuffer, depthImage,
+                            viewport,
+                            mesh.vertices.size(),
+                            mesh.triangles, {}, {}, vertexShader, fragmentShader, interpolator
+                    );
+                }
 
                 if (outModelView != nullptr) {
                     // Model matrix is identical
