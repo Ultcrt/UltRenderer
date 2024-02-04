@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "rendering/raytracing/Raytracing.h"
+#include "rendering/raytracing/WhittedStyleRaytracing.h"
 #include "math/Geometry.h"
 #include "rendering/Constants.h"
 

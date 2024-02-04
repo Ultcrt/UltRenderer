@@ -6,7 +6,7 @@
 #include <iostream>
 #include "rendering/raytracing/Camera.h"
 #include "math/Ray.h"
-#include "rendering/raytracing/Raytracing.h"
+#include "rendering/raytracing/WhittedStyleRaytracing.h"
 
 namespace UltRenderer {
     namespace Rendering {

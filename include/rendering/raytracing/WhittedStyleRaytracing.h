@@ -2,8 +2,8 @@
 // Created by ultcrt on 24-1-22.
 //
 
-#ifndef ULTRENDERER_RAYTRACING_H
-#define ULTRENDERER_RAYTRACING_H
+#ifndef ULTRENDERER_WHITTEDSTYLERAYTRACING_H
+#define ULTRENDERER_WHITTEDSTYLERAYTRACING_H
 
 #include <memory>
 #include <vector>
@@ -24,4 +24,4 @@ namespace UltRenderer {
     } // Rendering
 } // UltRenderer
 
-#endif //ULTRENDERER_RAYTRACING_H
+#endif //ULTRENDERER_WHITTEDSTYLERAYTRACING_H

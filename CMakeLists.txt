@@ -70,8 +70,8 @@ add_executable(UltRenderer src/Main.cpp
         include/shaders/DepthPeelingMeshShader.h
         src/data/BoundingInfo.cpp
         include/data/BoundingInfo.h
-        include/rendering/raytracing/Raytracing.h
-        src/rendering/raytracing/Raytracing.cpp
+        include/rendering/raytracing/WhittedStyleRaytracing.h
+        src/rendering/raytracing/WhittedStyleRaytracing.cpp
         src/math/Ray.cpp
         include/math/Ray.h
         src/data/IntersectionInfo.cpp
