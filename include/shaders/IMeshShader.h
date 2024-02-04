@@ -19,7 +19,7 @@ namespace UltRenderer {
             double intensity;
         };
 
-        template <std::derived_from<IVarying> V>
+        template <std::derived_from<IMeshVarying> V>
         class IMeshVertexShader: public IVertexShader<V> {
         public:
             // Uniforms
@@ -40,7 +40,7 @@ namespace UltRenderer {
             V operator()(std::size_t vIdx, Math::Vector4D& position) const override = 0;
         };
 
-        template <std::derived_from<IVarying> V>
+        template <std::derived_from<IMeshVarying> V>
         class IMeshFragmentShader: public IFragmentShader<V> {
         public:
             // Uniforms
