@@ -56,7 +56,6 @@ namespace UltRenderer {
                 [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, Shaders::IMeshVertexShader<V> &vertexShader, Shaders::IMeshFragmentShader<V> &fragmentShader,
                                                  const Shaders::IInterpolator<V> &interpolator, const RenderOptions& options = {}, const Postprocessors::IPostprocessor& postprocessor = Postprocessors::EmptyPostprocessor()) const;
 
-
                 static Math::Transform3D ComputeProjectionMatrix(double width, double height, double zMin, double zMax, ProjectionType projectionType);
 
                 static Math::Transform3D ComputeViewportMatrix(std::size_t width, std::size_t height);

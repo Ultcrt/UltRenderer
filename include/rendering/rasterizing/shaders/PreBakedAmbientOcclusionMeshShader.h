@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_PREBAKEDAMBIENTOCCLUSIONMESHSHADER_H
 #define ULTRENDERER_PREBAKEDAMBIENTOCCLUSIONMESHSHADER_H
 
-#include "shaders/IMeshShader.h"
+#include "IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {

@@ -36,24 +36,24 @@ add_executable(UltRenderer src/Main.cpp
         include/rendering/Light.h
         src/hierarchy/TransformNode.cpp
         include/hierarchy/TransformNode.h
-        src/shaders/IShader.cpp
-        include/shaders/IShader.h
+        src/rendering/rasterizing/shaders/IShader.cpp
+        include/rendering/rasterizing/shaders/IShader.h
         src/rendering/rasterizing/Pipeline.cpp
         include/rendering/rasterizing/Pipeline.h
-        src/shaders/FlatMeshShader.cpp
-        include/shaders/FlatMeshShader.h
-        src/shaders/GouraudMeshShader.cpp
-        include/shaders/GouraudMeshShader.h
-        src/shaders/PhongMeshShader.cpp
-        include/shaders/PhongMeshShader.h
-        src/shaders/IMeshShader.cpp
-        include/shaders/IMeshShader.h
-        src/shaders/NormalMappingMeshShader.cpp
-        include/shaders/NormalMappingMeshShader.h
-        src/shaders/BlinnPhongReflectionMeshShader.cpp
-        include/shaders/BlinnPhongReflectionMeshShader.h
-        include/shaders/DepthMeshShader.h
-        src/shaders/DepthMeshShader.cpp
+        src/rendering/rasterizing/shaders/FlatMeshShader.cpp
+        include/rendering/rasterizing/shaders/FlatMeshShader.h
+        src/rendering/rasterizing/shaders/GouraudMeshShader.cpp
+        include/rendering/rasterizing/shaders/GouraudMeshShader.h
+        src/rendering/rasterizing/shaders/PhongMeshShader.cpp
+        include/rendering/rasterizing/shaders/PhongMeshShader.h
+        src/rendering/rasterizing/shaders/IMeshShader.cpp
+        include/rendering/rasterizing/shaders/IMeshShader.h
+        src/rendering/rasterizing/shaders/NormalMappingMeshShader.cpp
+        include/rendering/rasterizing/shaders/NormalMappingMeshShader.h
+        src/rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.cpp
+        include/rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.h
+        include/rendering/rasterizing/shaders/DepthMeshShader.h
+        src/rendering/rasterizing/shaders/DepthMeshShader.cpp
         src/postprocessors/IPostprocessor.cpp
         include/postprocessors/IPostprocessor.h
         src/postprocessors/ScreenSpaceAmbientOcclusion.cpp
@@ -62,12 +62,12 @@ add_executable(UltRenderer src/Main.cpp
         include/postprocessors/EmptyPostprocessor.h
         src/rendering/rasterizing/bakers/PreBakedAmbientOcclusion.cpp
         include/rendering/rasterizing/bakers/PreBakedAmbientOcclusion.h
-        src/shaders/PreBakedAmbientOcclusionMeshShader.cpp
-        include/shaders/PreBakedAmbientOcclusionMeshShader.h
+        src/rendering/rasterizing/shaders/PreBakedAmbientOcclusionMeshShader.cpp
+        include/rendering/rasterizing/shaders/PreBakedAmbientOcclusionMeshShader.h
         src/rendering/rasterizing/Helper.cpp
         include/rendering/rasterizing/Helper.h
-        src/shaders/DepthPeelingMeshShader.cpp
-        include/shaders/DepthPeelingMeshShader.h
+        src/rendering/rasterizing/shaders/DepthPeelingMeshShader.cpp
+        include/rendering/rasterizing/shaders/DepthPeelingMeshShader.h
         src/data/BoundingInfo.cpp
         include/data/BoundingInfo.h
         include/rendering/raytracing/WhittedStyleRaytracingShader.h

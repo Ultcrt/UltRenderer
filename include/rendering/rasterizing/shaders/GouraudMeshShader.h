@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_GOURAUDMESHSHADER_H
 #define ULTRENDERER_GOURAUDMESHSHADER_H
 
-#include "shaders/IMeshShader.h"
+#include "IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {

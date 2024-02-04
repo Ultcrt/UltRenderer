@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_BLINNPHONGREFLECTIONMESHSHADER_H
 #define ULTRENDERER_BLINNPHONGREFLECTIONMESHSHADER_H
 
-#include "shaders/IMeshShader.h"
+#include "IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {

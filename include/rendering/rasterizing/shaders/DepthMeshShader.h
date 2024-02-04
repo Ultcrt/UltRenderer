@@ -5,7 +5,7 @@
 #ifndef ULTRENDERER_DEPTHMESHSHADER_H
 #define ULTRENDERER_DEPTHMESHSHADER_H
 
-#include "shaders/IMeshShader.h"
+#include "IMeshShader.h"
 
 namespace UltRenderer {
     namespace Shaders {
