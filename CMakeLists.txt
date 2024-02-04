@@ -70,8 +70,8 @@ add_executable(UltRenderer src/Main.cpp
         include/shaders/DepthPeelingMeshShader.h
         src/data/BoundingInfo.cpp
         include/data/BoundingInfo.h
-        include/rendering/raytracing/WhittedStyleRaytracing.h
-        src/rendering/raytracing/WhittedStyleRaytracing.cpp
+        include/rendering/raytracing/WhittedStyleRaytracingShader.h
+        src/rendering/raytracing/WhittedStyleRaytracingShader.cpp
         src/math/Ray.cpp
         include/math/Ray.h
         src/data/IntersectionInfo.cpp
@@ -89,6 +89,10 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/Constants.cpp
         include/rendering/Constants.h
         src/data/Color.cpp
-        include/data/Color.h)
+        include/data/Color.h
+        src/rendering/raytracing/BackwardsPathtracingShader.cpp
+        include/rendering/raytracing/BackwardsPathtracingShader.h
+        src/rendering/raytracing/IRayShader.cpp
+        include/rendering/raytracing/IRayShader.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

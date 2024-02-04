@@ -3,19 +3,27 @@
 //
 
 #include <iostream>
-#include "rendering/raytracing/WhittedStyleRaytracing.h"
+#include "rendering/raytracing/WhittedStyleRaytracingShader.h"
 #include "math/Geometry.h"
 #include "rendering/Constants.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
-            Data::Color<Data::ColorFormat::RGBA> Cast(
-                    const Math::Ray& ray,
-                    const Scene* pScene,
-                    const Math::Vector4D& backgroundColor,
-                    double eps,
-                    std::size_t maxRecursion) {
+            Data::Color<Data::ColorFormat::RGBA>
+            WhittedStyleRaytracingShader::operator()(const Math::Vector3D &pixelCenterCamera, double pixelWidthCamera,
+                                                     double pixelHeightCamera, const Math::Transform3D &transform,
+                                                     const Math::Vector3D &cameraOriginWorld, const Scene *pScene) const {
+                const auto pixelCenterWorld = (transform *
+                                               pixelCenterCamera.toHomogeneousCoordinates(1)).toCartesianCoordinates();
+                const Math::Ray pixelRay(cameraOriginWorld, (pixelCenterWorld - cameraOriginWorld).normalized());
+                return Cast(pixelRay, pScene);
+            }
+
+            Data::Color<Data::ColorFormat::RGBA>
+            WhittedStyleRaytracingShader::Cast(const Math::Ray &ray, const Scene *pScene,
+                                               const Math::Vector4D &backgroundColor, double eps,
+                                               std::size_t maxRecursion) {
                 Math::Vector4D color = backgroundColor;
 
                 // Restrict max recursion number
