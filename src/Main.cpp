@@ -6,8 +6,8 @@
 #include "rendering/rasterizing/Camera.h"
 #include "rendering/Light.h"
 #include "rendering/Scene.h"
-#include "shaders/FlatMeshShader.h"
-#include "shaders/BlinnPhongReflectionMeshShader.h"
+#include "rendering/rasterizing/shaders/FlatMeshShader.h"
+#include "rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.h"
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 #include "rendering/raytracing/Camera.h"
 #include "math/Ray.h"
@@ -16,9 +16,9 @@
 using namespace UltRenderer;
 
 int main() {
-    Shaders::BlinnPhongReflectionMeshInterpolator it;
-    Shaders::BlinnPhongReflectionMeshVertexShader vs;
-    Shaders::BlinnPhongReflectionMeshFragmentShader fs;
+    Rendering::Rasterizing::Shaders::BlinnPhongReflectionMeshInterpolator it;
+    Rendering::Rasterizing::Shaders::BlinnPhongReflectionMeshVertexShader vs;
+    Rendering::Rasterizing::Shaders::BlinnPhongReflectionMeshFragmentShader fs;
     Postprocessors::ScreenSpaceAmbientOcclusion ssao;
 
     // Obj material

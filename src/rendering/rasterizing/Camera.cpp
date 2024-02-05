@@ -3,7 +3,7 @@
 //
 
 #include "rendering/rasterizing/Camera.h"
-#include "shaders/BlinnPhongReflectionMeshShader.h"
+#include "rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.h"
 #include "rendering/raytracing/Camera.h"
 
 

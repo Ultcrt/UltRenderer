@@ -12,13 +12,13 @@
 #include "data/TriangleMesh.h"
 #include "Rasterizing.h"
 #include "Pipeline.h"
-#include "shaders/IMeshShader.h"
+#include "rendering/rasterizing/shaders/IMeshShader.h"
 #include "rendering/ICamera.h"
 #include "rendering/Scene.h"
-#include "shaders/DepthMeshShader.h"
+#include "rendering/rasterizing/shaders/DepthMeshShader.h"
 #include "postprocessors/EmptyPostprocessor.h"
 #include "Helper.h"
-#include "shaders/DepthPeelingMeshShader.h"
+#include "rendering/rasterizing/shaders/DepthPeelingMeshShader.h"
 
 namespace UltRenderer {
     namespace Rendering {

@@ -8,14 +8,18 @@
 #include "IMeshShader.h"
 
 namespace UltRenderer {
-    namespace Shaders {
-        class DepthPeelingMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
-        public:
-            const Data::Image* pLastDepthLayer;
+    namespace Rendering {
+        namespace Rasterizing {
+            namespace Shaders {
+                class DepthPeelingMeshFragmentShader: public IMeshFragmentShader<IMeshVarying> {
+                public:
+                    const Data::Image* pLastDepthLayer;
 
-            bool operator()(const IMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
-        };
-    } // Shaders
+                    bool operator()(const IMeshVarying& varying, const Math::Vector4D& fragCoord, Math::Vector4D& color, double& depth) const override;
+                };
+            } // Shaders
+        } // Rasterizing
+    } // Rendering
 } // UltRenderer
 
 #endif //ULTRENDERER_DEPTHPEELINGMESHSHADER_H

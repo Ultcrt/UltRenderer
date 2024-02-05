@@ -6,8 +6,8 @@
 #include "rendering/rasterizing/bakers/PreBakedAmbientOcclusion.h"
 #include "rendering/Scene.h"
 #include "math/Geometry.h"
-#include "shaders/DepthMeshShader.h"
-#include "shaders/PreBakedAmbientOcclusionMeshShader.h"
+#include "rendering/rasterizing/shaders/DepthMeshShader.h"
+#include "rendering/rasterizing/shaders/PreBakedAmbientOcclusionMeshShader.h"
 #include "rendering/rasterizing/Helper.h"
 
 namespace UltRenderer {

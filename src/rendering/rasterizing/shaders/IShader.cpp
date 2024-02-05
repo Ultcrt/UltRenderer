@@ -2,9 +2,13 @@
 // Created by ultcrt on 24-1-4.
 //
 
-#include "shaders/IShader.h"
+#include "rendering/rasterizing/shaders/IShader.h"
 
 namespace UltRenderer {
-    namespace Shaders {
+    namespace Rendering {
+        namespace Rasterizing {
+            namespace Shaders {
+            } // Rendering
+        } // Rasterizing
     } // Rendering
 } // UltRender

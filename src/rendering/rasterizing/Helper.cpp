@@ -3,7 +3,7 @@
 //
 
 #include "rendering/rasterizing/Helper.h"
-#include "shaders/IMeshShader.h"
+#include "rendering/rasterizing/shaders/IMeshShader.h"
 #include "math/Geometry.h"
 #include "rendering/rasterizing/Camera.h"
 

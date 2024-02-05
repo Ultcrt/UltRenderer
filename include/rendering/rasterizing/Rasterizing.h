@@ -10,7 +10,7 @@
 #include "math/Matrix.h"
 #include "data/Image.h"
 #include "math/Geometry.h"
-#include "shaders/IShader.h"
+#include "rendering/rasterizing/shaders/IShader.h"
 
 namespace UltRenderer {
     namespace Rendering {

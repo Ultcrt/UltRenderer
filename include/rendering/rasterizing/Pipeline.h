@@ -10,7 +10,7 @@
 #include <thread>
 #include "math/Matrix.h"
 #include "data/Image.h"
-#include "shaders/IShader.h"
+#include "rendering/rasterizing/shaders/IShader.h"
 #include "Rasterizing.h"
 #include "math/Transform.h"
 #include "postprocessors/EmptyPostprocessor.h"
