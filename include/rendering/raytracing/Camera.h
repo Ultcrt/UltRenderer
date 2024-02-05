@@ -6,7 +6,7 @@
 #define ULTRENDERER_RAYTRACING_CAMERA_H
 
 #include "rendering/ICamera.h"
-#include "rendering/raytracing/WhittedStyleRaytracingShader.h"
+#include "rendering/raytracing/shaders/WhittedStyleRaytracingShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -19,13 +19,13 @@ namespace UltRenderer {
                 Camera(double width, double height,
                        double zMin = 0.1, double zMax = 10, ProjectionType projectionType = ProjectionType::PERSPECTIVE);
 
-                template<std::derived_from<IRayShader> RS>
+                template<std::derived_from<Shaders::IRayShader> RS>
                 [[nodiscard]] Data::Image render(std::size_t width, std::size_t height, const RS& rayShader) const;
 
                 [[nodiscard]] Data::Image render(std::size_t width, std::size_t height) const override;
             };
 
-            template<std::derived_from<IRayShader> RS>
+            template<std::derived_from<Shaders::IRayShader> RS>
             Data::Image Camera::render(std::size_t width, std::size_t height, const RS& rayShader) const {
                 Data::Image img(width, height, Data::ColorFormat::RGBA);
 

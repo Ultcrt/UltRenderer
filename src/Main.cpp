@@ -75,7 +75,7 @@ int main() {
 
     // Rendering
     auto start = std::chrono::high_resolution_clock::now();
-    auto imgRasterizing = pRasterizingCamera->render(1920, 1920, vs, fs, it);
+    auto imgRasterizing = pRasterizingCamera->render(800, 800, vs, fs, it);
     auto imgRaytracing = pRaytracingCamera->render(800, 800);
     auto finish = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";

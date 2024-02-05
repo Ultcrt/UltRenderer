@@ -6,7 +6,7 @@
 #include <iostream>
 #include "rendering/raytracing/Camera.h"
 #include "math/Ray.h"
-#include "rendering/raytracing/WhittedStyleRaytracingShader.h"
+#include "rendering/raytracing/shaders/WhittedStyleRaytracingShader.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -16,8 +16,8 @@ namespace UltRenderer {
             }
 
             Data::Image Camera::render(std::size_t width, std::size_t height) const {
-                WhittedStyleRaytracingShader shader;
-                return this->render<WhittedStyleRaytracingShader>(width, height, shader);
+                Shaders::WhittedStyleRaytracingShader shader;
+                return this->render<Shaders::WhittedStyleRaytracingShader>(width, height, shader);
             }
         } // Raytracing
     } // Rendering
