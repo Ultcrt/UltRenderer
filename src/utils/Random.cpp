@@ -45,6 +45,12 @@ namespace UltRenderer {
             return res;
         }
 
+        /**
+         * Sampling uniformly from semi-sphere. Semi-sphere is facing y-axis
+         * @param n Sampling number
+         * @param pSeed Random seed pointer
+         * @return
+         */
         std::vector<Math::Vector3D> Random::SampleFromUnitSemiSphere(std::size_t n, std::size_t* pSeed) {
             std::vector<Math::Vector3D> res;
             for (std::size_t idx = 0; idx < n; idx++) {
