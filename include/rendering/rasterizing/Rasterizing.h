@@ -133,6 +133,7 @@ namespace UltRenderer {
 
                 for (std::size_t xIdx = minVec.x(); xIdx <= maxVec.x(); xIdx++) {
                     for (std::size_t yIdx = minVec.y(); yIdx <= maxVec.y(); yIdx++) {
+                        // Excellent explanation about perspective correction: https://stackoverflow.com/a/24460895/11889237
                         // Get barycentric coordinate in screen space
                         auto fragBarycentricCoord = Math::Geometry::ComputeBarycentricCoords({static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5}, points);
 
