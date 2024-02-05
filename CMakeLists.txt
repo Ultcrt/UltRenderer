@@ -93,6 +93,8 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/raytracing/shaders/BackwardsPathtracingShader.cpp
         include/rendering/raytracing/shaders/BackwardsPathtracingShader.h
         src/rendering/raytracing/shaders/IRayShader.cpp
-        include/rendering/raytracing/shaders/IRayShader.h)
+        include/rendering/raytracing/shaders/IRayShader.h
+        src/utils/Random.cpp
+        include/utils/Random.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

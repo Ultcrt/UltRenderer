@@ -5,8 +5,6 @@
 #ifndef ULTRENDERER_GEOMETRY_H
 #define ULTRENDERER_GEOMETRY_H
 
-#include <random>
-#include <utility>
 #include <vector>
 #include <array>
 #include "Matrix.h"
@@ -29,10 +27,6 @@ namespace UltRenderer {
             Vector3D ComputeBarycentricCoords(const Vector2D& point, const std::array<Vector2D, 3>& trianglePoints);
 
             Vector3D ComputeBarycentricCoords(const Vector3D& point, const std::array<Vector3D, 3>& trianglePoints);
-
-            std::vector<Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
-
-            std::vector<Vector3D> SampleFromUnitSemiSphere(std::size_t n, std::size_t seed = std::random_device()());
 
             Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target);
 

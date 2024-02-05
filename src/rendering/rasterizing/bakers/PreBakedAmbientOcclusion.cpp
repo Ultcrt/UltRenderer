@@ -4,8 +4,7 @@
 
 #include <vector>
 #include "rendering/rasterizing/bakers/PreBakedAmbientOcclusion.h"
-#include "rendering/Scene.h"
-#include "math/Geometry.h"
+#include "utils/Random.h"
 #include "rendering/rasterizing/shaders/DepthMeshShader.h"
 #include "rendering/rasterizing/shaders/PreBakedAmbientOcclusionMeshShader.h"
 #include "rendering/rasterizing/Helper.h"
@@ -17,7 +16,7 @@ namespace UltRenderer {
                 Data::Image PreBakedAmbientOcclusion::operator()(const std::shared_ptr<Data::TriangleMesh> &pMesh) const {
                     Data::Image bakedTexture(width, height, Data::ColorFormat::GRAY);
 
-                    std::vector<Math::Vector3D> sampledPoints = Math::Geometry::SampleFromUnitSphere(samplingNum);
+                    std::vector<Math::Vector3D> sampledPoints = Utils::Random::SampleFromUnitSphere(samplingNum);
 
                     Shaders::PreBakedAmbientOcclusionMeshInterpolator interpolator;
                     Shaders::PreBakedAmbientOcclusionMeshVertexShader vertexShader;
