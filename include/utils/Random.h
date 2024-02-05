@@ -7,15 +7,25 @@
 
 #include <random>
 #include <utility>
+#include <memory>
 #include "math/Matrix.h"
 
 namespace UltRenderer {
     namespace Utils {
-        namespace Random {
-            std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
+        class Random {
+        private:
+            static std::size_t _seed;
+            static std::shared_ptr<std::mt19937> _pEngine;
 
-            std::vector<Math::Vector3D> SampleFromUnitSemiSphere(std::size_t n, std::size_t seed = std::random_device()());
-        }
+        public:
+            static void SetSeed(std::size_t seed);
+
+            static double Range(double l = 0, double r = 1, std::size_t* pSeed = nullptr);
+
+            static std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t* pSeed = nullptr);
+
+            static std::vector<Math::Vector3D> SampleFromUnitSemiSphere(std::size_t n, std::size_t* pSeed = nullptr);
+        };
     } // Utils
 } // UltRenderer
 
