@@ -15,6 +15,7 @@ namespace UltRenderer {
             public:
                 std::size_t maxThreads = 20;
 
+                // TODO: Need to deal with ORTHOGONAL projection
                 Camera(double width, double height,
                        double zMin = 0.1, double zMax = 10, ProjectionType projectionType = ProjectionType::PERSPECTIVE);
 
