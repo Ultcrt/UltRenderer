@@ -32,6 +32,8 @@ namespace UltRenderer {
 
             std::vector<Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t seed = std::random_device()());
 
+            std::vector<Vector3D> SampleFromUnitSemiSphere(std::size_t n, std::size_t seed = std::random_device()());
+
             Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target);
 
             Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction);
