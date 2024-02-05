@@ -138,24 +138,26 @@ namespace UltRenderer {
 
                         // Check the point is inside triangle or not
                         if (fragBarycentricCoord.x() >= 0 && fragBarycentricCoord.y() >= 0 && fragBarycentricCoord.z() >= 0) {
+                            // FragCoord is under frag coordinate, should apply fragBarycentricCoord instead of clipBarycentricCoord
+                            double depth = preciseFragCoords[0].z() * fragBarycentricCoord[0] + preciseFragCoords[1].z() * fragBarycentricCoord[1] + preciseFragCoords[2].z() * fragBarycentricCoord[2];
+                            const double w = preciseFragCoords[0].w() * fragBarycentricCoord[0] + preciseFragCoords[1].w() * fragBarycentricCoord[1] + preciseFragCoords[2].w() * fragBarycentricCoord[2];
+
                             // Perform perspective correction
                             auto clipBarycentricCoord = Math::Vector3D{
                                     fragBarycentricCoord.x() * preciseFragCoords[0].w(),
                                     fragBarycentricCoord.y() * preciseFragCoords[1].w(),
                                     fragBarycentricCoord.z() * preciseFragCoords[2].w()
-                            } / (fragBarycentricCoord.x() * preciseFragCoords[0].w() + fragBarycentricCoord.y() * preciseFragCoords[1].w() + fragBarycentricCoord.z() * preciseFragCoords[2].w());
+                            } / w;
 
                             V interpolatedVarying = interpolator(varyings, clipBarycentricCoord);
 
                             Math::Vector4D color = fBuffer.at<Data::ColorFormat::RGBA>(xIdx, yIdx);
 
-                            // TODO: gl_FragDepth not work correctly, depth test should be done before or after fragment shader depending on gl_FragDepth is set or not
-                            double depth = preciseFragCoords[0].z() * clipBarycentricCoord[0] + preciseFragCoords[1].z() * clipBarycentricCoord[1] + preciseFragCoords[2].z() * clipBarycentricCoord[2];
-                            const double w = 1 / preciseFragCoords[0].w() * clipBarycentricCoord[0] + 1 / preciseFragCoords[1].w() * clipBarycentricCoord[1] + 1 / preciseFragCoords[2].w() * clipBarycentricCoord[2];
 
                             // Tips: Should not calculate xy using barycentric coord, because float error would make result not the same as xIdx + 0.5, yIdx + 0.5
-                            const Math::Vector4D fragCoord = {static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5, depth, 1 / w};
+                            const Math::Vector4D fragCoord = {static_cast<double>(xIdx) + 0.5, static_cast<double>(yIdx) + 0.5, depth, w};
 
+                            // TODO: gl_FragDepth not work correctly, depth test should be done before or after fragment shader depending on gl_FragDepth is set or not
                             // Only update when not discard
                             if (fragmentShader(interpolatedVarying, fragCoord, color, depth)) {
                                 if (depth < zBuffer.at<Data::ColorFormat::GRAY>(xIdx, yIdx)[0]) {
