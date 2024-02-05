@@ -28,6 +28,8 @@ namespace UltRenderer {
 
             Vector3D ComputeBarycentricCoords(const Vector3D& point, const std::array<Vector3D, 3>& trianglePoints);
 
+            Matrix3D GetTBN(const Vector3D& tangent, const Vector3D& normal);
+
             Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target);
 
             Vector3D ComputeReflectionDirection(const Vector3D& normal, const Vector3D& direction);

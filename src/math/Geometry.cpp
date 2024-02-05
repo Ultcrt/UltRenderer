@@ -49,7 +49,7 @@ namespace UltRenderer {
                 return {u, v, w};
             }
 
-            Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target) {
+            Matrix3D GetTBN(const Vector3D& tangent, const Vector3D& normal) {
                 // Make sure TBN are orthogonal
                 auto b = normal.cross(tangent);
                 auto n = normal;
@@ -65,6 +65,12 @@ namespace UltRenderer {
                         t.y(), b.y(), n.y(),
                         t.z(), b.z(), n.z(),
                 };
+
+                return tbn;
+            }
+
+            Vector3D ConvertDarbouxNormalToGlobal(const Vector3D& tangent, const Vector3D& normal, const Vector3D& target) {
+                const auto& tbn = GetTBN(tangent, normal);
 
                 return (tbn * target).normalized();
             }
