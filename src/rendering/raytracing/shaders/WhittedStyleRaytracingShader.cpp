@@ -18,17 +18,15 @@ namespace UltRenderer {
                     const auto pixelCenterWorld = (transform *
                                                    pixelCenterCamera.toHomogeneousCoordinates(1)).toCartesianCoordinates();
                     const Math::Ray pixelRay(cameraOriginWorld, (pixelCenterWorld - cameraOriginWorld).normalized());
-                    return Cast(pixelRay, pScene);
+                    return Cast(pixelRay, pScene, 0);
                 }
 
                 Data::Color<Data::ColorFormat::RGBA>
-                WhittedStyleRaytracingShader::Cast(const Math::Ray &ray, const Scene *pScene,
-                                                   const Math::Vector4D &backgroundColor, double eps,
-                                                   std::size_t maxRecursion) {
+                WhittedStyleRaytracingShader::Cast(const Math::Ray &ray, const Scene *pScene, std::size_t recursionLayer) const {
                     Math::Vector4D color = backgroundColor;
 
                     // Restrict max recursion number
-                    if (maxRecursion != 0) {
+                    if (recursionLayer < maxRecursion) {
                         const auto info = ray.intersect(pScene->meshes());
 
                         if (info.isIntersected) {
@@ -124,14 +122,14 @@ namespace UltRenderer {
                                 const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                                 const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                                 const Math::Ray reflectionRay(reflectionOrigin, reflectionDirection);
-                                reflectionColor = Cast(reflectionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ColorFormat::RGB>();
+                                reflectionColor = Cast(reflectionRay, pScene, recursionLayer + 1).to<Data::ColorFormat::RGB>();
                             }
 
                             if (mat.refractionCoefficient > 0) {
                                 const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, inRefractiveIndex / outRefractiveIndex);
                                 const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                                 const Math::Ray refractionRay(refractionOrigin, refractionDirection);
-                                refractionColor = Cast(refractionRay, pScene, backgroundColor, eps, maxRecursion - 1).to<Data::ColorFormat::RGB>();
+                                refractionColor = Cast(refractionRay, pScene, recursionLayer + 1).to<Data::ColorFormat::RGB>();
                             }
 
                             double kr = Math::Geometry::ComputeFresnel(normal, ray.direction, inRefractiveIndex, outRefractiveIndex);

@@ -18,6 +18,10 @@ namespace UltRenderer {
             namespace Shaders {
                 class WhittedStyleRaytracingShader: public IRayShader {
                 public:
+                    Math::Vector4D backgroundColor = {1, 1, 1, 1};
+                    double eps = 1e-6;
+                    std::size_t maxRecursion = 3;
+
                     Data::Color<Data::ColorFormat::RGBA> operator()(
                             const Math::Vector3D& pixelCenterCamera,
                             double pixelWidthCamera,
@@ -26,12 +30,7 @@ namespace UltRenderer {
                             const Math::Vector3D& cameraOriginWorld,
                             const Scene* pScene) const override;
 
-                    static Data::Color<Data::ColorFormat::RGBA> Cast(
-                            const Math::Ray& ray,
-                            const Scene* pScene,
-                            const Math::Vector4D& backgroundColor = {1, 1, 1, 1},
-                            double eps = 1e-6,
-                            std::size_t maxRecursion = 3);
+                    Data::Color<Data::ColorFormat::RGBA> Cast(const Math::Ray& ray, const Scene* pScene, std::size_t recursionLayer) const;
                 };
             } // Shaders
         } // Raytracing
