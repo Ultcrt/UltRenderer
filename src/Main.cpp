@@ -80,16 +80,16 @@ int main() {
 
     // Rendering
     auto start = std::chrono::high_resolution_clock::now();
-    auto imgRasterizing = pRasterizingCamera->render(800, 800, vs, fs, it);
-    auto imgRaytracing = pRaytracingCamera->render(800, 800);
-    auto imgPathtracing = pRaytracingCamera->render(128, 128, rs);
+//    auto imgRasterizing = pRasterizingCamera->render(800, 800, vs, fs, it);
+//    auto imgRaytracing = pRaytracingCamera->render(800, 800);
+    auto imgPathtracing = pRaytracingCamera->render(800, 800, rs);
     auto finish = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::seconds>(finish-start).count() << "s\n";
 
 
     // Saving
-    imgRasterizing.save("rasterizing.tga");
-    imgRaytracing.save("raytracing.tga");
+//    imgRasterizing.save("rasterizing.tga");
+//    imgRaytracing.save("raytracing.tga");
     imgPathtracing.save("pathtracing.tga");
 
     return 0;

@@ -94,6 +94,7 @@ namespace UltRenderer {
                             else {
                                 brdf = mat.pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
                             }
+                            brdf /= M_PI;
 
                             // Above and below is relative to normal
                             Math::Vector3D intersectedPointAbove = ray.origin + ray.direction * (info.length - eps);
