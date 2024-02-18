@@ -10,6 +10,8 @@ namespace UltRenderer {
         std::shared_ptr<std::mt19937> Random::_pEngine = std::make_shared<std::mt19937>(Random::_seed);
 
         double Random::Range(double l, double r, std::size_t* pSeed) {
+            assert(l < r);
+
             std::shared_ptr<std::mt19937> pEngine;
 
             if (pSeed) {
