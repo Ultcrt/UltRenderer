@@ -95,6 +95,8 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/raytracing/shaders/IRayShader.cpp
         include/rendering/raytracing/shaders/IRayShader.h
         src/utils/Random.cpp
-        include/utils/Random.h)
+        include/utils/Random.h
+        src/rendering/BSDF.cpp
+        include/rendering/BSDF.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

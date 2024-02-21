@@ -6,6 +6,7 @@
 #include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
 #include "utils/Random.h"
 #include "math/Geometry.h"
+#include "rendering/BSDF.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -89,14 +90,7 @@ namespace UltRenderer {
                         Math::Vector3D intersectedPointFurther = ray.origin + ray.direction * (info.length + eps);
 
                         // TODO: Only implement Lambertian BRDF here
-                        Math::Vector3D brdf;
-                        if (mat.pTexture->type() == Data::ColorFormat::GRAY) {
-                            brdf = mat.pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
-                        }
-                        else {
-                            brdf = mat.pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
-                        }
-                        brdf /= M_PI;
+                        Math::Vector3D lambertianBRDF = BSDF::LambertianDiffuseBRDF(uv, mat);
 
                         Math::Vector4D directIr = {0, 0, 0, 1};
                         Math::Vector4D indirectIr = {0, 0, 0, 1};
@@ -110,7 +104,7 @@ namespace UltRenderer {
                             // Shadow check
                             if (!reversedLightRay.intersect(pScene->meshes()).isIntersected) {
                                 const double cos = std::abs(normal.dot(pLight->direction));
-                                directIr += pLight->intensity * brdf.toHomogeneousCoordinates(1) * cos;
+                                directIr += pLight->intensity * lambertianBRDF.toHomogeneousCoordinates(1) * cos;
                             }
                         }
 
@@ -141,7 +135,7 @@ namespace UltRenderer {
                                 const auto sampledInfo = sampledRay.intersect(*pScene);
 
                                 // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
-                                indirectIr += Cast(sampledRay, pScene).componentWiseProduct(brdf.toHomogeneousCoordinates(1)) * cos / _uniformSamplingPossibility / (1 - dropout) / static_cast<double>(numBouncedRays);
+                                indirectIr += Cast(sampledRay, pScene).componentWiseProduct(lambertianBRDF.toHomogeneousCoordinates(1)) * cos / _uniformSamplingPossibility / (1 - dropout) / static_cast<double>(numBouncedRays);
                             }
                         }
 
