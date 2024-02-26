@@ -111,6 +111,22 @@ namespace UltRenderer {
 
                 return (rs + rp) / 2;
             }
+
+            std::pair<double, Vector3D> MollerTrumboreIntersection(const Data::Ray& ray, const Vector3D &p0, const Vector3D &p1, const Vector3D &p2, double eps) {
+                // Tips: Möller–Trumbore intersection algorithm
+                const auto e1 = p1 - p0;
+                const auto e2 = p2 - p0;
+                const auto s = ray.origin - p0;
+                const auto s1 = ray.direction.cross(e2);
+                const auto s2 = s.cross(e1);
+
+                const auto factor = s1.dot(e1);
+                const auto t = s2.dot(e2) / factor;
+                const auto b1 = s1.dot(s) / factor;
+                const auto b2 = s2.dot(ray.direction) / factor;
+
+                return {t, {1 - b1 - b2, b1, b2}};
+            }
         }
     } // Utils
 } // UltRender

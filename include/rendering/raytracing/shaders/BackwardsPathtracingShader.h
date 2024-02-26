@@ -6,7 +6,7 @@
 #define ULTRENDERER_BACKWARDSPATHTRACINGSHADER_H
 
 #include "IRayShader.h"
-#include "math/Ray.h"
+#include "data/Ray.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -34,7 +34,7 @@ namespace UltRenderer {
                     ) const override;
 
                     Data::Color<Data::ColorFormat::RGBA> Cast(
-                            const Math::Ray& ray,
+                            const Data::Ray& ray,
                             const Scene* pScene) const;
                 };
             } // Shaders

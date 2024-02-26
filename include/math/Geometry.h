@@ -9,6 +9,7 @@
 #include <array>
 #include "Matrix.h"
 #include "data/BoundingInfo.h"
+#include "data/Ray.h"
 
 namespace UltRenderer {
     namespace Math {
@@ -37,6 +38,8 @@ namespace UltRenderer {
             Vector3D ComputeRefractionDirection(const Vector3D& normal, const Vector3D& direction, double n12);
 
             double ComputeFresnel(const Vector3D& normal, const Vector3D& direction, double n1, double n2);
+
+            std::pair<double, Vector3D> MollerTrumboreIntersection(const Data::Ray& ray, const Vector3D &p0, const Vector3D &p1, const Vector3D &p2, double eps);
 
             /*----------Definition----------*/
             template<typename T, std::size_t N>

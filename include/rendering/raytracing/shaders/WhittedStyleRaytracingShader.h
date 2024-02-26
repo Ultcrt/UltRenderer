@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 #include "math/Matrix.h"
-#include "math/Ray.h"
+#include "data/Ray.h"
 #include "data/TriangleMesh.h"
 #include "IRayShader.h"
 
@@ -30,7 +30,7 @@ namespace UltRenderer {
                             const Math::Vector3D& cameraOriginWorld,
                             const Scene* pScene) const override;
 
-                    Data::Color<Data::ColorFormat::RGBA> Cast(const Math::Ray& ray, const Scene* pScene, std::size_t recursionLayer) const;
+                    Data::Color<Data::ColorFormat::RGBA> Cast(const Data::Ray& ray, const Scene* pScene, std::size_t recursionLayer) const;
                 };
             } // Shaders
         } // Raytracing

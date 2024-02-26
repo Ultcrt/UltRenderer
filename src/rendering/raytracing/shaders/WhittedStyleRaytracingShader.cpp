@@ -17,43 +17,25 @@ namespace UltRenderer {
                                                          const Math::Vector3D &cameraOriginWorld, const Scene *pScene) const {
                     const auto pixelCenterWorld = (transform *
                                                    pixelCenterCamera.toHomogeneousCoordinates(1)).toCartesianCoordinates();
-                    const Math::Ray pixelRay(cameraOriginWorld, (pixelCenterWorld - cameraOriginWorld).normalized());
+                    const Data::Ray pixelRay(cameraOriginWorld, (pixelCenterWorld - cameraOriginWorld).normalized());
                     return Cast(pixelRay, pScene, 0);
                 }
 
                 Data::Color<Data::ColorFormat::RGBA>
-                WhittedStyleRaytracingShader::Cast(const Math::Ray &ray, const Scene *pScene, std::size_t recursionLayer) const {
+                WhittedStyleRaytracingShader::Cast(const Data::Ray &ray, const Scene *pScene, std::size_t recursionLayer) const {
                     Math::Vector4D color = backgroundColor;
 
                     // Restrict max recursion number
                     if (recursionLayer < maxRecursion) {
-                        const auto info = ray.intersect(pScene->meshes());
+                        const auto info = ray.intersect(*pScene);
 
                         if (info.isIntersected) {
-                            const auto& mesh = *info.pMesh;
-                            const auto& mat = *mesh.pMaterial;
-                            const auto& baryCentricCoord = info.barycentricCoord;
-                            const auto& triangle = mesh.triangles[info.triangleIdx];
+                            const auto& node = *info.pNode;
+                            const auto& mat = *node.pMaterial;
 
-                            const auto& uv0 = mesh.vertexTextures[triangle[0]];
-                            const auto& uv1 = mesh.vertexTextures[triangle[1]];
-                            const auto& uv2 = mesh.vertexTextures[triangle[2]];
+                            const auto& uv = info.uv;
 
-                            const Math::Vector3D uv = uv0 * baryCentricCoord[0] + uv1 * baryCentricCoord[1] + uv2 * baryCentricCoord[2];
-
-                            Math::Vector3D normal = mesh.vertexNormals[0] * baryCentricCoord[0] + mesh.vertexNormals[1] * baryCentricCoord[1] + mesh.vertexNormals[2] * baryCentricCoord[2];
-                            if (mat.pNormalMap) {
-                                normal = (*mat.pNormalMap).get<Data::ColorFormat::RGB>(uv[0], uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-                                if (mat.normalMapType == Data::NormalMapType::DARBOUX) {
-                                    const auto& triangleNormal = (mesh.transformMatrix * mesh.triangleNormals[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
-                                    const auto& triangleTangent = (mesh.transformMatrix * mesh.triangleTangents[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
-
-                                    normal = Math::Geometry::ConvertDarbouxNormalToGlobal(triangleTangent, triangleNormal, normal);
-                                }
-                                else {
-                                    normal = (mesh.transformMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
-                                }
-                            }
+                            Math::Vector3D normal = info.normal;
 
                             // Above and below is relative to normal
                             Math::Vector3D intersectedPointAbove = ray.origin + ray.direction * (info.length - eps);
@@ -89,7 +71,7 @@ namespace UltRenderer {
                                 // Make sure the ray will never be occluded by intersected surface
                                 const Math::Vector3D lightRayDirection = -pLight->direction;
                                 const Math::Vector3D lightRayOrigin = normal.dot(lightRayDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
-                                Math::Ray lightRay(lightRayOrigin, lightRayDirection);
+                                Data::Ray lightRay(lightRayOrigin, lightRayDirection);
 
                                 const auto lightIntersectionInfo = lightRay.intersect(*pScene);
 
@@ -121,14 +103,14 @@ namespace UltRenderer {
                             if (mat.reflectionCoefficient > 0) {
                                 const auto& reflectionDirection = Math::Geometry::ComputeReflectionDirection(normal, ray.direction);
                                 const auto& reflectionOrigin = normal.dot(reflectionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
-                                const Math::Ray reflectionRay(reflectionOrigin, reflectionDirection);
+                                const Data::Ray reflectionRay(reflectionOrigin, reflectionDirection);
                                 reflectionColor = Cast(reflectionRay, pScene, recursionLayer + 1).to<Data::ColorFormat::RGB>();
                             }
 
                             if (mat.refractionCoefficient > 0) {
                                 const auto& refractionDirection = Math::Geometry::ComputeRefractionDirection(normal, ray.direction, inRefractiveIndex / outRefractiveIndex);
                                 const auto& refractionOrigin = normal.dot(refractionDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
-                                const Math::Ray refractionRay(refractionOrigin, refractionDirection);
+                                const Data::Ray refractionRay(refractionOrigin, refractionDirection);
                                 refractionColor = Cast(refractionRay, pScene, recursionLayer + 1).to<Data::ColorFormat::RGB>();
                             }
 

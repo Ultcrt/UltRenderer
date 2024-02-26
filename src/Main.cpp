@@ -10,9 +10,10 @@
 #include "rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.h"
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 #include "rendering/raytracing/Camera.h"
-#include "math/Ray.h"
+#include "data/Ray.h"
 #include "rendering/Material.h"
 #include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
+#include "data/GeometricPrimitives.h"
 
 using namespace UltRenderer;
 
@@ -57,6 +58,10 @@ int main() {
     auto pFloorMesh = std::make_shared<Data::TriangleMesh>("../data/floor.obj");
     pFloorMesh->pMaterial = pFloorMat;
 
+    // Geometry
+    auto pSphere = std::make_shared<Data::GeometricPrimitives::Sphere>(Math::Vector3D{0, 0, 0}, 0.3);
+    pSphere->pMaterial = pFloorMat;
+
     // Camera
     auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 3);
     auto pRaytracingCamera = std::make_shared<Rendering::Raytracing::Camera>(2, 2, 3);
@@ -73,6 +78,7 @@ int main() {
 
     scene.addMesh(pMesh);
     scene.addMesh(pFloorMesh);
+    scene.addIntersectables(pSphere);
     scene.addCamera(pRasterizingCamera);
     scene.addCamera(pRaytracingCamera);
     scene.addLight(pLight0);

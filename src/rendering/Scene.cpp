@@ -9,6 +9,13 @@ namespace UltRenderer {
         void Scene::addMesh(const std::shared_ptr<Data::TriangleMesh> &target) {
             target->setScene(this);
             _meshes.emplace_back(target);
+            // Mesh is also intersectable
+            _intersectables.emplace_back(target);
+        }
+
+        void Scene::addIntersectables(const std::shared_ptr<Hierarchy::IntersectableNode> &target) {
+            target->setScene(this);
+            _intersectables.emplace_back(target);
         }
 
         void Scene::addLight(const std::shared_ptr<Light> &target) {
@@ -31,6 +38,10 @@ namespace UltRenderer {
 
         std::vector<std::shared_ptr<ICamera>> Scene::cameras() const {
             return _cameras;
+        }
+
+        std::vector<std::shared_ptr<Hierarchy::IntersectableNode>> Scene::intersectables() const {
+            return _intersectables;
         }
     } // Rendering
 } // UltRenderer

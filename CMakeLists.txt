@@ -72,8 +72,8 @@ add_executable(UltRenderer src/Main.cpp
         include/data/BoundingInfo.h
         include/rendering/raytracing/shaders/WhittedStyleRaytracingShader.h
         src/rendering/raytracing/shaders/WhittedStyleRaytracingShader.cpp
-        src/math/Ray.cpp
-        include/math/Ray.h
+        src/data/Ray.cpp
+        include/data/Ray.h
         src/data/IntersectionInfo.cpp
         include/data/IntersectionInfo.h
         src/rendering/raytracing/Camera.cpp
@@ -97,6 +97,10 @@ add_executable(UltRenderer src/Main.cpp
         src/utils/Random.cpp
         include/utils/Random.h
         src/rendering/BSDF.cpp
-        include/rendering/BSDF.h)
+        include/rendering/BSDF.h
+        src/hierarchy/IntersectableNode.cpp
+        include/hierarchy/IntersectableNode.h
+        src/data/GeometricPrimitives.cpp
+        include/data/GeometricPrimitives.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

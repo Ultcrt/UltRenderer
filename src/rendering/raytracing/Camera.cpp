@@ -5,7 +5,7 @@
 #include <thread>
 #include <iostream>
 #include "rendering/raytracing/Camera.h"
-#include "math/Ray.h"
+#include "data/Ray.h"
 #include "rendering/raytracing/shaders/WhittedStyleRaytracingShader.h"
 
 namespace UltRenderer {

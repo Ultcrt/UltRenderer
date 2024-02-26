@@ -11,7 +11,7 @@
 #include <memory>
 #include "data/Image.h"
 #include "math/Transform.h"
-#include "hierarchy/TransformNode.h"
+#include "hierarchy/IntersectableNode.h"
 #include "set"
 #include "data/BoundingInfo.h"
 #include "math/BVH.h"
@@ -19,9 +19,13 @@
 
 namespace UltRenderer {
     namespace Data {
-        class TriangleMesh: public Hierarchy::TransformNode {
+        class TriangleMesh: public Hierarchy::IntersectableNode {
         private:
             std::vector<Math::Vector3D> _transformedVertices;
+            Data::IntersectionInfo
+            _intersectBVH(const Data::Ray& ray, const Math::BVH::Node *pNode, bool& stop, bool fastCheck, double eps);
+
+            Data::IntersectionInfo _intersectTriangle(const Data::Ray& ray, std::size_t triangleIdx, double eps);
 
         public:
             std::vector<Math::Vector3D> vertices;
@@ -35,10 +39,7 @@ namespace UltRenderer {
             std::vector<std::set<std::size_t>> adjacentVertices;
             std::vector<std::set<std::size_t>> adjacentTriangles;
 
-            Data::BoundingInfo boundingInfo;
             Math::BVH::Tree bvh;
-
-            std::shared_ptr<Rendering::Material> pMaterial;
 
             TriangleMesh(const std::vector<Math::Vector3D>& vertices, const std::vector<Math::Vector3S>& indices, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
             explicit TriangleMesh(const std::string& filename, const Math::Vector3D& defaultColor = {0.5, 0.5, 0.5});
@@ -58,8 +59,9 @@ namespace UltRenderer {
             void updateTransformedVertex();
 
             [[nodiscard]] Math::Vector3D getTransformedVertex(std::size_t idx) const;
-        };
 
+            [[nodiscard]] Data::IntersectionInfo intersect(const Data::Ray &ray, double eps) override;
+        };
     } // UltRenderer
 } // Data
 

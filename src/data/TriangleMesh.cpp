@@ -321,5 +321,100 @@ namespace UltRenderer {
                 _transformedVertices.emplace_back((transformMatrix * vertex.toHomogeneousCoordinates(1)).toCartesianCoordinates());
             }
         }
+
+        Data::IntersectionInfo TriangleMesh::intersect(const Data::Ray &ray, double eps) {
+            bool stop = false;
+            auto info = _intersectBVH(ray, bvh.pRoot.get(), stop, false, eps);
+            return info;
+        }
+
+        Data::IntersectionInfo
+        TriangleMesh::_intersectBVH(const Data::Ray& ray, const Math::BVH::Node *pNode, bool& stop, bool fastCheck, double eps) {
+            Data::IntersectionInfo res;
+
+            // Fast stop
+            if (!stop) {
+                // Check children when intersected with bounding box
+                if (ray.intersect(pNode->boundingInfo).isIntersected) {
+                    // Leaf node, check primitives inside
+                    if (pNode->pLeft == nullptr and pNode->pRight == nullptr) {
+                        for (const auto& tIdx: pNode->primitiveIndices) {
+                            const auto info = _intersectTriangle(ray, tIdx, eps);
+
+                            if (info.isIntersected) {
+                                if (info.length < res.length) {
+                                    res = info;
+                                    if (fastCheck) {
+                                        stop = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Non-leaf node, check children nodes
+                    else {
+                        for (const auto& pChild: {pNode->pLeft.get(), pNode->pRight.get()}) {
+                            if (pChild != nullptr) {
+                                const auto newInfo = _intersectBVH(ray, pChild, stop, fastCheck, eps);
+
+                                if (newInfo.isIntersected) {
+                                    if (newInfo.length < res.length) {
+                                        res = newInfo;
+                                        if (fastCheck) {
+                                            stop = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        Data::IntersectionInfo TriangleMesh::_intersectTriangle(const Data::Ray& ray, std::size_t triangleIdx, double eps) {
+            const auto triangle = triangles[triangleIdx];
+
+            // To world frame
+            const auto p0 = getTransformedVertex(triangle[0]);
+            const auto p1 = getTransformedVertex(triangle[1]);
+            const auto p2 = getTransformedVertex(triangle[2]);
+            const auto uv0 = vertexTextures[triangle[0]];
+            const auto uv1 = vertexTextures[triangle[1]];
+            const auto uv2 = vertexTextures[triangle[2]];
+
+            auto res = Math::Geometry::MollerTrumboreIntersection(ray, p0, p1, p2, eps);
+            auto t = res.first;
+            auto b0 = res.second[0];
+            auto b1 = res.second[1];
+            auto b2 = res.second[2];
+
+            IntersectionInfo info;
+            if (t >= 0 && b0 >= 0 && b1 >= 0 && b2 >= 0) {
+                info.pNode = this;
+                info.isIntersected = true;
+                info.length = t;
+                info.uv = uv0 * b0 + uv1 * b1 + uv2 * b2;
+
+                auto normal = vertexNormals[0] * b0 + vertexNormals[1] * b1 + vertexNormals[2] * b2;
+                if (pMaterial->pNormalMap) {
+                    normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(info.uv[0], info.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
+                    if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
+                        const auto& triangleNormal = (transformMatrix * triangleNormals[triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
+                        const auto& triangleTangent = (transformMatrix * triangleTangents[triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
+
+                        normal = Math::Geometry::ConvertDarbouxNormalToGlobal(triangleTangent, triangleNormal, normal);
+                    }
+                    else {
+                        normal = (transformMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
+                    }
+                }
+
+                info.normal = normal;
+            }
+            return info;
+        }
     } // UltRenderer
 } // Data

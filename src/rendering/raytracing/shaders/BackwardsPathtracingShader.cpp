@@ -38,7 +38,7 @@ namespace UltRenderer {
                         const auto offsetCenterWorld = (transform *
                                 offsetCenterCamera.toHomogeneousCoordinates(1)).toCartesianCoordinates();
 
-                        const Math::Ray pixelRay(cameraOriginWorld, (offsetCenterWorld - cameraOriginWorld).normalized());
+                        const Data::Ray pixelRay(cameraOriginWorld, (offsetCenterWorld - cameraOriginWorld).normalized());
 
                         auto res = Cast(pixelRay, pScene);
 
@@ -49,41 +49,21 @@ namespace UltRenderer {
                 }
 
                 Data::Color<Data::ColorFormat::RGBA> BackwardsPathtracingShader::Cast(
-                        const Math::Ray& ray,
+                        const Data::Ray& ray,
                         const Scene* pScene) const {
                     // If not intersect with anything, then return background color
                     Data::Color<Data::ColorFormat::RGBA> color = backgroundColor;
 
-                    const auto info = ray.intersect(pScene->meshes());
+                    const auto info = ray.intersect(*pScene);
 
                     if (info.isIntersected) {
                         // TODO: Codes can be reused here
-                        const auto& mesh = *info.pMesh;
-                        const auto& mat = *mesh.pMaterial;
-                        const auto& baryCentricCoord = info.barycentricCoord;
-                        const auto& triangle = mesh.triangles[info.triangleIdx];
+                        const auto& node = *info.pNode;
+                        const auto& mat = *node.pMaterial;
 
-                        const auto& uv0 = mesh.vertexTextures[triangle[0]];
-                        const auto& uv1 = mesh.vertexTextures[triangle[1]];
-                        const auto& uv2 = mesh.vertexTextures[triangle[2]];
+                        const Math::Vector3D uv = info.uv;
 
-                        const Math::Vector3D uv = uv0 * baryCentricCoord[0] + uv1 * baryCentricCoord[1] + uv2 * baryCentricCoord[2];
-
-                        const auto& triangleTangent = (mesh.transformMatrix * mesh.triangleTangents[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
-                        const auto& triangleNormal = (mesh.transformMatrix * mesh.triangleNormals[info.triangleIdx].toHomogeneousCoordinates(0)).toCartesianCoordinates();
-
-                        const auto tbn = Math::Geometry::GetTBN(triangleTangent, triangleNormal);
-
-                        Math::Vector3D normal = mesh.vertexNormals[0] * baryCentricCoord[0] + mesh.vertexNormals[1] * baryCentricCoord[1] + mesh.vertexNormals[2] * baryCentricCoord[2];
-                        if (mat.pNormalMap) {
-                            normal = (*mat.pNormalMap).get<Data::ColorFormat::RGB>(uv[0], uv[1]) * 2. - Math::Vector3D{1, 1, 1};
-                            if (mat.normalMapType == Data::NormalMapType::DARBOUX) {
-                                normal = (tbn * normal).normalized();
-                            }
-                            else {
-                                normal = (mesh.transformMatrix * normal.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
-                            }
-                        }
+                        Math::Vector3D normal = info.normal;
 
                         // Above and below is relative to ray origin
                         Math::Vector3D intersectedPointCloser = ray.origin + ray.direction * (info.length - eps);
@@ -100,9 +80,9 @@ namespace UltRenderer {
                             // Directional light
                             const Math::Vector3D dir = -pLight->direction;
                             const Math::Vector3D ori = intersectedPointCloser;
-                            const Math::Ray reversedLightRay = {ori, dir};
+                            const Data::Ray reversedLightRay = {ori, dir};
                             // Shadow check
-                            if (!reversedLightRay.intersect(pScene->meshes()).isIntersected) {
+                            if (!reversedLightRay.intersect(*pScene).isIntersected) {
                                 const double cos = std::abs(normal.dot(pLight->direction));
                                 directIr += pLight->intensity * lambertianBRDF.toHomogeneousCoordinates(1) * cos;
                             }
@@ -121,6 +101,8 @@ namespace UltRenderer {
                             }
 
                             // Transform sampledDirection into world space
+                            Math::Vector3D tangent = normal.cross(normal == Math::Vector3D::X() ? Math::Vector3D::X() : Math::Vector3D::Y()).normalized();
+                            const auto tbn = Math::Geometry::GetTBN(tangent, normal);
                             for (auto& dir: sampledDirections) {
                                 dir = (tbn * _transformY2Z * dir).normalized();
                             }
@@ -130,7 +112,7 @@ namespace UltRenderer {
                                 const Math::Vector3D ori = normal.dot(dir) >= 0 ? intersectedPointCloser : intersectedPointFurther;
                                 const double cos = std::abs(normal.dot(dir));
 
-                                const auto sampledRay = Math::Ray(ori, dir);
+                                const auto sampledRay = Data::Ray(ori, dir);
 
                                 const auto sampledInfo = sampledRay.intersect(*pScene);
 
