@@ -59,8 +59,11 @@ int main() {
     pFloorMesh->pMaterial = pFloorMat;
 
     // Geometry
-    auto pSphere = std::make_shared<Data::GeometricPrimitives::Sphere>(Math::Vector3D{0, 0, 0}, 0.3);
+    auto pSphere = std::make_shared<Data::GeometricPrimitives::Sphere>(0.3);
     pSphere->pMaterial = pFloorMat;
+
+    auto pCube = std::make_shared<Data::GeometricPrimitives::Cube>(0.1, 0.1, 1);
+    pCube->pMaterial = pFloorMat;
 
     // Camera
     auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 3);
@@ -79,6 +82,7 @@ int main() {
     scene.addMesh(pMesh);
     scene.addMesh(pFloorMesh);
     scene.addIntersectables(pSphere);
+    scene.addIntersectables(pCube);
     scene.addCamera(pRasterizingCamera);
     scene.addCamera(pRaytracingCamera);
     scene.addLight(pLight0);

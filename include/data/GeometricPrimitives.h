@@ -15,9 +15,21 @@ namespace UltRenderer {
                 double _radius = 1;
 
             public:
-                Sphere(const Math::Vector3D& center, double radius);
+                explicit Sphere(double radius);
 
                 Utils::MatrixProxy<double, 3, 1> center();
+
+                Data::IntersectionInfo intersect(const Ray &ray, double eps) override;
+            };
+
+            class Cube: public Hierarchy::IntersectableNode {
+            private:
+                double _w;
+                double _h;
+                double _d;
+
+            public:
+                Cube(double w, double h, double d);
 
                 Data::IntersectionInfo intersect(const Ray &ray, double eps) override;
             };
