@@ -29,7 +29,7 @@ namespace UltRenderer {
         }
 
 
-        Data::IntersectionInfo Ray::intersect(const Data::BoundingInfo &info, double eps) const {
+        bool Ray::isIntersected(const Data::BoundingInfo &info, double& enter, double & exit) const {
             std::array<double, 3> tMins{};
             std::array<double, 3> tMaxs{};
             for (std::size_t idx = 0; idx < 3; idx++) {
@@ -46,15 +46,15 @@ namespace UltRenderer {
                 }
             }
 
-            double enter = *std::max_element(tMins.begin(), tMins.end());
-            double exit = *std::min_element(tMaxs.begin(), tMaxs.end());
+            enter = *std::max_element(tMins.begin(), tMins.end());
+            exit = *std::min_element(tMaxs.begin(), tMaxs.end());
 
-            Data::IntersectionInfo res;
-            if (exit >= 0 && exit >= enter) {
-                res.isIntersected = true;
-                res.length = enter;
-            }
-            return res;
+            return exit >= 0 && exit >= enter;
+        }
+
+        bool Ray::isIntersected(const BoundingInfo &info) const {
+            double tmp0, tmp1;
+            return Ray::isIntersected(info, tmp0, tmp1);
         }
 
         Data::IntersectionInfo Ray::intersect(Hierarchy::IntersectableNode &node, double eps) const {

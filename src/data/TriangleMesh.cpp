@@ -335,7 +335,7 @@ namespace UltRenderer {
             // Fast stop
             if (!stop) {
                 // Check children when intersected with bounding box
-                if (ray.intersect(pNode->boundingInfo).isIntersected) {
+                if (ray.isIntersected(pNode->boundingInfo)) {
                     // Leaf node, check primitives inside
                     if (pNode->pLeft == nullptr and pNode->pRight == nullptr) {
                         for (const auto& tIdx: pNode->primitiveIndices) {

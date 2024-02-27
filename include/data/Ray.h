@@ -22,7 +22,9 @@ namespace UltRenderer {
             // TODO: Should implement intersect more than once
             [[nodiscard]] Data::IntersectionInfo intersect(Hierarchy::IntersectableNode& node, double eps = 1e-5) const;
             [[nodiscard]] Data::IntersectionInfo intersect(const Rendering::Scene& scene, bool fastCheck = false, double eps = 1e-5) const;
-            [[nodiscard]] Data::IntersectionInfo intersect(const Data::BoundingInfo& info, double eps = 1e-5) const;
+
+            [[nodiscard]] bool isIntersected(const Data::BoundingInfo& info) const;
+            [[nodiscard]] bool isIntersected(const Data::BoundingInfo& info, double& enter, double & exit) const;
         };
     } // Math
 } // UltRenderer
