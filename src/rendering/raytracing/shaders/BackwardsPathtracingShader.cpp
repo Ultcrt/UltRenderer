@@ -101,7 +101,7 @@ namespace UltRenderer {
                             }
 
                             // Transform sampledDirection into world space
-                            Math::Vector3D tangent = normal.cross(normal == Math::Vector3D::X() ? Math::Vector3D::X() : Math::Vector3D::Y()).normalized();
+                            Math::Vector3D tangent = normal.cross((normal == Math::Vector3D::X() || normal == -Math::Vector3D::X()) ? Math::Vector3D::Y() : Math::Vector3D::X()).normalized();
                             const auto tbn = Math::Geometry::GetTBN(tangent, normal);
                             for (auto& dir: sampledDirections) {
                                 dir = (tbn * _transformY2Z * dir).normalized();
