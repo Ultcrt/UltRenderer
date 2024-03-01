@@ -84,8 +84,8 @@ add_executable(UltRenderer src/Main.cpp
         include/math/BVH.h
         src/utils/Algorithm.cpp
         include/utils/Algorithm.h
-        src/rendering/Material.cpp
-        include/rendering/Material.h
+        src/rendering/material/CommonMaterial.cpp
+        include/rendering/material/CommonMaterial.h
         src/rendering/Constants.cpp
         include/rendering/Constants.h
         src/data/Color.cpp
@@ -101,6 +101,8 @@ add_executable(UltRenderer src/Main.cpp
         src/hierarchy/IntersectableNode.cpp
         include/hierarchy/IntersectableNode.h
         src/data/GeometricPrimitives.cpp
-        include/data/GeometricPrimitives.h)
+        include/data/GeometricPrimitives.h
+        src/rendering/material/LambertianBRDFMaterial.cpp
+        include/rendering/material/LambertianBRDFMaterial.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

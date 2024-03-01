@@ -15,7 +15,7 @@
 #include "set"
 #include "data/BoundingInfo.h"
 #include "math/BVH.h"
-#include "rendering/Material.h"
+#include "rendering/material/CommonMaterial.h"
 
 namespace UltRenderer {
     namespace Data {

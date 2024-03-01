@@ -11,7 +11,7 @@
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 #include "rendering/raytracing/Camera.h"
 #include "data/Ray.h"
-#include "rendering/Material.h"
+#include "rendering/material/LambertianBRDFMaterial.h"
 #include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
 #include "data/GeometricPrimitives.h"
 
@@ -28,7 +28,7 @@ int main() {
     Postprocessors::ScreenSpaceAmbientOcclusion ssao;
 
     // Obj material
-    auto pMat = std::make_shared<Rendering::Material>();
+    auto pMat = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
     auto pTexture = std::make_shared<Data::Image>("../data/diablo3_pose_diffuse.tga", Data::FilterType::LINEAR);
     auto pNormalMap = std::make_shared<Data::Image>("../data/diablo3_pose_nm_tangent.tga", Data::FilterType::LINEAR);
     auto pSpecular = std::make_shared<Data::Image>("../data/diablo3_pose_spec.tga", Data::FilterType::LINEAR);
@@ -47,7 +47,7 @@ int main() {
     pMesh->pMaterial = pMat;
 
     // Floor material
-    auto pFloorMat = std::make_shared<Rendering::Material>();
+    auto pFloorMat = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
     auto pFloorTexture = std::make_shared<Data::Image>("../data/floor_diffuse.tga", Data::FilterType::LINEAR);
     auto pFloorNormalMap = std::make_shared<Data::Image>("../data/floor_nm_tangent.tga", Data::FilterType::LINEAR);
     pFloorMat->pNormalMap = pFloorNormalMap;

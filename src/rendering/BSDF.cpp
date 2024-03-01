@@ -7,7 +7,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace BSDF {
-            Math::Vector3D LambertianDiffuseBRDF(const Math::Vector3D& uv, const Material& mat) {
+            Math::Vector3D LambertianDiffuseBRDF(const Math::Vector3D& uv, const Material::CommonMaterial& mat) {
                 Math::Vector3D color;
                 if (mat.pTexture->type() == Data::ColorFormat::GRAY) {
                     color = mat.pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
@@ -17,6 +17,10 @@ namespace UltRenderer {
                 }
 
                 return color * mat.diffuseCoefficient / M_PI;
+            }
+
+            Math::Vector3D PhongReflectionBRDF(const Math::Vector3D& uv, const Material::CommonMaterial& mat) {
+
             }
         } // BSDF
     } // Rendering

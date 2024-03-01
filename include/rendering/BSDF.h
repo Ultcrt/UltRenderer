@@ -6,12 +6,12 @@
 #define ULTRENDERER_BSDF_H
 
 #include "math/Matrix.h"
-#include "rendering/Material.h"
+#include "rendering/material/CommonMaterial.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace BSDF {
-            Math::Vector3D LambertianDiffuseBRDF(const Math::Vector3D& uv, const Material& mat);
+            Math::Vector3D LambertianDiffuseBRDF(const Math::Vector3D& uv, const Material::CommonMaterial& mat);
         } // BSDF
     } // Rendering
 } // UltRenderer

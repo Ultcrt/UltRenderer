@@ -6,7 +6,7 @@
 #define ULTRENDERER_IMESHSHADER_H
 
 #include "IShader.h"
-#include "rendering/Material.h"
+#include "rendering/material/CommonMaterial.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -51,7 +51,7 @@ namespace UltRenderer {
                     const Math::Transform3D* pModel;
                     const Math::Transform3D* pView;
                     const Math::Transform3D* pProjection;
-                    const Rendering::Material* pMaterial;
+                    const Rendering::Material::CommonMaterial* pMaterial;
                     // Transformation from camera viewport to light viewport
                     Math::Transform3D lightMatrix;
                     Math::Transform3D modelViewMatrix;
