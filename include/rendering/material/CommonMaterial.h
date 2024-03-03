@@ -34,6 +34,10 @@ namespace UltRenderer {
                 double glowIntensity = 1.0;
 
                 virtual Math::Vector3D getBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
+
+                [[nodiscard]] Math::Vector3D getDiffuseColor(const Math::Vector3D& uv) const;
+
+                [[nodiscard]] std::pair<double, Math::Vector3D> getSpecularInfo(const Math::Vector3D& uv) const;
             };
         }
     } // Rendering

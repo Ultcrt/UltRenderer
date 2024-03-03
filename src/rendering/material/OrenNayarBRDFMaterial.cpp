@@ -18,13 +18,7 @@ namespace UltRenderer {
                 Math::Vector3D v = view - view.dot(normal) * normal;
                 Math::Vector3D l = -light + light.dot(normal) * normal;
 
-                Math::Vector3D color;
-                if (pTexture->type() == Data::ColorFormat::GRAY) {
-                    color = pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
-                }
-                else {
-                    color = pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
-                }
+                Math::Vector3D color = getDiffuseColor(uv);
 
                 double r2 = roughness * roughness;
                 double a = 1. - 0.5 * r2 / (r2 + 0.33);
