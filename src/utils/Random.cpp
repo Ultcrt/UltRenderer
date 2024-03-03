@@ -48,7 +48,7 @@ namespace UltRenderer {
         }
 
         /**
-         * Sampling uniformly from semi-sphere. Semi-sphere is facing y-axis
+         * Sampling uniformly from semi-sphere. Semi-sphere is facing z-axis
          * @param n Sampling number
          * @param pSeed Random seed pointer
          * @return
@@ -58,13 +58,12 @@ namespace UltRenderer {
             for (std::size_t idx = 0; idx < n; idx++) {
                 const double u = Range(0, 1, pSeed);
                 const double v = Range(0, 1, pSeed);
-                // Only difference between this and SampleFromUnitSphere
-                const double theta = M_PI * u;
-                const double phi = std::acos(2 * v - 1);
+                const double theta = 2 * M_PI * u;
+                const double phi = std::acos(v);
 
-                const double x = std::sin(theta) * std::cos(phi);
+                const double x = std::cos(theta) * std::sin(phi);
                 const double y = std::sin(theta) * std::sin(phi);
-                const double z = std::cos(theta);
+                const double z = std::cos(phi);
 
                 res.emplace_back(x, y, z);
             }

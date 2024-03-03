@@ -12,12 +12,6 @@ namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
             namespace Shaders {
-                const Math::Matrix3D BackwardsPathtracingShader::_transformY2Z = {
-                        1, 0, 0,
-                        0, 0, -1,
-                        0, 1, 0
-                };
-
                 const double BackwardsPathtracingShader::_uniformSamplingPossibility = 1 / (2 * M_PI);
 
                 Data::Color<Data::ColorFormat::RGBA>
@@ -89,21 +83,14 @@ namespace UltRenderer {
 
                         // Indirect illumination using russian roulette
                         if (Utils::Random::Range() > dropout) {
-                            // sampledDirection is facing at y-axis
+                            // sampledDirection is facing at z-axis
                             auto sampledDirections = Utils::Random::SampleFromUnitSemiSphere(numBouncedRays);
-
-                            // Reverse direction is ray is coming from inside
-                            if (normal.dot(ray.direction) > 0) {
-                                for (auto& dir: sampledDirections) {
-                                    dir = -dir;
-                                }
-                            }
 
                             // Transform sampledDirection into world space
                             Math::Vector3D tangent = normal.cross((normal == Math::Vector3D::X() || normal == -Math::Vector3D::X()) ? Math::Vector3D::Y() : Math::Vector3D::X()).normalized();
                             const auto tbn = Math::Geometry::GetTBN(tangent, normal);
                             for (auto& dir: sampledDirections) {
-                                dir = (tbn * _transformY2Z * dir).normalized();
+                                dir = (tbn * dir).normalized();
                             }
 
                             // Monte Carlo integration
@@ -112,8 +99,6 @@ namespace UltRenderer {
                                 const double cos = std::abs(normal.dot(dir));
 
                                 const auto sampledRay = Data::Ray(ori, dir);
-
-                                const auto sampledInfo = sampledRay.intersect(*pScene);
 
                                 Math::Vector3D bsdf = mat.getBSDF(uv, normal, -ray.direction, -dir);
 
