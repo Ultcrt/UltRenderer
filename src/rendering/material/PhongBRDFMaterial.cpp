@@ -46,7 +46,8 @@ namespace UltRenderer {
                     // pdf = (s + 1) * std::pow(cosTheta, s) * std::sqrt(1 - cosTheta * cosTheta) / (2 * M_PI)
                     // Reduced to (s + 2.) / (s + 1.) / std::sqrt(1 - cosTheta * cosTheta)
                     // From: https://graphics.cs.kuleuven.be/publications/Phong/Phong_paper.ps
-                    res.emplace_back((s + 2.) / (s + 1.) * cos / static_cast<double>(n));
+                    // std::min is used to guarantee energy conservation
+                    res.emplace_back(std::min((s + 2.) / (s + 1.) * cos, 1.) / static_cast<double>(n));
                 }
 
                 return {sampledDirections, res};
