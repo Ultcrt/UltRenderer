@@ -19,6 +19,7 @@ namespace UltRenderer {
                 std::shared_ptr<Data::Image> pNormalMap;
                 Data::NormalMapType normalMapType;
 
+                double shininess = 1;
                 Math::Vector3D specularColor = {1, 1, 1};
                 Math::Vector3D ambientColor = {0.2, 0.1, 0};
 

@@ -74,7 +74,7 @@ namespace UltRenderer {
                             rgb = (*pMaterial->pTexture).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
                         }
 
-                        // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as brightness
+                        // Specular map can be RGB, if so, use RGB as specular color and grayscale of the map as shininess
                         double brightness = pMaterial->pSpecularMap ? (*pMaterial->pSpecularMap).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * static_cast<double>(std::numeric_limits<uint8_t>::max()) : 0;
                         Data::Color<Data::ColorFormat::RGB> finalSpecularColor = {1, 1, 1};
                         if (pMaterial->pSpecularMap && pMaterial->pSpecularMap->type() == Data::ColorFormat::RGB) {
