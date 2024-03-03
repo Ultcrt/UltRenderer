@@ -8,9 +8,9 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Material {
-            Math::Vector3D OrenNayarBRDFMaterial::getBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal,
-                                                          const Math::Vector3D &view,
-                                                          const Math::Vector3D &light) const {
+            Math::Vector3D OrenNayarBRDFMaterial::evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal,
+                                                           const Math::Vector3D &view,
+                                                           const Math::Vector3D &light) const {
                 double thetaV = std::acos(view.dot(normal));
                 double thetaL = std::acos(-light.dot(normal));
                 double alpha = std::max(thetaL, thetaV);

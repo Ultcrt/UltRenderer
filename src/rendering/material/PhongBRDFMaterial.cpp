@@ -9,7 +9,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Material {
-            Math::Vector3D PhongBRDFMaterial::getBSDF(const Math::Vector3D &uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const {
+            Math::Vector3D PhongBRDFMaterial::evalBSDF(const Math::Vector3D &uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const {
                 const Math::Vector3D& reflect = Math::Geometry::ComputeReflectionDirection(normal, light);
 
                 auto [brightness, finalSpecularColor] = getSpecularInfo(uv);

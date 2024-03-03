@@ -13,7 +13,7 @@ namespace UltRenderer {
             class DisneyBRDFMaterial: public CommonMaterial {
             public:
                 double roughness;
-                Math::Vector3D getBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
+                Math::Vector3D evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
             };
         } // Material
     } // Rendering
