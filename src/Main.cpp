@@ -10,8 +10,8 @@
 #include "rendering/rasterizing/shaders/BlinnPhongReflectionMeshShader.h"
 #include "postprocessors/ScreenSpaceAmbientOcclusion.h"
 #include "rendering/raytracing/Camera.h"
-#include "data/Ray.h"
 #include "rendering/material/LambertianBRDFMaterial.h"
+#include "rendering/material/PhongBRDFMaterial.h"
 #include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
 #include "data/GeometricPrimitives.h"
 
@@ -47,7 +47,7 @@ int main() {
     pMesh->pMaterial = pMat;
 
     // Floor material
-    auto pFloorMat = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
+    auto pFloorMat = std::make_shared<Rendering::Material::PhongBRDFMaterial>();
     auto pFloorTexture = std::make_shared<Data::Image>("../data/floor_diffuse.tga", Data::FilterType::LINEAR);
     auto pFloorNormalMap = std::make_shared<Data::Image>("../data/floor_nm_tangent.tga", Data::FilterType::LINEAR);
     pFloorMat->pNormalMap = pFloorNormalMap;

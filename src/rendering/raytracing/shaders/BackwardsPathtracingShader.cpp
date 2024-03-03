@@ -69,9 +69,6 @@ namespace UltRenderer {
                         Math::Vector3D intersectedPointCloser = ray.origin + ray.direction * (info.length - eps);
                         Math::Vector3D intersectedPointFurther = ray.origin + ray.direction * (info.length + eps);
 
-                        // TODO: Only implement Lambertian BRDF here
-                        Math::Vector3D bsdf = mat.getBSDF(uv);
-
                         Math::Vector4D directIr = {0, 0, 0, 1};
                         Math::Vector4D indirectIr = {0, 0, 0, 1};
 
@@ -81,6 +78,8 @@ namespace UltRenderer {
                             const Math::Vector3D dir = -pLight->direction;
                             const Math::Vector3D ori = intersectedPointCloser;
                             const Data::Ray reversedLightRay = {ori, dir};
+                            // TODO: Only implement Lambertian BRDF here
+                            Math::Vector3D bsdf = mat.getBSDF(uv, normal, -ray.direction, pLight->direction);
                             // Shadow check
                             if (!reversedLightRay.intersect(*pScene).isIntersected) {
                                 const double cos = std::abs(normal.dot(pLight->direction));
@@ -115,6 +114,8 @@ namespace UltRenderer {
                                 const auto sampledRay = Data::Ray(ori, dir);
 
                                 const auto sampledInfo = sampledRay.intersect(*pScene);
+
+                                Math::Vector3D bsdf = mat.getBSDF(uv, normal, -ray.direction, -dir);
 
                                 // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
                                 indirectIr += Cast(sampledRay, pScene).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) * cos / _uniformSamplingPossibility / (1 - dropout) / static_cast<double>(numBouncedRays);

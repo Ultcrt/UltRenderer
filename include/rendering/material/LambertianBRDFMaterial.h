@@ -12,7 +12,7 @@ namespace UltRenderer {
         namespace Material {
             class LambertianBRDFMaterial: public CommonMaterial {
             public:
-                Math::Vector3D getBSDF(const Math::Vector3D& uv) const override;
+                Math::Vector3D getBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const override;
             };
         } // Material
     } // Rendering

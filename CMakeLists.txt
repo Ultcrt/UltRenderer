@@ -103,6 +103,8 @@ add_executable(UltRenderer src/Main.cpp
         src/data/GeometricPrimitives.cpp
         include/data/GeometricPrimitives.h
         src/rendering/material/LambertianBRDFMaterial.cpp
-        include/rendering/material/LambertianBRDFMaterial.h)
+        include/rendering/material/LambertianBRDFMaterial.h
+        src/rendering/material/PhongBRDFMaterial.cpp
+        include/rendering/material/PhongBRDFMaterial.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
