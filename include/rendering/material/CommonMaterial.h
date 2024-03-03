@@ -34,9 +34,9 @@ namespace UltRenderer {
                 double shadowIntensity = 0.3;
                 double glowIntensity = 1.0;
 
-                virtual Math::Vector3D evalBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
+                [[nodiscard]] virtual Math::Vector3D evalBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
 
-
+                [[nodiscard]] virtual Math::Vector3D sampleBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
 
                 [[nodiscard]] Math::Vector3D getDiffuseColor(const Math::Vector3D& uv) const;
 

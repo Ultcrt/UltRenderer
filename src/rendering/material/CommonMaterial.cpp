@@ -10,6 +10,12 @@ namespace UltRenderer {
             throw std::runtime_error("Material not support Physic based rendering (i.e. not implement evalBSDF method)");
         }
 
+        Math::Vector3D Material::CommonMaterial::sampleBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal,
+                                                            const Math::Vector3D &view,
+                                                            const Math::Vector3D &light) const {
+            throw std::runtime_error("Material not support Physic based rendering (i.e. not implement sampleBSDF method)");
+        }
+
         Math::Vector3D Material::CommonMaterial::getDiffuseColor(const Math::Vector3D &uv) const {
             Math::Vector3D color;
             if (pTexture->type() == Data::ColorFormat::GRAY) {
