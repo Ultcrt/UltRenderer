@@ -25,6 +25,8 @@ namespace UltRenderer {
             static std::vector<Math::Vector3D> SampleFromUnitSphere(std::size_t n, std::size_t* pSeed = nullptr);
 
             static std::vector<Math::Vector3D> SampleFromUnitSemiSphere(std::size_t n, std::size_t* pSeed = nullptr);
+
+            static std::vector<Math::Vector3D> SampleWithPhongBRDF(std::size_t n, double shininess, std::size_t* pSeed = nullptr);
         };
     } // Utils
 } // UltRenderer

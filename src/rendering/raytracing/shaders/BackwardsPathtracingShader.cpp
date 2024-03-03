@@ -12,8 +12,6 @@ namespace UltRenderer {
     namespace Rendering {
         namespace Raytracing {
             namespace Shaders {
-                const double BackwardsPathtracingShader::_uniformSamplingPossibility = 1 / (2 * M_PI);
-
                 Data::Color<Data::ColorFormat::RGBA>
                 BackwardsPathtracingShader::operator()(const Math::Vector3D &pixelCenterCamera, double pixelWidthCamera,
                                                        double pixelHeightCamera, const Math::Transform3D &transform,
@@ -84,26 +82,19 @@ namespace UltRenderer {
                         // Indirect illumination using russian roulette
                         if (Utils::Random::Range() > dropout) {
                             // sampledDirection is facing at z-axis
-                            auto sampledDirections = Utils::Random::SampleFromUnitSemiSphere(numBouncedRays);
-
-                            // Transform sampledDirection into world space
-                            Math::Vector3D tangent = normal.cross((normal == Math::Vector3D::X() || normal == -Math::Vector3D::X()) ? Math::Vector3D::Y() : Math::Vector3D::X()).normalized();
-                            const auto tbn = Math::Geometry::GetTBN(tangent, normal);
-                            for (auto& dir: sampledDirections) {
-                                dir = (tbn * dir).normalized();
-                            }
+                            auto [sampledDirections, bsdfs] = mat.sampleBSDF(uv, numBouncedRays, normal, -ray.direction);
 
                             // Monte Carlo integration
-                            for (const auto& dir: sampledDirections) {
+                            for (std::size_t sampleIdx = 0; sampleIdx < numBouncedRays; sampleIdx++) {
+                                const auto dir = sampledDirections[sampleIdx];
+                                const auto bsdf = bsdfs[sampleIdx];
+
                                 const Math::Vector3D ori = normal.dot(dir) >= 0 ? intersectedPointCloser : intersectedPointFurther;
-                                const double cos = std::abs(normal.dot(dir));
 
                                 const auto sampledRay = Data::Ray(ori, dir);
 
-                                Math::Vector3D bsdf = mat.evalBSDF(uv, normal, -ray.direction, -dir);
-
                                 // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
-                                indirectIr += Cast(sampledRay, pScene).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) * cos / _uniformSamplingPossibility / (1 - dropout) / static_cast<double>(numBouncedRays);
+                                indirectIr += Cast(sampledRay, pScene).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) / (1 - dropout);
                             }
                         }
 

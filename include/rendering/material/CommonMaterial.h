@@ -36,7 +36,7 @@ namespace UltRenderer {
 
                 [[nodiscard]] virtual Math::Vector3D evalBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
 
-                [[nodiscard]] virtual Math::Vector3D sampleBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
+                [[nodiscard]] virtual std::pair<std::vector<Math::Vector3D>, std::vector<Math::Vector3D>> sampleBSDF(const Math::Vector3D& uv, std::size_t n, const Math::Vector3D& normal, const Math::Vector3D& view) const;
 
                 [[nodiscard]] Math::Vector3D getDiffuseColor(const Math::Vector3D& uv) const;
 

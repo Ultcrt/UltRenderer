@@ -12,6 +12,8 @@
 #include "rendering/raytracing/Camera.h"
 #include "rendering/material/LambertianBRDFMaterial.h"
 #include "rendering/material/PhongBRDFMaterial.h"
+#include "rendering/material/OrenNayarBRDFMaterial.h"
+#include "rendering/material/DisneyBRDFMaterial.h"
 #include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
 #include "data/GeometricPrimitives.h"
 
@@ -52,6 +54,7 @@ int main() {
     auto pFloorNormalMap = std::make_shared<Data::Image>("../data/floor_nm_tangent.tga", Data::FilterType::LINEAR);
     pFloorMat->pNormalMap = pFloorNormalMap;
     pFloorMat->pTexture = pFloorTexture;
+    pFloorMat->shininess = 10000;
     pFloorMat->normalMapType = Data::NormalMapType::DARBOUX;
 
     // Floor
@@ -60,10 +63,21 @@ int main() {
 
     // Geometry
     auto pSphere = std::make_shared<Data::GeometricPrimitives::Sphere>(0.3);
-    pSphere->pMaterial = pFloorMat;
+    pSphere->center() = {0, -0.7, 0};
+    auto pSphereMat = std::make_shared<Rendering::Material::DisneyBRDFMaterial>();
+    pSphereMat->pNormalMap = pFloorNormalMap;
+    pSphereMat->pTexture = pFloorTexture;
+    pSphereMat->normalMapType = Data::NormalMapType::DARBOUX;
+    pSphereMat->shininess = 1000;
+    pSphere->pMaterial = pSphereMat;
 
-    auto pCube = std::make_shared<Data::GeometricPrimitives::Cube>(0.1, 0.1, 1);
-    pCube->pMaterial = pFloorMat;
+    auto pCube = std::make_shared<Data::GeometricPrimitives::Cube>(0.5, 0.5, 1);
+    auto pCubeMat = std::make_shared<Rendering::Material::DisneyBRDFMaterial>();
+    pCubeMat->pNormalMap = pFloorNormalMap;
+    pCubeMat->pTexture = pTexture;
+    pCubeMat->normalMapType = Data::NormalMapType::DARBOUX;
+    pCubeMat->shininess = 10;
+    pCube->pMaterial = pCubeMat;
 
     // Camera
     auto pRasterizingCamera = std::make_shared<Rendering::Rasterizing::Camera>(2, 2, 3);
@@ -79,7 +93,7 @@ int main() {
     // Scene
     Rendering::Scene scene;
 
-    scene.addMesh(pMesh);
+//    scene.addMesh(pMesh);
     scene.addMesh(pFloorMesh);
     scene.addIntersectables(pSphere);
     scene.addIntersectables(pCube);

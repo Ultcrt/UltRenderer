@@ -75,5 +75,24 @@ namespace UltRenderer {
             Random::_seed = seed;
             Random::_pEngine = std::make_shared<std::mt19937>(seed);
         }
+
+        std::vector<Math::Vector3D> Random::SampleWithPhongBRDF(std::size_t n, double shininess, std::size_t *pSeed) {
+            // From https://www.mathematik.uni-marburg.de/%7Ethormae/lectures/graphics1/code/ImportanceSampling/importance_sampling_notes.pdf
+            std::vector<Math::Vector3D> res;
+            for (std::size_t idx = 0; idx < n; idx++) {
+                const double u = Range(0, 1, pSeed);
+                const double v = Range(0, 1, pSeed);
+                const double theta = 2 * M_PI * u;
+                const double phi = std::acos(std::pow((1. - v), 1. / (shininess + 1.)));
+
+                const double x = std::cos(theta) * std::sin(phi);
+                const double y = std::sin(theta) * std::sin(phi);
+                const double z = std::cos(phi);
+
+                res.emplace_back(x, y, z);
+            }
+
+            return res;
+        }
     } // Utils
 } // UltRenderer

@@ -13,9 +13,6 @@ namespace UltRenderer {
         namespace Raytracing {
             namespace Shaders {
                 class BackwardsPathtracingShader: public IRayShader {
-                private:
-                    const static double _uniformSamplingPossibility;
-
                 public:
                     Math::Vector4D backgroundColor = {0, 0, 0, 1};
                     double eps = 1e-6;

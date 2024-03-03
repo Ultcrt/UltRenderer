@@ -4,6 +4,8 @@
 
 #include "rendering/material/LambertianBRDFMaterial.h"
 #include "rendering/BSDF.h"
+#include "utils/Random.h"
+#include "math/Geometry.h"
 
 namespace UltRenderer {
     namespace Rendering {
