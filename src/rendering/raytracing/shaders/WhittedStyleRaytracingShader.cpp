@@ -118,7 +118,7 @@ namespace UltRenderer {
 
                             color = (
                                     mat.diffuseCoefficient * diffuseIntensity * diffuseRGB +
-                                    mat.specularCoefficient * diffuseIntensity * finalSpecularColor +
+                                    mat.specularCoefficient * specularIntensity * finalSpecularColor +
                                     mat.ambientCoefficient * mat.ambientColor +
                                     mat.glowIntensity * glowColor +
                                     mat.reflectionCoefficient * reflectionColor * kr +
