@@ -105,6 +105,8 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/material/LambertianBRDFMaterial.cpp
         include/rendering/material/LambertianBRDFMaterial.h
         src/rendering/material/PhongBRDFMaterial.cpp
-        include/rendering/material/PhongBRDFMaterial.h)
+        include/rendering/material/PhongBRDFMaterial.h
+        src/rendering/material/OrenNayarBRDFMaterial.cpp
+        include/rendering/material/OrenNayarBRDFMaterial.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
