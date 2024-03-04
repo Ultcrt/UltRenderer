@@ -5,6 +5,7 @@
 #ifndef ULTRENDERER_RAYTRACING_CAMERA_H
 #define ULTRENDERER_RAYTRACING_CAMERA_H
 
+#include <thread>
 #include "rendering/ICamera.h"
 #include "rendering/raytracing/shaders/WhittedStyleRaytracingShader.h"
 

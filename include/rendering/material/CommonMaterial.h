@@ -13,6 +13,8 @@ namespace UltRenderer {
         namespace Material {
             class CommonMaterial {
             public:
+                static CommonMaterial DefaultMaterial;
+
                 std::shared_ptr<Data::Image> pTexture;
                 std::shared_ptr<Data::Image> pSpecularMap;
                 std::shared_ptr<Data::Image> pGlowMap;
@@ -20,6 +22,7 @@ namespace UltRenderer {
                 Data::NormalMapType normalMapType;
 
                 double shininess = 1;
+                Math::Vector3D diffuseColor = {0.5, 0.5, 0.5};
                 Math::Vector3D specularColor = {1, 1, 1};
                 Math::Vector3D ambientColor = {0.2, 0.1, 0};
 

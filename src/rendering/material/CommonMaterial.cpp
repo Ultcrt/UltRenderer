@@ -40,12 +40,14 @@ namespace UltRenderer {
         }
 
         Math::Vector3D Material::CommonMaterial::getDiffuseColor(const Math::Vector3D &uv) const {
-            Math::Vector3D color;
-            if (pTexture->type() == Data::ColorFormat::GRAY) {
-                color = pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
-            }
-            else {
-                color = pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
+            Math::Vector3D color = diffuseColor;
+            if (pTexture) {
+                if (pTexture->type() == Data::ColorFormat::GRAY) {
+                    color = pTexture->get<Data::ColorFormat::GRAY>(uv[0], uv[1]).to<Data::ColorFormat::RGB>();
+                }
+                else {
+                    color = pTexture->get<Data::ColorFormat::RGB>(uv[0], uv[1]);
+                }
             }
 
             return color;

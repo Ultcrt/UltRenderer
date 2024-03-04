@@ -16,7 +16,14 @@
 
 namespace UltRenderer {
     namespace Data {
-        TriangleMesh::TriangleMesh(const std::vector<Math::Vector3D> &vertices, const std::vector<Math::Vector3S> &indices, const Math::Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor), bvh(vertices, indices) {}
+        TriangleMesh::TriangleMesh(const std::vector<Math::Vector3D> &vertices, const std::vector<Math::Vector3S> &indices, const Math::Vector3D& defaultColor): vertices(vertices), triangles(indices), vertexColors(vertices.size(), defaultColor), bvh(vertices, indices) {
+            updateTransformedVertex();
+            updateTriangleAttributes();
+            updateAdjacentList();
+            updateVertexNormals();
+            updateVertexTangents();
+            updateBoundingInfo();
+        }
 
         TriangleMesh::TriangleMesh(const std::string &filename, const Math::Vector3D& defaultColor) {
             std::ifstream loader(filename);
@@ -179,6 +186,7 @@ namespace UltRenderer {
             }
 
             // Create f map
+            // TODO: Need dealing with no vt obj
             const std::size_t bucketSize = 2 * fList.size();
             std::unordered_map<Math::Vector3S, std::size_t, Utils::Hash::SpatialHash3D<std::size_t>> fMap(bucketSize, Utils::Hash::SpatialHash3D<std::size_t>(bucketSize));
             for (const auto& f: fList) {
@@ -208,14 +216,14 @@ namespace UltRenderer {
             }
 
             // Update computed attributes
-            if (vnList.empty()) {
-                updateVertexNormals();
-            }
             updateTransformedVertex();
             updateTriangleAttributes();
             updateAdjacentList();
             updateVertexTangents();
             updateBoundingInfo();
+            if (vnList.empty()) {
+                updateVertexNormals();
+            }
 
             bvh = Math::BVH::Tree(_transformedVertices, triangles);
         }
@@ -267,29 +275,49 @@ namespace UltRenderer {
         void TriangleMesh::updateTriangleAttributes() {
             triangleNormals = {};
             triangleTangents = {};
-            for (const auto triangle: triangles) {
-                const auto vertex0 = vertices[triangle[0]];
-                const auto vertex1 = vertices[triangle[1]];
-                const auto vertex2 = vertices[triangle[2]];
-                const auto u0 = vertexTextures[triangle[0]].x();
-                const auto u1 = vertexTextures[triangle[1]].x();
-                const auto u2 = vertexTextures[triangle[2]].x();
 
-                const auto vec01 = vertex1 - vertex0;
-                const auto vec02 = vertex2 - vertex0;
+            if (vertexTextures.empty()) {
+                // If uvs is empty, then use the first edge as tangent
+                for (const auto triangle: triangles) {
+                    const auto vertex0 = vertices[triangle[0]];
+                    const auto vertex1 = vertices[triangle[1]];
+                    const auto vertex2 = vertices[triangle[2]];
 
-                const auto normal = vec01.cross(vec02).normalized();
+                    const auto vec01 = vertex1 - vertex0;
+                    const auto vec02 = vertex2 - vertex0;
 
-                const Math::Matrix3D transform = {
-                        vec01.x(), vec01.y(), vec01.z(),
-                        vec02.x(), vec02.y(), vec02.z(),
-                        normal.x(), normal.y(), normal.z()
-                };
+                    const auto normal = vec01.cross(vec02).normalized();
+                    const auto tangent = vec01.normalized();
 
-                const auto tangent = (transform.inverse() * Math::Vector3D{u1 - u0, u2 - u0, 0}).normalized();
+                    triangleNormals.emplace_back(normal);
+                    triangleTangents.emplace_back(tangent);
+                }
+            }
+            else {
+                for (const auto triangle: triangles) {
+                    const auto vertex0 = vertices[triangle[0]];
+                    const auto vertex1 = vertices[triangle[1]];
+                    const auto vertex2 = vertices[triangle[2]];
+                    const auto u0 = vertexTextures[triangle[0]].x();
+                    const auto u1 = vertexTextures[triangle[1]].x();
+                    const auto u2 = vertexTextures[triangle[2]].x();
 
-                triangleNormals.emplace_back(normal);
-                triangleTangents.emplace_back(tangent);
+                    const auto vec01 = vertex1 - vertex0;
+                    const auto vec02 = vertex2 - vertex0;
+
+                    const auto normal = vec01.cross(vec02).normalized();
+
+                    const Math::Matrix3D transform = {
+                            vec01.x(), vec01.y(), vec01.z(),
+                            vec02.x(), vec02.y(), vec02.z(),
+                            normal.x(), normal.y(), normal.z()
+                    };
+
+                    const auto tangent = (transform.inverse() * Math::Vector3D{u1 - u0, u2 - u0, 0}).normalized();
+
+                    triangleNormals.emplace_back(normal);
+                    triangleTangents.emplace_back(tangent);
+                }
             }
         }
 
@@ -381,9 +409,15 @@ namespace UltRenderer {
             const auto p0 = getTransformedVertex(triangle[0]);
             const auto p1 = getTransformedVertex(triangle[1]);
             const auto p2 = getTransformedVertex(triangle[2]);
-            const auto uv0 = vertexTextures[triangle[0]];
-            const auto uv1 = vertexTextures[triangle[1]];
-            const auto uv2 = vertexTextures[triangle[2]];
+            auto uv0 = Math::Vector3D(0, 0, 0);
+            auto uv1 = Math::Vector3D(0, 0, 0);
+            auto uv2 = Math::Vector3D(0, 0, 0);
+
+            if (!vertexTextures.empty()) {
+                uv0 = vertexTextures[triangle[0]];
+                uv1 = vertexTextures[triangle[1]];
+                uv2 = vertexTextures[triangle[2]];
+            }
 
             auto res = Math::Geometry::MollerTrumboreIntersection(ray, p0, p1, p2, eps);
             auto t = res.first;

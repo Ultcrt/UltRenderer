@@ -109,6 +109,7 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/material/OrenNayarBRDFMaterial.cpp
         include/rendering/material/OrenNayarBRDFMaterial.h
         src/rendering/material/DisneyBRDFMaterial.cpp
-        include/rendering/material/DisneyBRDFMaterial.h)
+        include/rendering/material/DisneyBRDFMaterial.h
+        src/examples/CreateCornellBox.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
