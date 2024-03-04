@@ -18,7 +18,7 @@ namespace UltRenderer {
                     double eps = 1e-6;
                     double dropout = 0.1;
                     std::size_t numBouncedRays = 1;
-                    std::size_t samplesPerPixel = 100;
+                    std::size_t samplesPerPixel = 32;
 
                     Data::Color<Data::ColorFormat::RGBA> operator()(
                             const Math::Vector3D& pixelCenterCamera,
