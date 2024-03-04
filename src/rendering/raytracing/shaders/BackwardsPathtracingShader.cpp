@@ -75,11 +75,14 @@ namespace UltRenderer {
                             // Shadow check
                             if (!reversedLightRay.intersect(*pScene).isIntersected) {
                                 const double cos = std::abs(normal.dot(-dir));
-
-                                double a = pLight->getDistanceTo(intersectedPointCloser);
                                 // distance^2 is needed because intensity in non area light is irradiance instead of radiance
                                 directIr += pLight->intensity * bsdf.toHomogeneousCoordinates(1) * cos / std::pow(pLight->getDistanceTo(intersectedPointCloser), 2.);
                             }
+                        }
+                        // Deal with area light
+                        for (const auto& pLight: pScene->areaLights()) {
+                            // TODO: Double count area light, no visibility checking
+                            directIr += pLight->sample(numBouncedRays, intersectedPointCloser, mat, -ray.direction, uv, normal).toHomogeneousCoordinates(1);
                         }
 
                         // Indirect illumination using russian roulette

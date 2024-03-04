@@ -7,6 +7,7 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Light {
+            IAreaLight::IAreaLight(double i): intensity(i) {}
         } // Light
     } // Rendering
 } // UltRenderer

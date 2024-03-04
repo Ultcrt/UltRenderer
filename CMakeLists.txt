@@ -118,6 +118,9 @@ add_executable(UltRenderer src/Main.cpp
         src/rendering/light/PointLight.cpp
         include/rendering/light/PointLight.h
         src/rendering/light/IAreaLight.cpp
-        include/rendering/light/IAreaLight.h)
+        include/rendering/light/IAreaLight.h
+        src/rendering/light/PlaneLight.cpp
+        include/rendering/light/PlaneLight.h
+)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

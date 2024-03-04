@@ -26,6 +26,8 @@ namespace UltRenderer {
         void Scene::addAreaLight(const std::shared_ptr<Light::IAreaLight> &target) {
             target->setScene(this);
             _areaLights.emplace_back(target);
+            // Area light is also intersectable
+            _intersectables.emplace_back(target);
         }
 
         void Scene::addCamera(const std::shared_ptr<ICamera> &target) {
