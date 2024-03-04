@@ -5,15 +5,15 @@
 #ifndef ULTRENDERER_DISNEYBRDFMATERIAL_H
 #define ULTRENDERER_DISNEYBRDFMATERIAL_H
 
-#include "CommonMaterial.h"
+#include "BSDFMaterial.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace Material {
-            class DisneyBRDFMaterial: public CommonMaterial {
+            class DisneyBRDFMaterial: public BSDFMaterial {
             public:
-                double roughness;
-                Math::Vector3D evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
+                double roughness = 0.1;
+                [[nodiscard]] Math::Vector3D evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
             };
         } // Material
     } // Rendering

@@ -5,16 +5,16 @@
 #ifndef ULTRENDERER_ORENNAYARBRDFMATERIAL_H
 #define ULTRENDERER_ORENNAYARBRDFMATERIAL_H
 
-#include "CommonMaterial.h"
+#include "BSDFMaterial.h"
 
 namespace UltRenderer {
     namespace Rendering {
         namespace Material {
-            class OrenNayarBRDFMaterial: public CommonMaterial {
+            class OrenNayarBRDFMaterial: public BSDFMaterial {
             public:
                 double roughness = 0.1;
 
-                Math::Vector3D evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
+                [[nodiscard]] Math::Vector3D evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal, const Math::Vector3D &view, const Math::Vector3D &light) const override;
             };
         } // Material
     } // Rendering
