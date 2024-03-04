@@ -432,7 +432,7 @@ namespace UltRenderer {
                 info.length = t;
                 info.uv = uv0 * b0 + uv1 * b1 + uv2 * b2;
 
-                auto normal = vertexNormals[0] * b0 + vertexNormals[1] * b1 + vertexNormals[2] * b2;
+                auto normal = (transformMatrix * (vertexNormals[triangle[0]] * b0 + vertexNormals[triangle[1]] * b1 + vertexNormals[triangle[2]] * b2).toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
                 if (pMaterial->pNormalMap) {
                     normal = (*pMaterial->pNormalMap).get<Data::ColorFormat::RGB>(info.uv[0], info.uv[1]) * 2. - Math::Vector3D{1, 1, 1};
                     if (pMaterial->normalMapType == Data::NormalMapType::DARBOUX) {
