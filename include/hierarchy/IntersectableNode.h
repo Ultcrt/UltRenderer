@@ -18,7 +18,7 @@ namespace UltRenderer {
     namespace Hierarchy {
         class IntersectableNode: public TransformNode {
         public:
-            std::shared_ptr<Rendering::Material::CommonMaterial> pMaterial;
+            std::shared_ptr<Rendering::Material::CommonMaterial> pMaterial = Rendering::Material::CommonMaterial::pDefaultMaterial;
             Data::BoundingInfo boundingInfo;
 
             [[nodiscard]] virtual Data::IntersectionInfo intersect(const Data::Ray& ray, double eps) = 0;

@@ -8,35 +8,17 @@
 
 namespace UltRenderer {
     namespace Rendering {
+        std::shared_ptr<Material::CommonMaterial> Material::CommonMaterial::pDefaultMaterial = std::make_shared<Material::CommonMaterial>();
+
         Math::Vector3D Material::CommonMaterial::evalBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const {
-            throw std::runtime_error("Material not support Physic based rendering (i.e. not implement evalBSDF method)");
+            throw std::runtime_error("Material not support BSDF evaluation (i.e. not implement evalBSDF method)");
         }
 
         // Default implementation: Uniform sampling
         std::pair<std::vector<Math::Vector3D>, std::vector<Math::Vector3D>>
         Material::CommonMaterial::sampleBSDF(const Math::Vector3D &uv, std::size_t n, const Math::Vector3D &normal,
                                              const Math::Vector3D &view) const {
-            // sampledDirection is facing at z-axis
-            auto sampledDirections = Utils::Random::SampleFromUnitSemiSphere(n);
-
-            // Transform sampledDirection into world space
-            Math::Vector3D tangent = normal.cross((normal == Math::Vector3D::X() || normal == -Math::Vector3D::X()) ? Math::Vector3D::Y() : Math::Vector3D::X()).normalized();
-            const auto tbn = Math::Geometry::GetTBN(tangent, normal);
-            for (auto& dir: sampledDirections) {
-                dir = (tbn * dir).normalized();
-            }
-
-            // Monte Carlo integration
-            std::vector<Math::Vector3D> res;
-            for (const auto& dir: sampledDirections) {
-                const double cos = std::abs(normal.dot(dir));
-
-                Math::Vector3D bsdf = evalBSDF(uv, normal, view, -dir);
-
-                res.emplace_back(bsdf * cos / (1. / 2. * M_PI) / static_cast<double>(n));
-            }
-
-            return {sampledDirections, res};
+            throw std::runtime_error("Material not support BSDF sampling (i.e. not implement sampleBSDF method)");
         }
 
         Math::Vector3D Material::CommonMaterial::getDiffuseColor(const Math::Vector3D &uv) const {

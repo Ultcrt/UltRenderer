@@ -13,7 +13,7 @@ namespace UltRenderer {
         namespace Material {
             class CommonMaterial {
             public:
-                static CommonMaterial DefaultMaterial;
+                static std::shared_ptr<CommonMaterial> pDefaultMaterial;
 
                 std::shared_ptr<Data::Image> pTexture;
                 std::shared_ptr<Data::Image> pSpecularMap;
