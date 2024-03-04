@@ -19,6 +19,7 @@
 #include "postprocessors/EmptyPostprocessor.h"
 #include "Helper.h"
 #include "rendering/rasterizing/shaders/DepthPeelingMeshShader.h"
+#include "rendering/light/INonAreaLight.h"
 
 namespace UltRenderer {
     namespace Rendering {
@@ -74,14 +75,16 @@ namespace UltRenderer {
                 Data::Image shadowMap(width, height, Data::Color<Data::ColorFormat::GRAY>(1));
 
                 // TODO: Compute only the first light here for simplicity, which is wrong
-                const Rendering::Light& light = *_pScene->lights()[0];
+                const Rendering::Light::INonAreaLight& light = *_pScene->nonAreaLights()[0];
+                const auto lightDir = light.getDirectionAt({0, 0, 0});
 
                 // Shadow mapping
                 // TODO: Shadow mapping's projection matrix may not be identical to camera's, e.g. directional light should use orthogonal projection.
                 Math::Transform3D lightModelView;
                 Math::Transform3D lightProjection;
                 Math::Transform3D lightViewport;
-                RenderDepthImageOfMeshes(_pScene->meshes(), light.direction, shadowMap, &lightModelView,
+                // TODO: Only support directional light
+                RenderDepthImageOfMeshes(_pScene->meshes(), lightDir, shadowMap, &lightModelView,
                                          &lightProjection, &lightViewport);
 
                 const Math::Transform3D view = transformMatrix.inverse();
@@ -101,7 +104,7 @@ namespace UltRenderer {
                         vertexShader.pModel = &pMesh->transformMatrix;
                         vertexShader.pView = &view;
                         vertexShader.pProjection = &projectionMatrix;
-                        vertexShader.pLight = &light.direction;
+                        vertexShader.pLight = &lightDir;
                         vertexShader.intensity = light.intensity;
                         vertexShader.modelViewMatrix = view * pMesh->transformMatrix;
                         vertexShader.modelViewProjectionMatrix = projectionMatrix * vertexShader.modelViewMatrix;

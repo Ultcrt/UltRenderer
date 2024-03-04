@@ -65,17 +65,20 @@ namespace UltRenderer {
                         Math::Vector4D indirectIr = {0, 0, 0, 1};
 
                         // Direct illumination using direct/explicit light sampling
-                        for (const auto& pLight: pScene->lights()) {
-                            // Directional light
-                            const Math::Vector3D dir = -pLight->direction;
+                        // Deal with non area light
+                        for (const auto& pLight: pScene->nonAreaLights()) {
+                            const Math::Vector3D dir = -pLight->getDirectionAt(intersectedPointCloser);
                             const Math::Vector3D ori = intersectedPointCloser;
                             const Data::Ray reversedLightRay = {ori, dir};
                             // TODO: Only implement Lambertian BRDF here
-                            Math::Vector3D bsdf = mat.evalBSDF(uv, normal, -ray.direction, pLight->direction);
+                            Math::Vector3D bsdf = mat.evalBSDF(uv, normal, -ray.direction, -dir);
                             // Shadow check
                             if (!reversedLightRay.intersect(*pScene).isIntersected) {
-                                const double cos = std::abs(normal.dot(pLight->direction));
-                                directIr += pLight->intensity * bsdf.toHomogeneousCoordinates(1) * cos;
+                                const double cos = std::abs(normal.dot(-dir));
+
+                                double a = pLight->getDistanceTo(intersectedPointCloser);
+                                // distance^2 is needed because intensity in non area light is irradiance instead of radiance
+                                directIr += pLight->intensity * bsdf.toHomogeneousCoordinates(1) * cos / std::pow(pLight->getDistanceTo(intersectedPointCloser), 2.);
                             }
                         }
 

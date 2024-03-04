@@ -32,8 +32,6 @@ add_executable(UltRenderer src/Main.cpp
         include/utils/Proxy.h
         src/hierarchy/Node.cpp
         include/hierarchy/Node.h
-        src/rendering/Light.cpp
-        include/rendering/Light.h
         src/hierarchy/TransformNode.cpp
         include/hierarchy/TransformNode.h
         src/rendering/rasterizing/shaders/IShader.cpp
@@ -112,6 +110,14 @@ add_executable(UltRenderer src/Main.cpp
         include/rendering/material/DisneyBRDFMaterial.h
         src/examples/CreateCornellBox.cpp
         src/rendering/material/BSDFMaterial.cpp
-        include/rendering/material/BSDFMaterial.h)
+        include/rendering/material/BSDFMaterial.h
+        src/rendering/light/INonAreaLight.cpp
+        include/rendering/light/INonAreaLight.h
+        src/rendering/light/DirectionalLight.cpp
+        include/rendering/light/DirectionalLight.h
+        src/rendering/light/PointLight.cpp
+        include/rendering/light/PointLight.h
+        src/rendering/light/IAreaLight.cpp
+        include/rendering/light/IAreaLight.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

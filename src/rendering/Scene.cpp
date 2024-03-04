@@ -18,9 +18,14 @@ namespace UltRenderer {
             _intersectables.emplace_back(target);
         }
 
-        void Scene::addLight(const std::shared_ptr<Light> &target) {
+        void Scene::addNonAreaLight(const std::shared_ptr<Light::INonAreaLight> &target) {
             target->setScene(this);
-            _lights.emplace_back(target);
+            _nonAreaLights.emplace_back(target);
+        }
+
+        void Scene::addAreaLight(const std::shared_ptr<Light::IAreaLight> &target) {
+            target->setScene(this);
+            _areaLights.emplace_back(target);
         }
 
         void Scene::addCamera(const std::shared_ptr<ICamera> &target) {
@@ -32,8 +37,12 @@ namespace UltRenderer {
             return _meshes;
         }
 
-        std::vector<std::shared_ptr<Light>> Scene::lights() const {
-            return _lights;
+        std::vector<std::shared_ptr<Light::INonAreaLight>> Scene::nonAreaLights() const {
+            return _nonAreaLights;
+        }
+
+        std::vector<std::shared_ptr<Light::IAreaLight>> Scene::areaLights() const {
+            return _areaLights;
         }
 
         std::vector<std::shared_ptr<ICamera>> Scene::cameras() const {

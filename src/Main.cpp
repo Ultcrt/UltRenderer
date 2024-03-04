@@ -1,14 +1,17 @@
 #include "examples/CreateCornellBox.cpp"
+#include "rendering/raytracing/shaders/BackwardsPathtracingShader.h"
 
 int main() {
-    auto pScene = CreateCornellBox();
+    const Rendering::Raytracing::Shaders::BackwardsPathtracingShader shader;
 
-    auto pCamera = pScene->cameras()[0];
+    auto pCamera = make_shared<Rendering::Raytracing::Camera>(0, 0);
 
-    auto img = pCamera->render(128, 128);
+    auto pScene = CreateCornellBox(pCamera);
+
+    auto img = pCamera->render(256, 256, shader);
 
     // Saving
-    img.save("pathtracing.tga");
+    img.save("../img/pathtracing.tga");
 
     return 0;
 }

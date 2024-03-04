@@ -67,9 +67,9 @@ namespace UltRenderer {
                             // Iterate all light to get diffuse and specular intensity
                             double diffuseIntensity = 0;
                             double specularIntensity = 0;
-                            for (const auto& pLight: pScene->lights()) {
+                            for (const auto& pLight: pScene->nonAreaLights()) {
                                 // Make sure the ray will never be occluded by intersected surface
-                                const Math::Vector3D lightRayDirection = -pLight->direction;
+                                const Math::Vector3D lightRayDirection = -pLight->getDirectionAt(intersectedPointAbove);
                                 const Math::Vector3D lightRayOrigin = normal.dot(lightRayDirection) >= 0 ? intersectedPointAbove : intersectedPointBelow;
                                 Data::Ray lightRay(lightRayOrigin, lightRayDirection);
 
@@ -78,7 +78,7 @@ namespace UltRenderer {
                                 // Only do shading when light is not occlude
                                 if (!lightIntersectionInfo.isIntersected) {
                                     // Blinn-Phong reflection model
-                                    const auto& lightVec = pLight->direction * pLight->intensity;
+                                    const auto& lightVec = -lightRayDirection * pLight->intensity;
 
                                     // Diffuse
                                     diffuseIntensity += normal.dot(-lightVec);
