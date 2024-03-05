@@ -17,10 +17,10 @@ namespace UltRenderer {
                  * Create IAreaLight
                  * @param i Radiance
                  */
-                explicit IAreaLight(double i = 1);
+                explicit IAreaLight(const Math::Vector3D & i = {1, 1, 1});
 
-                double& intensity();
-                [[nodiscard]] double intensity() const;
+                Utils::MatrixProxy<double, 3, 1> intensity();
+                [[nodiscard]] Math::Vector3D intensity() const;
 
                 [[nodiscard]] virtual Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal, const Scene& scene, double eps = 1e-5) const = 0;
             };

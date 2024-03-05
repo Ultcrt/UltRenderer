@@ -62,7 +62,7 @@ namespace UltRenderer {
                             }
 
                             // Glow texture
-                            Math::Vector3D glowColor = mat.pGlowMap ? static_cast<Math::Vector3D>((*mat.pSpecularMap).get<Data::ColorFormat::RGB>(uv[0], uv[1])) : Math::Vector3D{0, 0, 0};
+                            Math::Vector3D glowIntensity = mat.getGlowIntensity(uv);
 
                             // Iterate all light to get diffuse and specular intensity
                             double diffuseIntensity = 0;
@@ -78,7 +78,7 @@ namespace UltRenderer {
                                 // Only do shading when light is not occlude
                                 if (!lightIntersectionInfo.isIntersected) {
                                     // Blinn-Phong reflection model
-                                    const auto& lightVec = -lightRayDirection * pLight->intensity;
+                                    const auto& lightVec = -lightRayDirection.componentWiseProduct(pLight->intensity);
 
                                     // Diffuse
                                     diffuseIntensity += normal.dot(-lightVec);
@@ -120,7 +120,7 @@ namespace UltRenderer {
                                     mat.diffuseCoefficient * diffuseIntensity * diffuseRGB +
                                     mat.specularCoefficient * specularIntensity * finalSpecularColor +
                                     mat.ambientCoefficient * mat.ambientColor +
-                                    mat.glowIntensity * glowColor +
+                                    glowIntensity +
                                     mat.reflectionCoefficient * reflectionColor * kr +
                                     mat.refractionCoefficient * refractionColor * (1 - kr)
                             ).toHomogeneousCoordinates(1);

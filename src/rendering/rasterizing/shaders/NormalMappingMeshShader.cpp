@@ -55,7 +55,7 @@ namespace UltRenderer {
                 bool NormalMappingMeshFragmentShader::operator()(const IMeshVarying &varying, const Math::Vector4D& fragCoord, Math::Vector4D &color,
                                                                  double &depth) const {
                     // Apply intensity here
-                    Math::Vector3D light = varying.light * varying.intensity;
+                    Math::Vector3D light = varying.light;
                     Math::Vector3D rgb;
                     if ((*pMaterial->pTexture).type() == Data::ColorFormat::GRAY) {
                         rgb = (*pMaterial->pTexture).get<Data::ColorFormat::GRAY>(varying.uv[0], varying.uv[1])[0] * Math::Vector3D{1, 1, 1};
@@ -75,7 +75,7 @@ namespace UltRenderer {
                         }
                     }
 
-                    color = (normal.dot(-light) * rgb).toHomogeneousCoordinates(1);
+                    color = (normal.dot(-light) * rgb).componentWiseProduct(varying.intensity).toHomogeneousCoordinates(1);
                     return true;
                 }
             } // Shaders

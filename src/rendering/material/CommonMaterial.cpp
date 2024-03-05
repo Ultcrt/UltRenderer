@@ -45,5 +45,9 @@ namespace UltRenderer {
 
             return {s, finalSpecularColor};
         }
+
+        Math::Vector3D Material::CommonMaterial::getGlowIntensity(const Math::Vector3D &uv) const {
+            return pGlowMap ? (*pGlowMap).get<Data::ColorFormat::RGB>(uv[0], uv[1]) : Data::Color<Data::ColorFormat::RGB>{0, 0, 0};
+        }
     } // Rendering
 } // UltRenderer

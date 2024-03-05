@@ -59,12 +59,12 @@ namespace UltRenderer {
                                                                         double &depth) const {
                     if ((*pLastDepthLayer).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(fragCoord.x()), static_cast<std::size_t>(fragCoord.y()))[0] < depth) {
                         // Apply intensity here
-                        Math::Vector3D light = varying.light * varying.intensity;
+                        Math::Vector3D light = varying.light;
                         auto shadowFragCoord = (lightMatrix * Math::Vector4D(fragCoord.x(), fragCoord.y(), fragCoord.z(), 1)).toCartesianCoordinates();
                         // 0.01 is a coefficient to fix z-fighting
                         bool inShadow = shadowFragCoord.z() - 1e-3 > (*pShadowMap).at<Data::ColorFormat::GRAY>(static_cast<std::size_t>(shadowFragCoord.x()), static_cast<std::size_t>(shadowFragCoord.y()))[0];
 
-                        Math::Vector3D glowColor = pMaterial->pGlowMap ? (*pMaterial->pGlowMap).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]) : Data::Color<Data::ColorFormat::RGB>{0, 0, 0};
+                        Math::Vector3D glowIntensity = pMaterial->getGlowIntensity(varying.uv);
 
                         Math::Vector3D rgb;
                         if ((*pMaterial->pTexture).type() == Data::ColorFormat::GRAY) {
@@ -103,9 +103,9 @@ namespace UltRenderer {
 
                         color = (
                                 pMaterial->ambientCoefficient * pMaterial->ambientColor +
-                                pMaterial->diffuseCoefficient * diffuse * rgb +
+                                (pMaterial->diffuseCoefficient * diffuse * rgb).componentWiseProduct(varying.intensity) +
                                 pMaterial->specularCoefficient * specular * finalSpecularColor +
-                                glowColor * pMaterial->glowIntensity).toHomogeneousCoordinates(1);
+                                glowIntensity).toHomogeneousCoordinates(1);
 
                         if (inShadow) {
                             color = pMaterial->shadowIntensity * color;

@@ -18,7 +18,7 @@ namespace UltRenderer {
                     Math::Vector3D normal;
                     Math::Vector3D tangent;
                     Math::Vector3D light;
-                    double intensity;
+                    Math::Vector3D intensity;
                 };
 
                 template <std::derived_from<IMeshVarying> V>
@@ -29,7 +29,7 @@ namespace UltRenderer {
                     const Math::Transform3D* pView;
                     const Math::Transform3D* pProjection;
                     const Math::Vector3D* pLight;
-                    double intensity;
+                    Math::Vector3D intensity;
                     Math::Transform3D modelViewMatrix;
                     Math::Transform3D modelViewProjectionMatrix;
 

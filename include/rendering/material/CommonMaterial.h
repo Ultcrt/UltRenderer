@@ -21,6 +21,7 @@ namespace UltRenderer {
                 std::shared_ptr<Data::Image> pNormalMap;
                 Data::NormalMapType normalMapType;
 
+                // TODO: shiness should also support 3D
                 double shininess = 1;
                 Math::Vector3D diffuseColor = {0.5, 0.5, 0.5};
                 Math::Vector3D specularColor = {1, 1, 1};
@@ -35,7 +36,8 @@ namespace UltRenderer {
                 double refractiveIndex = 1;
 
                 double shadowIntensity = 0.3;
-                double glowIntensity = 1.0;
+
+                Math::Vector3D glowIntensity = {0, 0, 0};
 
                 [[nodiscard]] virtual Math::Vector3D evalBSDF(const Math::Vector3D& uv, const Math::Vector3D& normal, const Math::Vector3D& view, const Math::Vector3D& light) const;
 
@@ -44,6 +46,8 @@ namespace UltRenderer {
                 [[nodiscard]] Math::Vector3D getDiffuseColor(const Math::Vector3D& uv) const;
 
                 [[nodiscard]] std::pair<double, Math::Vector3D> getSpecularInfo(const Math::Vector3D& uv) const;
+
+                [[nodiscard]] Math::Vector3D getGlowIntensity(const Math::Vector3D& uv) const;
             };
         }
     } // Rendering

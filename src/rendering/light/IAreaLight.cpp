@@ -8,16 +8,16 @@
 namespace UltRenderer {
     namespace Rendering {
         namespace Light {
-            IAreaLight::IAreaLight(double i) {
+            IAreaLight::IAreaLight(const Math::Vector3D &i) {
                 pMaterial = std::make_shared<Material::GlowBSDFMaterial>();
                 intensity() = i;
             }
 
-            double &IAreaLight::intensity() {
-                return pMaterial->glowIntensity;
+            Utils::MatrixProxy<double, 3, 1> IAreaLight::intensity() {
+                return Utils::MatrixProxy<double, 3, 1>({&pMaterial->glowIntensity[0], &pMaterial->glowIntensity[1], &pMaterial->glowIntensity[2]});
             }
 
-            double IAreaLight::intensity() const {
+            Math::Vector3D IAreaLight::intensity() const {
                 return pMaterial->glowIntensity;
             }
         } // Light

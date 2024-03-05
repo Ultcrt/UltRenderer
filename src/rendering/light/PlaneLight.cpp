@@ -41,7 +41,7 @@ namespace UltRenderer {
                 return res;
             }
 
-            PlaneLight::PlaneLight(double w, double h, double intensity): IAreaLight(intensity), width(w), height(h) {}
+            PlaneLight::PlaneLight(double w, double h, const Math::Vector3D& intensity): IAreaLight(intensity), width(w), height(h) {}
 
             Math::Vector3D PlaneLight::sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal, const Scene& scene, double eps) const {
                 Math::Vector3D radiance = {0, 0, 0};
@@ -56,7 +56,7 @@ namespace UltRenderer {
                     const double cosTheta = -normal.dot(lightDir);
                     const double cosThetaPrime = worldNormal.dot(lightDir);
 
-                    double i = 0.;
+                    Math::Vector3D i = {0., 0., 0.};
                     // Visibility
                     const Data::Ray lightRay(worldSampledPoint, lightDir);
                     const auto info = lightRay.intersect(scene);
@@ -67,7 +67,7 @@ namespace UltRenderer {
                         }
                     }
 
-                    radiance += i * target.evalBSDF(uv, normal, v, lightDir) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
+                    radiance += i.componentWiseProduct(target.evalBSDF(uv, normal, v, lightDir)) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
                 }
 
                 return radiance;

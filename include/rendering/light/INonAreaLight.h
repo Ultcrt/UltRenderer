@@ -14,7 +14,7 @@ namespace UltRenderer {
             class INonAreaLight: public Hierarchy::Node {
             public:
                 // Irradiance
-                double intensity = 1;
+                Math::Vector3D intensity = {1, 1, 1};
 
                 explicit INonAreaLight(double i);
 

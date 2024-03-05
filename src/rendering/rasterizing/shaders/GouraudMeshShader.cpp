@@ -59,7 +59,7 @@ namespace UltRenderer {
                         rgb = (*pMaterial->pTexture).get<Data::ColorFormat::RGB>(varying.uv[0], varying.uv[1]);
                     }
 
-                    color = (varying.intensity * rgb).toHomogeneousCoordinates(1);
+                    color = (varying.intensity.componentWiseProduct(rgb)).toHomogeneousCoordinates(1);
 
                     return true;
                 }
