@@ -8,6 +8,7 @@
 #include "rendering/Scene.h"
 #include "rendering/raytracing/Camera.h"
 #include "rendering/material/LambertianBRDFMaterial.h"
+#include "rendering/material/PhongBRDFMaterial.h"
 #include "rendering/light/DirectionalLight.h"
 #include "rendering/light/PointLight.h"
 #include "rendering/light/PlaneLight.h"
@@ -171,9 +172,8 @@ inline unique_ptr<Rendering::Scene> CreateCornellBox(const std::shared_ptr<Rende
     pShort->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
     pShort->pMaterial->diffuseColor = white;
 
-    pTall->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pTall->pMaterial->diffuseColor = white;
-
+    pTall->pMaterial = std::make_shared<Rendering::Material::PhongBRDFMaterial>();
+    pTall->pMaterial->shininess = 1000000;
 
     pScene->addCamera(pCamera);
     pScene->addMesh(pFloor);
