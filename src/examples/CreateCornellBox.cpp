@@ -178,7 +178,10 @@ inline unique_ptr<Rendering::Scene> CreateCornellBox(const std::shared_ptr<Rende
     pScene->addMesh(pShort);
     pScene->addMesh(pTall);
 
-    auto pLight = make_shared<Rendering::Light::PlaneLight>(1.30, 1.05, 100);
+    Math::Vector3D intensity = Math::Vector3D{0., 1., 146. / 255.} * 8. +
+            Math::Vector3D{1., 190. / 255., 0.} * 15.6 +
+            Math::Vector3D{205. / 255., 0., 0.} * 18.4;
+    auto pLight = make_shared<Rendering::Light::PlaneLight>(1.30, 1.05, intensity);
     pLight->transformMatrix = {
             1., 0., 0., 2.780,
             0., -1., 0., 5.488,
