@@ -29,7 +29,7 @@ namespace UltRenderer {
 
                     Math::Vector3D bsdf = evalBSDF(uv, normal, view, -dir);
 
-                    res.emplace_back(bsdf * cos / (1. / 2. * M_PI) / static_cast<double>(n));
+                    res.emplace_back(bsdf * cos / (1. / (2. * M_PI)) / static_cast<double>(n));
                 }
 
                 return {sampledDirections, res};
