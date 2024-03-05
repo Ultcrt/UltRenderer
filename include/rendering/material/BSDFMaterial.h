@@ -12,6 +12,14 @@ namespace UltRenderer {
         namespace Material {
             class BSDFMaterial: public CommonMaterial {
             public:
+                /**
+                 * Uniform sampling
+                 * @param uv The UV of shading point
+                 * @param n The number of samples
+                 * @param normal The normal of shading point
+                 * @param view The view direction of shading point (point to eye)
+                 * @return
+                 */
                 [[nodiscard]] std::pair<std::vector<Math::Vector3D>, std::vector<Math::Vector3D>> sampleBSDF(const Math::Vector3D &uv, std::size_t n, const Math::Vector3D &normal, const Math::Vector3D &view) const override;
             };
         } // Material
