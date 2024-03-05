@@ -32,7 +32,7 @@ namespace UltRenderer {
 
                         const Data::Ray pixelRay(cameraOriginWorld, (offsetCenterWorld - cameraOriginWorld).normalized());
 
-                        auto res = Cast(pixelRay, pScene);
+                        auto res = Cast(pixelRay, pScene, 0);
 
                         sum += res;
                     }
@@ -42,13 +42,25 @@ namespace UltRenderer {
 
                 Data::Color<Data::ColorFormat::RGBA> BackwardsPathtracingShader::Cast(
                         const Data::Ray& ray,
-                        const Scene* pScene) const {
+                        const Scene* pScene,
+                        std::size_t depth) const {
                     // If not intersect with anything, then return background color
                     Data::Color<Data::ColorFormat::RGBA> color = backgroundColor;
 
                     const auto info = ray.intersect(*pScene);
 
                     if (info.isIntersected) {
+                        // Check if direct illumination
+                        if (depth > 0) {
+                            // If is not direct illumination, check shading point is on area lights or not
+                            for (const auto& pLight: pScene->areaLights()) {
+                                if (pLight.get() == info.pNode) {
+                                    // If on area lights, return 0 radiance, since current ray is already considered in direct illumination
+                                    return {0, 0, 0, 1};
+                                }
+                            }
+                        }
+
                         // TODO: Codes can be reused here
                         const auto& node = *info.pNode;
                         const auto& mat = *node.pMaterial;
@@ -81,7 +93,6 @@ namespace UltRenderer {
                         }
                         // Deal with area light
                         for (const auto& pLight: pScene->areaLights()) {
-                            // TODO: Double count area light, no visibility checking
                             directIr += pLight->sample(numBouncedRays, intersectedPointCloser, mat, -ray.direction, uv, normal, *pScene).toHomogeneousCoordinates(1);
                         }
 
@@ -100,7 +111,7 @@ namespace UltRenderer {
                                 const auto sampledRay = Data::Ray(ori, dir);
 
                                 // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
-                                indirectIr += Cast(sampledRay, pScene).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) / (1 - dropout);
+                                indirectIr += Cast(sampledRay, pScene, depth + 1).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) / (1 - dropout);
                             }
                         }
 

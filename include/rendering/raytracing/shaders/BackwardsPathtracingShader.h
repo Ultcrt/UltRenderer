@@ -31,7 +31,8 @@ namespace UltRenderer {
 
                     Data::Color<Data::ColorFormat::RGBA> Cast(
                             const Data::Ray& ray,
-                            const Scene* pScene) const;
+                            const Scene* pScene,
+                            std::size_t depth) const;
                 };
             } // Shaders
         } // Raytracing
