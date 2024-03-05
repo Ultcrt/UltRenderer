@@ -37,7 +37,9 @@ namespace UltRenderer {
                         sum += res;
                     }
 
-                    return sum / static_cast<double>(samplesPerPixel);
+                    sum /= static_cast<double>(samplesPerPixel);
+
+                    return {std::pow(sum.x(), gamma), std::pow(sum.y(), gamma), std::pow(sum.z(), gamma), std::pow(sum.w(), gamma)};
                 }
 
                 Data::Color<Data::ColorFormat::RGBA> BackwardsPathtracingShader::Cast(

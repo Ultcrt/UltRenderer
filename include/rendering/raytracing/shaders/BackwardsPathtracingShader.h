@@ -14,11 +14,13 @@ namespace UltRenderer {
             namespace Shaders {
                 class BackwardsPathtracingShader: public IRayShader {
                 public:
+                    double gamma = 1 / 2.2;
+
                     Math::Vector4D backgroundColor = {0, 0, 0, 1};
                     double eps = 1e-6;
                     double dropout = 0.1;
                     std::size_t numBouncedRays = 1;
-                    std::size_t samplesPerPixel = 32;
+                    std::size_t samplesPerPixel = 256;
 
                     Data::Color<Data::ColorFormat::RGBA> operator()(
                             const Math::Vector3D& pixelCenterCamera,
