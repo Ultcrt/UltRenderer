@@ -17,14 +17,14 @@ namespace UltRenderer {
 
                 const auto transInv = transformMatrix.inverse();
                 const auto localRayDir = (transInv * ray.direction.toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
-                const auto localRayOri = (transInv * ray.direction.toHomogeneousCoordinates(1)).toCartesianCoordinates();
+                const auto localRayOri = (transInv * ray.origin.toHomogeneousCoordinates(1)).toCartesianCoordinates();
 
                 const double h = (localRayOri - origin).dot(normal);
                 const double cos = -localRayDir.dot(normal);
+                const double l = h / cos;
 
                 Data::IntersectionInfo res;
-                if (h * cos >= 0) {
-                    const double l = std::abs(h) / std::sqrt(1 - cos * cos);
+                if (l >= 0) {
                     const Math::Vector3D intersectedPoint = localRayOri + localRayDir * l;
 
                     if (intersectedPoint.x() <= width / 2. && intersectedPoint.x() >= -width / 2.) {
@@ -56,7 +56,7 @@ namespace UltRenderer {
                     const double cosTheta = -normal.dot(lightDir);
                     const double cosThetaPrime = worldNormal.dot(lightDir);
 
-                    radiance += intensity * target.evalBSDF(uv, normal, v, lightDir) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
+                    radiance += intensity() * target.evalBSDF(uv, normal, v, lightDir) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
                 }
 
                 return radiance;

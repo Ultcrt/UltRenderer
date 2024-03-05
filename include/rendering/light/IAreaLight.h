@@ -13,12 +13,16 @@ namespace UltRenderer {
         namespace Light {
             class IAreaLight: public Hierarchy::IntersectableNode {
             public:
-                // Radiance
-                double intensity = 1;
+                /**
+                 * Create IAreaLight
+                 * @param i Radiance
+                 */
+                explicit IAreaLight(double i = 1);
 
-                explicit IAreaLight(double i);
+                double& intensity();
+                [[nodiscard]] double intensity() const;
 
-                virtual Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal) const = 0;
+                [[nodiscard]] virtual Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal) const = 0;
             };
         } // Light
     } // Rendering
