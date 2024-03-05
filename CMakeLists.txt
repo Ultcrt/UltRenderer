@@ -121,6 +121,8 @@ add_executable(UltRenderer src/Main.cpp
         include/rendering/light/IAreaLight.h
         src/rendering/light/PlaneLight.cpp
         include/rendering/light/PlaneLight.h
+        src/rendering/material/GlowBSDFMaterial.cpp
+        include/rendering/material/GlowBSDFMaterial.h
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
