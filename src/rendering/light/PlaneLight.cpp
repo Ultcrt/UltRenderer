@@ -67,7 +67,7 @@ namespace UltRenderer {
                         }
                     }
 
-                    radiance += i.componentWiseProduct(target.evalBSDF(uv, normal, v, lightDir)) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
+                    radiance += i.componentWiseProduct(target.evalBSDF(uv, normal, v, lightDir)) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1. / (width * height)) / static_cast<double>(n);
                 }
 
                 return radiance;
