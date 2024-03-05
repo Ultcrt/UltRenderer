@@ -18,7 +18,7 @@ namespace UltRenderer {
                 PlaneLight(double w, double h, double intensity = 1);
 
                 [[nodiscard]] Data::IntersectionInfo intersect(const Data::Ray &ray, double eps) override;
-                [[nodiscard]] Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal) const override;
+                [[nodiscard]] Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal, const Scene& scene, double eps) const override;
             };
         } // Light
     } // Rendering

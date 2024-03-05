@@ -82,7 +82,7 @@ namespace UltRenderer {
                         // Deal with area light
                         for (const auto& pLight: pScene->areaLights()) {
                             // TODO: Double count area light, no visibility checking
-                            directIr += pLight->sample(numBouncedRays, intersectedPointCloser, mat, -ray.direction, uv, normal).toHomogeneousCoordinates(1);
+                            directIr += pLight->sample(numBouncedRays, intersectedPointCloser, mat, -ray.direction, uv, normal, *pScene).toHomogeneousCoordinates(1);
                         }
 
                         // Indirect illumination using russian roulette

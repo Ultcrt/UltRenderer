@@ -43,20 +43,31 @@ namespace UltRenderer {
 
             PlaneLight::PlaneLight(double w, double h, double intensity): IAreaLight(intensity), width(w), height(h) {}
 
-            Math::Vector3D PlaneLight::sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal) const {
+            Math::Vector3D PlaneLight::sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal, const Scene& scene, double eps) const {
                 Math::Vector3D radiance = {0, 0, 0};
 
                 for (std::size_t idx = 0; idx < n; idx++) {
                     const double w = Utils::Random::Range(-1, 1) * width / 2;
                     const double h = Utils::Random::Range(-1, 1) * height / 2;
-                    const Math::Vector3D sampledPoint = {w, 0, h};
+                    const Math::Vector3D sampledPoint = {w, eps, h};
                     const Math::Vector3D worldSampledPoint = (transformMatrix * sampledPoint.toHomogeneousCoordinates(1)).toCartesianCoordinates();
                     const Math::Vector3D worldNormal = (transformMatrix * Math::Vector3D::Y().toHomogeneousCoordinates(0)).toCartesianCoordinates().normalized();
                     const Math::Vector3D lightDir = (p - worldSampledPoint).normalized();
                     const double cosTheta = -normal.dot(lightDir);
                     const double cosThetaPrime = worldNormal.dot(lightDir);
 
-                    radiance += intensity() * target.evalBSDF(uv, normal, v, lightDir) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
+                    double i = 0.;
+                    // Visibility
+                    const Data::Ray lightRay(worldSampledPoint, lightDir);
+                    const auto info = lightRay.intersect(scene);
+                    if (info.isIntersected) {
+                        const auto intersectedPoint = worldSampledPoint + lightDir * info.length;
+                        if ((p - intersectedPoint).norm() < eps) {
+                            i = intensity();
+                        }
+                    }
+
+                    radiance += i * target.evalBSDF(uv, normal, v, lightDir) * std::max(cosTheta, 0.) * cosThetaPrime / (p - worldSampledPoint).norm2() / (1 / (width * height)) / static_cast<double>(n);
                 }
 
                 return radiance;

@@ -22,7 +22,7 @@ namespace UltRenderer {
                 double& intensity();
                 [[nodiscard]] double intensity() const;
 
-                [[nodiscard]] virtual Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal) const = 0;
+                [[nodiscard]] virtual Math::Vector3D sample(std::size_t n, const Math::Vector3D &p, const Material::CommonMaterial& target, const Math::Vector3D& v, const Math::Vector3D& uv, const Math::Vector3D& normal, const Scene& scene, double eps = 1e-5) const = 0;
             };
         } // Light
     } // Rendering
