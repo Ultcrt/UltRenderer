@@ -94,5 +94,25 @@ namespace UltRenderer {
 
             return res;
         }
+
+        std::vector<Math::Vector3D>
+        Random::SampleWithCosWeightedBRDF(std::size_t n, std::size_t *pSeed) {
+            // From https://zhuanlan.zhihu.com/p/503163354
+            std::vector<Math::Vector3D> res;
+            for (std::size_t idx = 0; idx < n; idx++) {
+                const double u = Range(0, 1, pSeed);
+                const double v = Range(0, 1, pSeed);
+                const double theta = 2 * M_PI * u;
+                const double phi = std::acos(std::sqrt(1. - v));
+
+                const double x = std::cos(theta) * std::sin(phi);
+                const double y = std::sin(theta) * std::sin(phi);
+                const double z = std::cos(phi);
+
+                res.emplace_back(x, y, z);
+            }
+
+            return res;
+        }
     } // Utils
 } // UltRenderer
