@@ -110,8 +110,10 @@ namespace UltRenderer {
 
                                 const auto sampledRay = Data::Ray(ori, dir);
 
+                                const auto incidentRadiance = Cast(sampledRay, pScene, depth + 1);
+
                                 // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
-                                indirectIr += Cast(sampledRay, pScene, depth + 1).componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) / (1 - dropout);
+                                indirectIr += incidentRadiance.componentWiseProduct(bsdf.toHomogeneousCoordinates(1)) / (1 - dropout);
                             }
                         }
 
