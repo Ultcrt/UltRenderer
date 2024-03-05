@@ -138,6 +138,12 @@ inline unique_ptr<Rendering::Scene> CreateCornellBox(const std::shared_ptr<Rende
             {18, 19, 16},
     };
 
+    // RGB color from: https://github.com/mattdesl/glsl-cornell-box/blob/master/index.glsl
+    Math::Vector3D intensity = {16.86, 10.76, 3.7};
+    Math::Vector3D white = {.7295, .7355, .729};
+    Math::Vector3D red = {.611, .0555, .062};
+    Math::Vector3D green = {.117, .4125, .115};
+
     auto pFloor = make_shared<Data::TriangleMesh>(floorVertices, planeTriangles);
     auto pCeil = make_shared<Data::TriangleMesh>(ceilVertices, planeTriangles);
     auto pBack = make_shared<Data::TriangleMesh>(backVertices, planeTriangles);
@@ -148,25 +154,25 @@ inline unique_ptr<Rendering::Scene> CreateCornellBox(const std::shared_ptr<Rende
     auto pTall = make_shared<Data::TriangleMesh>(tallVertices, blockTriangles);
 
     pFloor->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pFloor->pMaterial->diffuseColor = {1, 1, 1};
+    pFloor->pMaterial->diffuseColor = white;
 
     pCeil->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pCeil->pMaterial->diffuseColor = {1, 1, 1};
+    pCeil->pMaterial->diffuseColor = white;
 
     pBack->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pBack->pMaterial->diffuseColor = {1, 1, 1};
+    pBack->pMaterial->diffuseColor = white;
 
     pRight->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pRight->pMaterial->diffuseColor = {0, 1, 0};
+    pRight->pMaterial->diffuseColor = green;
 
     pLeft->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pLeft->pMaterial->diffuseColor = {1, 0, 0};
+    pLeft->pMaterial->diffuseColor = red;
 
     pShort->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pShort->pMaterial->diffuseColor = {1, 1, 1};
+    pShort->pMaterial->diffuseColor = white;
 
     pTall->pMaterial = std::make_shared<Rendering::Material::LambertianBRDFMaterial>();
-    pTall->pMaterial->diffuseColor = {1, 1, 1};
+    pTall->pMaterial->diffuseColor = white;
 
 
     pScene->addCamera(pCamera);
@@ -178,9 +184,6 @@ inline unique_ptr<Rendering::Scene> CreateCornellBox(const std::shared_ptr<Rende
     pScene->addMesh(pShort);
     pScene->addMesh(pTall);
 
-    Math::Vector3D intensity = Math::Vector3D{0., 1., 146. / 255.} * 8. +
-            Math::Vector3D{1., 190. / 255., 0.} * 15.6 +
-            Math::Vector3D{205. / 255., 0., 0.} * 18.4;
     auto pLight = make_shared<Rendering::Light::PlaneLight>(1.30, 1.05, intensity);
     pLight->transformMatrix = {
             1., 0., 0., 2.780,
