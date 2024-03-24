@@ -9,7 +9,7 @@ namespace UltRenderer {
         namespace Material {
             Math::Vector3D GlowBSDFMaterial::evalBSDF(const Math::Vector3D &uv, const Math::Vector3D &normal,
                                                       const Math::Vector3D &view, const Math::Vector3D &light) const {
-                return glowIntensity.componentWiseProduct(Math::Vector3D(1, 1, 1));
+                return glowIntensity;
             }
         } // Material
     } // Rendering
