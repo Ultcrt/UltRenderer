@@ -38,7 +38,6 @@ namespace UltRenderer {
                 // Monte Carlo integration
                 std::vector<Math::Vector3D> res;
                 for (const auto& dir: sampledDirections) {
-                    const double cosTheta = idealReflect.dot(dir);
                     const double cos = std::abs(normal.dot(dir));
 
                     // TODO: Check sampled ray is not intersected with emitting object (because all emitting object should already be considered in direct illumination)
